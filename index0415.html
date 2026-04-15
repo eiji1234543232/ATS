@@ -1,0 +1,1214 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>ATS Portal</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:#f5f5f3;color:#1a1a18;min-height:100vh;}
+/* ===== TOKENS ===== */
+:root{
+  --bg:#fff;--bg2:#f5f5f3;--bg3:#eeecea;
+  --text:#1a1a18;--text2:#6b6b68;--text3:#a0a09c;
+  --border:rgba(0,0,0,0.12);--border2:rgba(0,0,0,0.22);
+  --purple:#534AB7;--purple-dark:#3C3489;--purple-light:#EEEDFE;
+  --green-light:#E1F5EE;--green:#085041;
+  --red-light:#FCEBEB;--red:#791F1F;
+  --amber-light:#FAEEDA;--amber:#633806;
+  --blue-light:#E6F1FB;--blue:#0C447C;
+  --gray-light:#F1EFE8;--gray:#444441;
+  --r-md:8px;--r-lg:12px;
+}
+@media(prefers-color-scheme:dark){
+  :root{--bg:#1c1c1a;--bg2:#252523;--bg3:#2e2e2b;--text:#f0ede8;--text2:#a8a8a4;--text3:#6b6b68;--border:rgba(255,255,255,0.1);--border2:rgba(255,255,255,0.2);}
+}
+/* ===== PAGES ===== */
+.page{display:none;}
+.page.active{display:block;}
+/* ===== LOGIN ===== */
+#page-login{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:1rem;background:var(--bg2);}
+.login-card{background:var(--bg);border:0.5px solid var(--border);border-radius:var(--r-lg);padding:2rem 2.5rem;width:100%;max-width:380px;}
+.logo{display:flex;align-items:center;gap:10px;margin-bottom:2rem;}
+.logo-mark{width:36px;height:36px;background:var(--purple);border-radius:var(--r-md);display:flex;align-items:center;justify-content:center;}
+.logo-text{font-size:18px;font-weight:500;color:var(--text);}
+.logo-sub{font-size:12px;color:var(--text2);}
+.login-card h2{font-size:20px;font-weight:500;color:var(--text);margin-bottom:4px;}
+.login-sub{font-size:13px;color:var(--text2);margin-bottom:1.75rem;}
+.field{margin-bottom:1rem;}
+.field label{display:block;font-size:13px;color:var(--text2);margin-bottom:6px;}
+.field input{width:100%;height:40px;padding:0 12px;border:0.5px solid var(--border2);border-radius:var(--r-md);background:var(--bg);color:var(--text);font-size:14px;outline:none;}
+.field input:focus{border-color:var(--purple);box-shadow:0 0 0 3px rgba(83,74,183,0.12);}
+.forgot{text-align:right;font-size:12px;margin-top:4px;color:var(--purple);cursor:pointer;}
+.login-btn{width:100%;height:40px;background:var(--purple);color:#fff;border:none;border-radius:var(--r-md);font-size:14px;font-weight:500;cursor:pointer;margin-top:8px;}
+.login-btn:hover{background:var(--purple-dark);}
+.login-err{display:none;font-size:12px;color:#A32D2D;background:var(--red-light);border:0.5px solid #F09595;border-radius:var(--r-md);padding:8px 12px;margin-bottom:1rem;}
+/* ===== SHELL ===== */
+#page-app{min-height:100vh;display:flex;flex-direction:column;}
+.navbar{height:52px;background:var(--bg);border-bottom:0.5px solid var(--border);display:flex;align-items:center;padding:0 1.25rem;gap:12px;position:sticky;top:0;z-index:50;}
+.nav-logo{display:flex;align-items:center;gap:8px;}
+.nav-logo-mark{width:28px;height:28px;background:var(--purple);border-radius:6px;display:flex;align-items:center;justify-content:center;}
+.nav-title{font-size:15px;font-weight:500;color:var(--text);}
+.nav-spacer{flex:1;}
+.nav-user{font-size:13px;color:var(--text2);}
+.nav-logout{height:30px;padding:0 12px;font-size:12px;border:0.5px solid var(--border2);border-radius:var(--r-md);background:transparent;color:var(--text2);cursor:pointer;}
+.nav-logout:hover{background:var(--bg2);}
+.app-body{flex:1;padding:1.25rem;max-width:1200px;margin:0 auto;width:100%;}
+/* ===== COMMON COMPONENTS ===== */
+.btn{height:34px;padding:0 14px;font-size:13px;border:0.5px solid var(--border2);border-radius:var(--r-md);background:var(--bg);color:var(--text);cursor:pointer;white-space:nowrap;display:inline-flex;align-items:center;gap:6px;}
+.btn:hover{background:var(--bg2);}
+.btn.pri{background:var(--purple);color:#fff;border-color:var(--purple);}
+.btn.pri:hover{background:var(--purple-dark);}
+.btn.sm{height:28px;font-size:12px;padding:0 10px;}
+.btn.danger{color:#A32D2D;border-color:#F09595;}
+.btn.danger:hover{background:var(--red-light);}
+.card{background:var(--bg);border:0.5px solid var(--border);border-radius:var(--r-lg);padding:13px 15px;}
+.badge{display:inline-block;font-size:11px;padding:2px 7px;border-radius:99px;white-space:nowrap;}
+.stepb{display:inline-block;font-size:11px;padding:2px 7px;border-radius:4px;white-space:nowrap;}
+.step-doc{background:var(--blue-light);color:var(--blue);}
+.step-written{background:var(--purple-light);color:var(--purple-dark);}
+.step-1st{background:var(--amber-light);color:var(--amber);}
+.step-2nd{background:#FAC775;color:var(--amber);}
+.step-final{background:#FAECE7;color:#712B13;}
+.step-offer{background:var(--green-light);color:var(--green);}
+.st-pass{background:var(--green-light);color:var(--green);}
+.st-fail{background:var(--red-light);color:var(--red);}
+.st-hold{background:var(--gray-light);color:var(--gray);}
+.st-new{background:var(--blue-light);color:var(--blue);}
+.st-wd{background:#FBEAF0;color:#72243E;}
+.tag{display:inline-block;font-size:11px;padding:2px 6px;border-radius:99px;margin:1px;}
+.t-eng{background:var(--purple-light);color:var(--purple-dark);}
+.t-hr{background:var(--green-light);color:var(--green);}
+.t-hot{background:#FAECE7;color:#712B13;}
+.t-keep{background:var(--amber-light);color:var(--amber);}
+.gm{color:#185FA5;font-weight:500;}
+.gf{color:#993556;font-weight:500;}
+.toast{display:none;position:fixed;bottom:1.5rem;left:50%;transform:translateX(-50%);background:#2C2C2A;color:#F1EFE8;font-size:12px;padding:9px 18px;border-radius:var(--r-md);white-space:nowrap;z-index:9999;box-shadow:0 4px 12px rgba(0,0,0,0.2);}
+.toast.show{display:block;}
+/* ===== LIST PAGE ===== */
+.list-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:1rem;flex-wrap:wrap;gap:8px;}
+.page-title{font-size:18px;font-weight:500;color:var(--text);}
+.metrics{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;margin-bottom:1rem;}
+@media(max-width:480px){.metrics{grid-template-columns:repeat(2,minmax(0,1fr));}}
+.metric{background:var(--bg2);border-radius:var(--r-md);padding:11px 13px;}
+.metric-label{font-size:12px;color:var(--text2);margin-bottom:3px;}
+.metric-val{font-size:20px;font-weight:500;color:var(--text);}
+.metric-sub{font-size:11px;color:var(--text3);}
+.search-bar{display:flex;align-items:center;gap:8px;margin-bottom:8px;flex-wrap:wrap;}
+.search-bar input{flex:1;min-width:160px;height:36px;padding:0 12px;font-size:13px;border:0.5px solid var(--border2);border-radius:var(--r-md);background:var(--bg);color:var(--text);outline:none;}
+.search-bar input:focus{border-color:var(--purple);}
+.adv-panel{display:none;background:var(--bg2);border:0.5px solid var(--border);border-radius:var(--r-md);padding:14px;margin-bottom:10px;}
+.adv-panel.open{display:block;}
+.adv-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin-bottom:10px;}
+@media(max-width:520px){.adv-grid{grid-template-columns:1fr 1fr;}}
+@media(max-width:360px){.adv-grid{grid-template-columns:1fr;}}
+.adv-field{display:flex;flex-direction:column;gap:4px;}
+.adv-field label{font-size:11px;color:var(--text3);}
+.adv-field select,.adv-field input[type=date]{height:32px;padding:0 8px;font-size:13px;border:0.5px solid var(--border2);border-radius:var(--r-md);background:var(--bg);color:var(--text);outline:none;width:100%;}
+.adv-field select:focus,.adv-field input:focus{border-color:var(--purple);}
+.date-range{display:flex;align-items:center;gap:6px;}
+.date-range input{flex:1;}
+.date-range span{font-size:12px;color:var(--text3);}
+.tag-pills{display:flex;flex-wrap:wrap;gap:6px;}
+.tag-pill{font-size:12px;padding:4px 12px;border-radius:99px;border:0.5px solid var(--border2);background:var(--bg);color:var(--text2);cursor:pointer;}
+.tag-pill.active{background:var(--purple);color:#fff;border-color:var(--purple);}
+.adv-section-title{font-size:11px;font-weight:500;color:var(--text2);margin-bottom:8px;margin-top:10px;}
+.adv-actions{display:flex;gap:8px;justify-content:flex-end;border-top:0.5px solid var(--border);padding-top:10px;margin-top:10px;}
+.bulk-bar{display:none;align-items:center;gap:6px;background:var(--bg2);border:0.5px solid var(--border2);border-radius:var(--r-md);padding:8px 12px;margin-bottom:10px;flex-wrap:wrap;}
+.bulk-bar.active{display:flex;}
+.bsep{width:0.5px;height:20px;background:var(--border2);flex-shrink:0;}
+.result-info{font-size:12px;color:var(--text3);margin-bottom:6px;}
+.table-wrap{background:var(--bg);border:0.5px solid var(--border);border-radius:var(--r-lg);overflow-x:auto;}
+table{width:100%;border-collapse:collapse;font-size:12px;min-width:560px;}
+thead th{background:var(--bg2);padding:8px 10px;text-align:left;font-size:11px;font-weight:500;color:var(--text2);border-bottom:0.5px solid var(--border);white-space:nowrap;user-select:none;}
+th.sortable{cursor:pointer;}
+th.sortable:hover{color:var(--text);}
+th.sort-on{color:var(--purple);}
+.si{display:inline-flex;flex-direction:column;gap:1px;vertical-align:middle;margin-left:3px;opacity:0.35;}
+.si svg{width:7px;height:5px;}
+.si.asc svg:first-child,.si.desc svg:last-child{opacity:1;}
+tbody tr{border-bottom:0.5px solid var(--border);cursor:pointer;transition:background 0.1s;}
+tbody tr:last-child{border-bottom:none;}
+tbody tr:hover{background:var(--bg2);}
+tbody tr.sel{background:var(--purple-light);}
+td{padding:8px 10px;color:var(--text);vertical-align:middle;}
+td.ell{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:0;}
+input[type=checkbox]{width:14px;height:14px;cursor:pointer;accent-color:var(--purple);}
+.eval-date{display:flex;flex-direction:column;gap:1px;}
+.date-row{font-size:11px;color:var(--text3);}
+.star{color:#EF9F27;font-size:11px;}
+.star.off{color:var(--border2);}
+.empty{text-align:center;padding:2rem;color:var(--text3);font-size:13px;}
+/* MODAL */
+.overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.4);z-index:200;align-items:flex-start;justify-content:center;padding:40px 16px;}
+.overlay.open{display:flex;}
+.mbox{background:var(--bg);border:0.5px solid var(--border);border-radius:var(--r-lg);padding:1.25rem;width:100%;max-width:440px;max-height:calc(100vh - 80px);overflow-y:auto;}
+.mbox h3{font-size:15px;font-weight:500;color:var(--text);margin-bottom:1rem;}
+.modal-tabs{display:grid;gap:4px;margin-bottom:1rem;}
+.mtab{height:30px;font-size:12px;border:0.5px solid var(--border2);border-radius:var(--r-md);background:var(--bg);color:var(--text2);cursor:pointer;padding:0 4px;}
+.mtab.active{background:var(--purple);color:#fff;border-color:var(--purple);}
+.msearch{width:100%;height:32px;padding:0 10px;font-size:13px;border:0.5px solid var(--border2);border-radius:var(--r-md);background:var(--bg2);color:var(--text);outline:none;margin-bottom:8px;}
+.msearch:focus{border-color:var(--purple);}
+.opt-list{display:flex;flex-direction:column;gap:3px;max-height:180px;overflow-y:auto;}
+.opt{display:flex;align-items:center;gap:8px;padding:6px 10px;border:0.5px solid var(--border);border-radius:var(--r-md);cursor:pointer;font-size:13px;}
+.opt:hover{background:var(--bg2);}
+.opt.sel{background:var(--purple-light);border-color:#AFA9EC;}
+.opt input[type=radio]{width:13px;height:13px;accent-color:var(--purple);flex-shrink:0;}
+.tag-grid{display:flex;flex-wrap:wrap;gap:8px;padding:4px 0;}
+.tag-opt{padding:6px 12px;border:0.5px solid var(--border2);border-radius:99px;cursor:pointer;font-size:13px;color:var(--text2);}
+.tag-opt.add{background:var(--purple);color:#fff;border-color:var(--purple);}
+.tag-opt.remove{background:var(--red-light);color:#A32D2D;border-color:#F09595;}
+.macts{display:flex;gap:8px;margin-top:1rem;justify-content:flex-end;}
+.tpl-item,.fmt-item{padding:8px 10px;border:0.5px solid var(--border);border-radius:var(--r-md);cursor:pointer;margin-bottom:4px;}
+.tpl-item:hover,.fmt-item:hover{background:var(--bg2);}
+.tpl-item.sel,.fmt-item.sel{background:var(--purple-light);border-color:#AFA9EC;}
+.tpl-name,.fmt-name{font-size:13px;font-weight:500;color:var(--text);}
+.tpl-desc,.fmt-cols{font-size:11px;color:var(--text2);margin-top:2px;}
+/* ===== DETAIL ===== */
+#pane-detail{display:none;}
+#pane-detail.active{display:block;}
+.detail-topbar{display:flex;align-items:center;justify-content:space-between;margin-bottom:1rem;gap:8px;flex-wrap:wrap;}
+.detail-layout{display:grid;grid-template-columns:220px 1fr;gap:12px;align-items:start;}
+@media(max-width:640px){.detail-layout{grid-template-columns:1fr;}}
+.d-side{display:flex;flex-direction:column;gap:10px;}
+.ph-head{display:flex;flex-direction:column;align-items:center;text-align:center;padding-bottom:10px;border-bottom:0.5px solid var(--border);margin-bottom:10px;}
+.av{width:52px;height:52px;border-radius:50%;overflow:hidden;background:var(--bg2);border:0.5px solid var(--border);display:flex;align-items:center;justify-content:center;margin-bottom:5px;cursor:pointer;}
+.av img{width:100%;height:100%;object-fit:cover;}
+.av svg{flex-shrink:0;}
+.ph-hint{font-size:10px;color:var(--purple);cursor:pointer;margin-bottom:2px;}
+.pname{font-size:15px;font-weight:500;color:var(--text);}
+.pid{font-size:10px;color:var(--text3);font-family:monospace;}
+.irow{display:flex;align-items:flex-start;padding:3px 0;border-bottom:0.5px solid var(--border);}
+.irow:last-child{border-bottom:none;}
+.ikey{font-size:11px;color:var(--text2);width:64px;flex-shrink:0;padding-top:2px;}
+.ival{font-size:12px;color:var(--text);flex:1;word-break:break-all;}
+.iinput{font-size:12px;width:100%;border:0.5px solid var(--border2);border-radius:4px;padding:2px 6px;background:var(--bg);color:var(--text);outline:none;}
+.iinput:focus{border-color:var(--purple);}
+.detail-toggle-link{font-size:11px;color:var(--purple);cursor:pointer;margin-top:6px;display:block;}
+.step-flow{display:flex;flex-direction:column;gap:4px;}
+.snode{display:flex;align-items:center;gap:6px;padding:5px 8px;border-radius:var(--r-md);border:0.5px solid var(--border);font-size:11px;}
+.snode.cur{border-color:var(--purple);background:var(--purple-light);}
+.snode.done{background:var(--bg2);color:var(--text3);}
+.snode.fut{color:var(--text3);}
+.sdot{width:6px;height:6px;border-radius:50%;flex-shrink:0;}
+.sd-done{background:#1D9E75;}.sd-cur{background:var(--purple);}.sd-fut{background:var(--border2);}
+.sname{flex:1;font-weight:500;}
+.memo-wrap{border-top:0.5px solid var(--border);padding-top:8px;margin-top:8px;}
+.mlabel{font-size:11px;color:var(--text2);margin-bottom:4px;}
+.mta{width:100%;min-height:52px;padding:6px 8px;font-size:12px;border:0.5px solid var(--border2);border-radius:var(--r-md);background:var(--bg);color:var(--text);outline:none;resize:vertical;line-height:1.5;}
+.mta:focus{border-color:var(--purple);}
+.tabs{display:flex;border-bottom:0.5px solid var(--border);margin-bottom:1rem;overflow-x:auto;}
+.tab{height:36px;padding:0 12px;font-size:13px;border:none;background:transparent;color:var(--text2);cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-0.5px;white-space:nowrap;}
+.tab.active{color:var(--purple);border-bottom-color:var(--purple);font-weight:500;}
+.dpane{display:none;}.dpane.active{display:block;}
+/* history */
+.tl{display:flex;flex-direction:column;}
+.tli{display:flex;gap:10px;padding-bottom:14px;}
+.tli:last-child{padding-bottom:0;}
+.tll{display:flex;flex-direction:column;align-items:center;width:16px;flex-shrink:0;}
+.tdot{width:9px;height:9px;border-radius:50%;flex-shrink:0;margin-top:3px;}
+.tline{width:1px;flex:1;background:var(--border);margin-top:3px;}
+.tg{background:#1D9E75;}.tp{background:var(--purple);}.ta{background:#EF9F27;}.tr{background:#E24B4A;}.tgr{background:#888780;}
+.tdate{font-size:11px;color:var(--text3);}
+.ttitle{font-size:13px;font-weight:500;color:var(--text);}
+.tbody2{font-size:12px;color:var(--text2);margin-top:2px;line-height:1.6;}
+/* eval */
+.acc{border:0.5px solid var(--border);border-radius:var(--r-lg);margin-bottom:8px;overflow:hidden;}
+.acc-head{display:flex;align-items:center;gap:8px;padding:10px 13px;cursor:pointer;background:var(--bg2);user-select:none;}
+.acc-head:hover{background:var(--bg3);}
+.acc-chev{font-size:9px;color:var(--text3);transition:transform 0.15s;}
+.acc-body{padding:12px 13px;border-top:0.5px solid var(--border);}
+.sbar{margin-bottom:4px;}
+.sbar-head{display:flex;justify-content:space-between;font-size:11px;color:var(--text2);margin-bottom:2px;}
+.sbar-track{height:4px;background:var(--border);border-radius:99px;overflow:hidden;}
+.sbar-fill{height:100%;background:var(--purple);border-radius:99px;}
+.assign-row{display:flex;align-items:center;gap:7px;margin-bottom:10px;flex-wrap:wrap;}
+.asel{height:30px;padding:0 8px;font-size:12px;border:0.5px solid var(--border2);border-radius:var(--r-md);background:var(--bg);color:var(--text);outline:none;flex:1;min-width:0;}
+.ecard{background:var(--bg);border:0.5px solid var(--border);border-radius:var(--r-md);padding:10px 12px;margin-bottom:7px;}
+.ehead{display:flex;align-items:center;gap:7px;margin-bottom:7px;flex-wrap:wrap;}
+.iav{width:28px;height:28px;border-radius:50%;background:var(--purple-light);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:500;color:var(--purple-dark);flex-shrink:0;}
+.iname{font-size:12px;font-weight:500;color:var(--text);}
+.irole{font-size:11px;color:var(--text2);}
+.idate{font-size:11px;color:var(--text3);margin-left:auto;}
+.edbadge{font-size:10px;padding:1px 5px;border-radius:3px;margin-left:4px;}
+.edbadge.e{background:var(--amber-light);color:var(--amber);}
+.star-row{display:flex;gap:2px;align-items:center;margin-bottom:7px;}
+.si-star{font-size:20px;cursor:pointer;color:var(--border2);line-height:1;user-select:none;}
+.si-star.on{color:#EF9F27;}
+.cgrid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:5px;margin-bottom:7px;}
+@media(max-width:400px){.cgrid{grid-template-columns:repeat(2,minmax(0,1fr));}}
+.citem{background:var(--bg2);border-radius:var(--r-md);padding:6px 8px;}
+.clabel{font-size:10px;color:var(--text2);margin-bottom:3px;}
+.cstars{display:flex;gap:1px;}
+.csi{font-size:14px;cursor:pointer;color:var(--border2);user-select:none;}
+.csi.on{color:#EF9F27;}
+.cmt-ta{width:100%;min-height:56px;padding:7px 9px;font-size:12px;border:0.5px solid var(--border2);border-radius:var(--r-md);background:var(--bg);color:var(--text);outline:none;resize:vertical;line-height:1.5;}
+.cmt-ta:focus{border-color:var(--purple);}
+.row-btns{display:flex;gap:5px;margin-top:5px;justify-content:flex-end;}
+.admin-sect{margin-top:10px;border-top:0.5px solid var(--border);padding-top:10px;}
+.sect-label{font-size:11px;font-weight:500;color:var(--text2);margin-bottom:5px;}
+/* mail */
+.mitem{border:0.5px solid var(--border);border-radius:var(--r-md);margin-bottom:7px;overflow:hidden;}
+.mhead{display:flex;align-items:center;gap:8px;padding:9px 12px;cursor:pointer;}
+.mhead:hover{background:var(--bg2);}
+.mdir{width:22px;height:22px;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.mo{background:var(--purple-light);}.min{background:var(--green-light);}
+.msubj{font-size:13px;font-weight:500;color:var(--text);flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.mdt{font-size:11px;color:var(--text3);white-space:nowrap;}
+.mchev{font-size:9px;color:var(--text3);transition:transform 0.15s;margin-left:4px;}
+.mbody{display:none;padding:10px 12px;border-top:0.5px solid var(--border);background:var(--bg2);}
+.mmeta{font-size:11px;color:var(--text2);margin-bottom:7px;line-height:1.7;}
+.mtext{font-size:12px;color:var(--text);line-height:1.7;white-space:pre-wrap;}
+/* docs */
+.ditem{display:flex;align-items:center;gap:9px;padding:8px 0;border-bottom:0.5px solid var(--border);}
+.ditem:last-child{border-bottom:none;}
+.dicon{width:28px;height:28px;border-radius:var(--r-md);background:var(--blue-light);display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.dname{font-size:12px;font-weight:500;color:var(--text);}
+.dmeta{font-size:11px;color:var(--text3);}
+.ddl{margin-left:auto;height:24px;padding:0 9px;font-size:11px;border:0.5px solid var(--border2);border-radius:var(--r-md);background:transparent;color:var(--text2);cursor:pointer;}
+/* ITL */
+.itl-compose{background:var(--bg2);border-radius:var(--r-md);padding:10px 12px;margin-bottom:12px;}
+.itl-ta{width:100%;min-height:52px;padding:7px 9px;font-size:13px;border:0.5px solid var(--border2);border-radius:var(--r-md);background:var(--bg);color:var(--text);outline:none;resize:none;line-height:1.5;margin-bottom:6px;}
+.itl-ta:focus{border-color:var(--purple);}
+.itl-foot{display:flex;align-items:center;gap:7px;}
+.itl-sel{height:28px;padding:0 8px;font-size:12px;border:0.5px solid var(--border2);border-radius:var(--r-md);background:var(--bg);color:var(--text);outline:none;}
+.itl-post{height:28px;padding:0 12px;font-size:12px;font-weight:500;background:var(--purple);color:#fff;border:none;border-radius:var(--r-md);cursor:pointer;margin-left:auto;}
+.itl-post:hover{background:var(--purple-dark);}
+.icard{background:var(--bg);border:0.5px solid var(--border);border-radius:var(--r-md);padding:9px 11px;margin-bottom:7px;}
+.icard-head{display:flex;align-items:center;gap:7px;margin-bottom:5px;flex-wrap:wrap;}
+.iav2{width:26px;height:26px;border-radius:50%;background:var(--purple-light);display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:500;color:var(--purple-dark);flex-shrink:0;}
+.iwho{font-size:12px;font-weight:500;color:var(--text);}
+.iwhen{font-size:11px;color:var(--text3);margin-left:auto;}
+.itbadge{font-size:10px;padding:1px 6px;border-radius:99px;}
+.it-notify{background:var(--blue-light);color:var(--blue);}
+.it-discuss{background:var(--purple-light);color:var(--purple-dark);}
+.it-urgent{background:var(--red-light);color:var(--red);}
+.itext{font-size:12px;color:var(--text2);line-height:1.6;}
+</style>
+</head>
+<body>
+
+<!-- ===== LOGIN ===== -->
+<div id="page-login" class="page active">
+  <div class="login-card">
+    <div class="logo">
+      <div class="logo-mark">
+        <svg width="20" height="20" viewBox="0 0 20 20" fill="none"><path d="M10 2L3 6v8l7 4 7-4V6L10 2z" stroke="#fff" stroke-width="1.5" stroke-linejoin="round"/><path d="M10 2v12M3 6l7 4 7-4" stroke="#fff" stroke-width="1.5" stroke-linejoin="round"/></svg>
+      </div>
+      <div>
+        <div class="logo-text">ATS Portal</div>
+        <div class="logo-sub">採用管理システム</div>
+      </div>
+    </div>
+    <h2>ログイン</h2>
+    <p class="login-sub">アカウント情報を入力してください</p>
+    <div id="login-err" class="login-err">ユーザー名またはパスワードが正しくありません</div>
+    <div class="field">
+      <label>ユーザー名</label>
+      <input type="text" id="login-user" placeholder="ユーザー名"/>
+    </div>
+    <div class="field">
+      <label>パスワード</label>
+      <input type="password" id="login-pass" placeholder="••••••••"/>
+      <div class="forgot">パスワードを忘れた方</div>
+    </div>
+    <button class="login-btn" id="login-btn">ログイン</button>
+  </div>
+</div>
+
+<!-- ===== APP ===== -->
+<div id="page-app" class="page">
+  <nav class="navbar">
+    <div class="nav-logo">
+      <div class="nav-logo-mark">
+        <svg width="16" height="16" viewBox="0 0 20 20" fill="none"><path d="M10 2L3 6v8l7 4 7-4V6L10 2z" stroke="#fff" stroke-width="1.5" stroke-linejoin="round"/><path d="M10 2v12M3 6l7 4 7-4" stroke="#fff" stroke-width="1.5" stroke-linejoin="round"/></svg>
+      </div>
+      <span class="nav-title">ATS Portal</span>
+    </div>
+    <div class="nav-spacer"></div>
+    <span class="nav-user" id="nav-user"></span>
+    <button class="nav-logout" id="nav-logout">ログアウト</button>
+  </nav>
+  <div class="app-body">
+
+    <!-- LIST -->
+    <div id="pane-list">
+      <div class="list-header">
+        <div class="page-title">応募者管理</div>
+        <button class="btn pri" id="new-btn">+ 新規応募者</button>
+      </div>
+      <div class="metrics" id="metrics"></div>
+      <div class="search-bar">
+        <input type="text" id="f-kw" placeholder="氏名・求人・応募者IDで検索..."/>
+        <button class="btn" id="adv-toggle-btn">詳細検索 ▾</button>
+        <button class="btn pri" id="search-btn">検索</button>
+      </div>
+      <div class="adv-panel" id="adv-panel">
+        <div class="adv-grid">
+          <div class="adv-field"><label>選考ステップ</label><select id="f-step"><option value="">すべて</option></select></div>
+          <div class="adv-field"><label>ステータス</label><select id="f-status"><option value="">すべて</option></select></div>
+          <div class="adv-field"><label>応募求人</label><select id="f-job"><option value="">すべて</option></select></div>
+          <div class="adv-field"><label>性別</label><select id="f-gender"><option value="">すべて</option><option value="男">男性</option><option value="女">女性</option></select></div>
+          <div class="adv-field" style="grid-column:span 2;"><label>応募期間</label><div class="date-range"><input type="date" id="f-d1"/><span>〜</span><input type="date" id="f-d2"/></div></div>
+        </div>
+        <div class="adv-section-title">タグ（AND条件）</div>
+        <div class="tag-pills" id="tag-pills"></div>
+        <div class="adv-actions">
+          <button class="btn" id="reset-btn">リセット</button>
+          <button class="btn pri" id="adv-search-btn">この条件で検索</button>
+        </div>
+      </div>
+      <div class="bulk-bar" id="bulk-bar">
+        <span style="font-size:13px;font-weight:500;color:var(--text);" id="bulk-count">0件選択中</span>
+        <div class="bsep"></div>
+        <button class="btn sm" id="bulk-change-btn">一括変更</button>
+        <button class="btn sm" id="bulk-mail-btn">メール送付</button>
+        <button class="btn sm" id="bulk-csv-btn">CSV</button>
+        <div class="bsep"></div>
+        <button class="btn sm danger" id="bulk-clear-btn">解除</button>
+      </div>
+      <div class="result-info" id="result-info"></div>
+      <div class="table-wrap">
+        <table>
+          <colgroup><col style="width:32px"><col style="width:13%"><col style="width:38px"><col style="width:44px"><col style="width:16%"><col style="width:12%"><col style="width:10%"><col style="width:14%"><col style="width:11%"></colgroup>
+          <thead>
+            <tr>
+              <th><input type="checkbox" id="check-all"/></th>
+              <th class="sortable" data-key="name">氏名 <span class="si" id="si-name"><svg viewBox="0 0 8 5"><path d="M4 0L8 5H0z" fill="currentColor"/></svg><svg viewBox="0 0 8 5"><path d="M4 5L0 0h8z" fill="currentColor"/></svg></span></th>
+              <th class="sortable" data-key="gender">性別 <span class="si" id="si-gender"><svg viewBox="0 0 8 5"><path d="M4 0L8 5H0z" fill="currentColor"/></svg><svg viewBox="0 0 8 5"><path d="M4 5L0 0h8z" fill="currentColor"/></svg></span></th>
+              <th class="sortable" data-key="age">年齢 <span class="si" id="si-age"><svg viewBox="0 0 8 5"><path d="M4 0L8 5H0z" fill="currentColor"/></svg><svg viewBox="0 0 8 5"><path d="M4 5L0 0h8z" fill="currentColor"/></svg></span></th>
+              <th class="sortable" data-key="job">応募求人 <span class="si" id="si-job"><svg viewBox="0 0 8 5"><path d="M4 0L8 5H0z" fill="currentColor"/></svg><svg viewBox="0 0 8 5"><path d="M4 5L0 0h8z" fill="currentColor"/></svg></span></th>
+              <th class="sortable" data-key="step">ステップ <span class="si" id="si-step"><svg viewBox="0 0 8 5"><path d="M4 0L8 5H0z" fill="currentColor"/></svg><svg viewBox="0 0 8 5"><path d="M4 5L0 0h8z" fill="currentColor"/></svg></span></th>
+              <th class="sortable" data-key="status">ステータス <span class="si" id="si-status"><svg viewBox="0 0 8 5"><path d="M4 0L8 5H0z" fill="currentColor"/></svg><svg viewBox="0 0 8 5"><path d="M4 5L0 0h8z" fill="currentColor"/></svg></span></th>
+              <th>タグ</th>
+              <th class="sortable" data-key="stars">評価 / 応募日 <span class="si" id="si-stars"><svg viewBox="0 0 8 5"><path d="M4 0L8 5H0z" fill="currentColor"/></svg><svg viewBox="0 0 8 5"><path d="M4 5L0 0h8z" fill="currentColor"/></svg></span></th>
+            </tr>
+          </thead>
+          <tbody id="tbody"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- DETAIL -->
+    <div id="pane-detail">
+      <div class="detail-topbar">
+        <button class="btn" id="back-btn">← 一覧に戻る</button>
+        <div style="display:flex;gap:7px;flex-wrap:wrap;">
+          <button class="btn" id="d-mail-btn">メール送付</button>
+          <button class="btn" id="d-step-btn">ステップ更新</button>
+          <button class="btn pri" id="d-save-btn">保存</button>
+        </div>
+      </div>
+      <div class="detail-layout">
+        <div class="d-side">
+          <div class="card">
+            <div class="ph-head">
+              <div class="av" id="d-av">
+                <svg width="24" height="24" viewBox="0 0 32 32" fill="none"><circle cx="16" cy="12" r="6" stroke="#aaa" stroke-width="1.5"/><path d="M4 28c0-6.627 5.373-12 12-12s12 5.373 12 12" stroke="#aaa" stroke-width="1.5" stroke-linecap="round"/></svg>
+              </div>
+              <input type="file" id="ph-file" accept="image/*" style="display:none"/>
+              <div class="ph-hint" id="ph-hint">写真をアップロード</div>
+              <div class="pname" id="d-name"></div>
+              <div class="pid" id="d-id"></div>
+            </div>
+            <div id="basic-info"></div>
+            <span class="detail-toggle-link" id="detail-toggle">▶ 詳細情報を表示</span>
+            <div id="detail-info" style="display:none;margin-top:4px;"></div>
+            <div style="display:flex;gap:6px;margin-top:7px;justify-content:flex-end;">
+              <button class="btn sm" id="info-edit-btn">編集</button>
+              <button class="btn sm pri" id="info-save-btn" style="display:none">保存</button>
+            </div>
+            <div class="memo-wrap">
+              <div class="mlabel">メモ</div>
+              <textarea class="mta" id="d-memo"></textarea>
+              <div style="display:flex;justify-content:flex-end;"><button class="btn sm pri" id="memo-save-btn" style="margin-top:4px;">保存</button></div>
+            </div>
+          </div>
+          <div class="card">
+            <div style="font-size:11px;font-weight:500;color:var(--text2);margin-bottom:8px;">選考ステップ</div>
+            <div class="step-flow" id="d-step-flow"></div>
+          </div>
+        </div>
+        <div>
+          <div class="tabs">
+            <button class="tab active" data-tab="history">選考履歴</button>
+            <button class="tab" data-tab="eval">評価</button>
+            <button class="tab" data-tab="docs">提出書類</button>
+            <button class="tab" data-tab="mail">メール履歴</button>
+            <button class="tab" data-tab="itl">社内連絡</button>
+          </div>
+          <div class="dpane active" id="dpane-history"></div>
+          <div class="dpane" id="dpane-eval"></div>
+          <div class="dpane" id="dpane-docs"></div>
+          <div class="dpane" id="dpane-mail"></div>
+          <div class="dpane" id="dpane-itl"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- MODALS -->
+<div class="overlay" id="modal-bulk"><div class="mbox">
+  <h3>一括変更</h3>
+  <div class="modal-tabs" id="bulk-mtabs" style="grid-template-columns:repeat(5,1fr);"></div>
+  <div id="bulk-mbody"></div>
+  <div class="macts"><button class="btn" id="bulk-mcancel">キャンセル</button><button class="btn pri" id="bulk-mok">変更する</button></div>
+</div></div>
+
+<div class="overlay" id="modal-mail"><div class="mbox">
+  <h3>メールテンプレート選択</h3>
+  <input class="msearch" id="mail-msearch" placeholder="テンプレートを検索..."/>
+  <div id="mail-mlist"></div>
+  <div class="macts"><button class="btn" id="mail-mcancel">キャンセル</button><button class="btn pri" id="mail-mok">送付する</button></div>
+</div></div>
+
+<div class="overlay" id="modal-csv"><div class="mbox">
+  <h3>CSVフォーマット選択</h3>
+  <input class="msearch" id="csv-msearch" placeholder="フォーマットを検索..."/>
+  <div id="csv-mlist"></div>
+  <div class="macts"><button class="btn" id="csv-mcancel">キャンセル</button><button class="btn pri" id="csv-mok">ダウンロード</button></div>
+</div></div>
+
+<div class="overlay" id="modal-step"><div class="mbox">
+  <h3>ステップ・ステータス更新</h3>
+  <div style="margin-bottom:10px;"><div style="font-size:11px;font-weight:500;color:var(--text2);margin-bottom:5px;">選考ステップ</div><div id="sm-steps" class="opt-list"></div></div>
+  <div><div style="font-size:11px;font-weight:500;color:var(--text2);margin-bottom:5px;">ステータス</div><div id="sm-statuses" class="opt-list"></div></div>
+  <div class="macts"><button class="btn" id="sm-cancel">キャンセル</button><button class="btn pri" id="sm-ok">更新する</button></div>
+</div></div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// ===== CONSTANTS =====
+const USERS={"admin":"demo1234","hr":"hr2024"};
+const STEPS=["書類選考","筆記試験","1次面接","2次面接","最終面接","内定"];
+const STEP_CLS={"書類選考":"step-doc","筆記試験":"step-written","1次面接":"step-1st","2次面接":"step-2nd","最終面接":"step-final","内定":"step-offer"};
+const STATUSES=["未対応","通過","不合格","保留","辞退"];
+const ST_CLS={"通過":"st-pass","不合格":"st-fail","保留":"st-hold","未対応":"st-new","辞退":"st-wd"};
+const STEP_ORD={"書類選考":1,"筆記試験":2,"1次面接":3,"2次面接":4,"最終面接":5,"内定":6};
+const ST_ORD={"未対応":1,"通過":2,"保留":3,"不合格":4,"辞退":5};
+const ALL_TAGS=["エンジニア","HR","HOT","KEEP"];
+const TAG_CLS={"エンジニア":"t-eng","HR":"t-hr","HOT":"t-hot","KEEP":"t-keep"};
+const AVAIL_IV=["鈴木 一郎（EMgr）","佐藤 花子（人事）","高橋 健（CTO）","中島 彩（PM）"];
+const ITL_TYPE={notify:{label:"連絡",cls:"it-notify"},discuss:{label:"相談",cls:"it-discuss"},urgent:{label:"至急",cls:"it-urgent"}};
+const CSV_FORMATS=[
+  {id:"basic",name:"基本フォーマット",cols:"ID,氏名,性別,年齢,応募求人,ステップ,ステータス,応募日"},
+  {id:"full",name:"詳細フォーマット",cols:"ID,氏名,性別,年齢,応募求人,ステップ,ステータス,応募日,タグ,評価"},
+  {id:"hr",name:"HR連携フォーマット",cols:"ID,氏名,性別,年齢,ステップ,ステータス,タグ"},
+  {id:"report",name:"レポートフォーマット",cols:"応募求人,ID,氏名,ステップ,ステータス,応募日,評価"},
+];
+const MAIL_TPLS=[
+  {id:"pass_doc",name:"書類選考通過",desc:"書類選考通過のご連絡と次ステップ案内"},
+  {id:"interview",name:"面接日程調整",desc:"面接日程の確認・調整依頼"},
+  {id:"offer",name:"内定通知",desc:"内定のご連絡と条件提示"},
+  {id:"reject",name:"不合格通知",desc:"選考終了のご連絡"},
+  {id:"remind",name:"書類提出リマインド",desc:"未提出者へのリマインド"},
+];
+
+// ===== APPLICANT DATA =====
+const ALL_DATA=[
+  {id:"AP-0001",name:"田中 涼子",gender:"女",age:28,job:"フロントエンドエンジニア",step:"1次面接",status:"通過",date:"2025-04-08",stars:4,tags:["エンジニア","HOT"],
+   basic:[{k:"現年収",f:"cur_sal",v:"450万円"},{k:"希望年収",f:"des_sal",v:"600万円"}],
+   detail:[{k:"生年月日",f:"dob",v:"1997-01-15"},{k:"メール",f:"email",v:"tanaka.r@example.com"},{k:"電話",f:"tel",v:"090-1234-5678"},{k:"住所",f:"addr",v:"東京都渋谷区"},{k:"最終学歴",f:"edu",v:"〇〇大学 工学部"},{k:"現職",f:"job_now",v:"株式会社△△ FEエンジニア"},{k:"経験年数",f:"exp",v:"5年"},{k:"応募日",f:"app_date",v:"2025-04-08"}],
+   memo:"コミュニケーション能力高い。次回最終面接を調整中。",
+   evals:{"書類選考":{adminComment:"書類は申し分なし。",ivs:[{name:"佐藤 花子",ini:"佐",role:"人事リード",date:"2025-04-09",overall:4,crit:{書類品質:4,印象:4,意欲:4},comment:"職務経歴書の記述が具体的で好印象。"}]},"1次面接":{adminComment:"最終面接へ進める。",ivs:[{name:"鈴木 一郎",ini:"鈴",role:"EMgr",date:"2025-04-13",overall:4,crit:{技術力:4,コミュ力:5,カルチャー:3},comment:"技術力は申し分ない。"},{name:"佐藤 花子",ini:"佐",role:"人事リード",date:"2025-04-14",overall:4,crit:{技術力:4,コミュ力:5,カルチャー:3},comment:"入社意欲が高い。"}]}},
+   history:[{c:"tg",date:"2025-04-08",title:"応募受付",body:"フロントエンドエンジニア職に応募。"},{c:"tg",date:"2025-04-09",title:"書類選考 通過",body:"書類審査通過。面接案内メール送付。"},{c:"tp",date:"2025-04-12",title:"1次面接 実施",body:"オンライン60分。鈴木・佐藤が担当。"},{c:"ta",date:"2025-04-15",title:"最終面接 調整中",body:"日程調整メール送付済み。"}],
+   mails:[{dir:"out",subj:"【書類選考通過のご連絡】",from:"佐藤花子 <hr@co.jp>",to:"田中涼子 <tanaka.r@example.com>",date:"2025-04-09 14:32",body:"田中 涼子 様\n\n書類選考の結果、次の選考にお進みいただけることとなりました。\n面接日程の調整をお願いいたします。\n\n採用担当 佐藤花子"},{dir:"in",subj:"Re: 【書類選考通過のご連絡】",from:"田中涼子 <tanaka.r@example.com>",to:"佐藤花子 <hr@co.jp>",date:"2025-04-09 18:15",body:"佐藤様\n\n4月12日（土）13:00にてお願いいたします。\n\n田中 涼子"}],
+   docs:[{name:"履歴書.pdf",type:"PDF",date:"2025-04-08",size:"1.2MB"},{name:"職務経歴書.pdf",type:"PDF",date:"2025-04-08",size:"0.8MB"},{name:"ポートフォリオ.zip",type:"ZIP",date:"2025-04-09",size:"12.4MB"}],
+   itl:[{who:"佐藤 花子",ini:"佐",type:"discuss",text:"1次面接の総評：全員通過票。最終面接の日程調整をお願いします。",time:"2025-04-14 15:20"}]},
+  {id:"AP-0002",name:"山本 健二",gender:"男",age:35,job:"バックエンドエンジニア",step:"書類選考",status:"保留",date:"2025-04-10",stars:3,tags:["エンジニア"],basic:[{k:"現年収",f:"cur_sal",v:"550万円"},{k:"希望年収",f:"des_sal",v:"700万円"}],detail:[{k:"生年月日",f:"dob",v:"1990-03-22"},{k:"メール",f:"email",v:"yamamoto.k@example.com"},{k:"電話",f:"tel",v:"080-2345-6789"},{k:"住所",f:"addr",v:"神奈川県横浜市"},{k:"最終学歴",f:"edu",v:"△△大学 情報学部"},{k:"現職",f:"job_now",v:"株式会社□□ バックエンドエンジニア"},{k:"経験年数",f:"exp",v:"10年"},{k:"応募日",f:"app_date",v:"2025-04-10"}],memo:"経験豊富だが年収要望が高め。",evals:{},history:[{c:"tg",date:"2025-04-10",title:"応募受付",body:"バックエンドエンジニア職に応募。"}],mails:[],docs:[{name:"履歴書.pdf",type:"PDF",date:"2025-04-10",size:"0.9MB"}],itl:[]},
+  {id:"AP-0003",name:"佐々木 美咲",gender:"女",age:31,job:"人事マネージャー",step:"内定",status:"通過",date:"2025-03-28",stars:5,tags:["HR","HOT"],basic:[{k:"現年収",f:"cur_sal",v:"480万円"},{k:"希望年収",f:"des_sal",v:"550万円"}],detail:[{k:"生年月日",f:"dob",v:"1994-07-05"},{k:"メール",f:"email",v:"sasaki.m@example.com"},{k:"電話",f:"tel",v:"070-3456-7890"},{k:"住所",f:"addr",v:"東京都港区"},{k:"最終学歴",f:"edu",v:"○○大学 経営学部"},{k:"現職",f:"job_now",v:"株式会社★★ 人事"},{k:"経験年数",f:"exp",v:"7年"},{k:"応募日",f:"app_date",v:"2025-03-28"}],memo:"即戦力。入社日調整中。",evals:{},history:[{c:"tg",date:"2025-03-28",title:"応募受付",body:"人事マネージャー職に応募。"},{c:"tg",date:"2025-04-01",title:"書類選考 通過",body:""},{c:"tg",date:"2025-04-05",title:"最終面接 通過",body:""},{c:"tp",date:"2025-04-10",title:"内定通知",body:"内定通知書送付済み。"}],mails:[],docs:[{name:"履歴書.pdf",type:"PDF",date:"2025-03-28",size:"1.0MB"}],itl:[]},
+  {id:"AP-0004",name:"中村 大輔",gender:"男",age:26,job:"フロントエンドエンジニア",step:"書類選考",status:"未対応",date:"2025-04-12",stars:0,tags:[],basic:[{k:"現年収",f:"cur_sal",v:"320万円"},{k:"希望年収",f:"des_sal",v:"420万円"}],detail:[{k:"生年月日",f:"dob",v:"1999-11-30"},{k:"メール",f:"email",v:"nakamura.d@example.com"},{k:"電話",f:"tel",v:"090-4567-8901"},{k:"住所",f:"addr",v:"大阪府大阪市"},{k:"最終学歴",f:"edu",v:"□□工業大学 情報工学部"},{k:"現職",f:"job_now",v:"フリーランス"},{k:"経験年数",f:"exp",v:"2年"},{k:"応募日",f:"app_date",v:"2025-04-12"}],memo:"",evals:{},history:[{c:"tg",date:"2025-04-12",title:"応募受付",body:"フロントエンドエンジニア職に応募。"}],mails:[],docs:[{name:"履歴書.pdf",type:"PDF",date:"2025-04-12",size:"0.7MB"}],itl:[]},
+  {id:"AP-0005",name:"小林 彩",gender:"女",age:29,job:"プロダクトマネージャー",step:"最終面接",status:"通過",date:"2025-03-15",stars:5,tags:["KEEP"],basic:[{k:"現年収",f:"cur_sal",v:"520万円"},{k:"希望年収",f:"des_sal",v:"650万円"}],detail:[{k:"生年月日",f:"dob",v:"1996-04-18"},{k:"メール",f:"email",v:"kobayashi.a@example.com"},{k:"電話",f:"tel",v:"080-5678-9012"},{k:"住所",f:"addr",v:"東京都新宿区"},{k:"最終学歴",f:"edu",v:"△△大学 経済学部"},{k:"現職",f:"job_now",v:"株式会社◎◎ PM"},{k:"経験年数",f:"exp",v:"5年"},{k:"応募日",f:"app_date",v:"2025-03-15"}],memo:"",evals:{},history:[{c:"tg",date:"2025-03-15",title:"応募受付",body:""},{c:"tg",date:"2025-03-20",title:"書類選考 通過",body:""},{c:"tp",date:"2025-04-02",title:"最終面接 実施",body:""}],mails:[],docs:[],itl:[]},
+  {id:"AP-0006",name:"伊藤 拓也",gender:"男",age:42,job:"バックエンドエンジニア",step:"2次面接",status:"不合格",date:"2025-04-01",stars:2,tags:[],basic:[{k:"現年収",f:"cur_sal",v:"700万円"},{k:"希望年収",f:"des_sal",v:"800万円"}],detail:[{k:"生年月日",f:"dob",v:"1983-08-14"},{k:"メール",f:"email",v:"ito.t@example.com"},{k:"電話",f:"tel",v:"070-6789-0123"},{k:"住所",f:"addr",v:"埼玉県さいたま市"},{k:"最終学歴",f:"edu",v:"○○大学 理工学部"},{k:"現職",f:"job_now",v:"株式会社▲▲ シニアエンジニア"},{k:"経験年数",f:"exp",v:"17年"},{k:"応募日",f:"app_date",v:"2025-04-01"}],memo:"技術力は高いがカルチャーフィット懸念。",evals:{},history:[{c:"tg",date:"2025-04-01",title:"応募受付",body:""},{c:"tr",date:"2025-04-10",title:"2次面接 不合格",body:""}],mails:[],docs:[],itl:[]},
+  {id:"AP-0007",name:"渡辺 さくら",gender:"女",age:24,job:"人事マネージャー",step:"書類選考",status:"通過",date:"2025-04-11",stars:3,tags:["HR"],basic:[{k:"現年収",f:"cur_sal",v:"300万円"},{k:"希望年収",f:"des_sal",v:"380万円"}],detail:[{k:"生年月日",f:"dob",v:"2001-02-28"},{k:"メール",f:"email",v:"watanabe.s@example.com"},{k:"電話",f:"tel",v:"090-7890-1234"},{k:"住所",f:"addr",v:"東京都世田谷区"},{k:"最終学歴",f:"edu",v:"□□大学 文学部"},{k:"現職",f:"job_now",v:"株式会社●● 人事補佐"},{k:"経験年数",f:"exp",v:"2年"},{k:"応募日",f:"app_date",v:"2025-04-11"}],memo:"",evals:{},history:[{c:"tg",date:"2025-04-11",title:"応募受付",body:""}],mails:[],docs:[],itl:[]},
+  {id:"AP-0008",name:"加藤 誠",gender:"男",age:38,job:"プロダクトマネージャー",step:"2次面接",status:"保留",date:"2025-04-07",stars:4,tags:["HOT","KEEP"],basic:[{k:"現年収",f:"cur_sal",v:"600万円"},{k:"希望年収",f:"des_sal",v:"720万円"}],detail:[{k:"生年月日",f:"dob",v:"1987-06-10"},{k:"メール",f:"email",v:"kato.m@example.com"},{k:"電話",f:"tel",v:"080-8901-2345"},{k:"住所",f:"addr",v:"東京都品川区"},{k:"最終学歴",f:"edu",v:"△△大学 工学部"},{k:"現職",f:"job_now",v:"株式会社■■ PM"},{k:"経験年数",f:"exp",v:"12年"},{k:"応募日",f:"app_date",v:"2025-04-07"}],memo:"",evals:{},history:[{c:"tg",date:"2025-04-07",title:"応募受付",body:""}],mails:[],docs:[],itl:[]},
+];
+
+// ===== STATE =====
+let currentUser="";
+let displayData=[...ALL_DATA];
+let selected=new Set();
+let sortKey=null,sortDir=1;
+let activeTags=new Set();
+let advOpen=false;
+let currentApplicantId=null;
+let showDetailInfo=false;
+let editingInfo=false;
+let openAccs=new Set();
+let selStep2=null,selStatus2=null;
+let bulkTab="step",selBulkVal=null,selTagsOp=new Set();
+let selCsvFmt=null,selMailTpl=null;
+
+// ===== UTILS =====
+function $(id){return document.getElementById(id);}
+function showToast(msg){const t=$("toast");t.textContent=msg;t.className="toast show";setTimeout(()=>t.className="toast",2500);}
+function openModal(id){$(id).classList.add("open");}
+function closeModal(id){$(id).classList.remove("open");}
+
+// ===== LOGIN =====
+$("login-btn").onclick=doLogin;
+$("login-pass").onkeydown=e=>{if(e.key==="Enter")doLogin();};
+function doLogin(){
+  const u=$("login-user").value.trim(),p=$("login-pass").value;
+  if(USERS[u]&&USERS[u]===p){
+    currentUser=u;
+    $("page-login").classList.remove("active");
+    $("page-app").classList.add("active");
+    $("nav-user").textContent=u;
+    initApp();
+  } else {
+    $("login-err").style.display="block";
+    $("login-pass").value="";
+  }
+}
+$("nav-logout").onclick=()=>{
+  $("page-app").classList.remove("active");
+  $("page-login").classList.add("active");
+  $("login-user").value="";$("login-pass").value="";
+  $("login-err").style.display="none";
+};
+
+// ===== APP INIT =====
+function initApp(){
+  populateFilters();
+  renderTagPills();
+  renderMetrics();
+  renderTable();
+  setupListEvents();
+  setupDetailEvents();
+  setupModalEvents();
+}
+
+function populateFilters(){
+  const fs=$("f-step"),fst=$("f-status"),fj=$("f-job");
+  STEPS.forEach(s=>{const o=document.createElement("option");o.value=s;o.textContent=s;fs.appendChild(o);});
+  STATUSES.forEach(s=>{const o=document.createElement("option");o.value=s;o.textContent=s;fst.appendChild(o);});
+  [...new Set(ALL_DATA.map(d=>d.job))].forEach(j=>{const o=document.createElement("option");o.value=j;o.textContent=j;fj.appendChild(o);});
+}
+
+function renderTagPills(){
+  $("tag-pills").innerHTML=ALL_TAGS.map(t=>`<span class="tag-pill${activeTags.has(t)?" active":""}" data-tag="${t}">${t}</span>`).join("");
+  $("tag-pills").querySelectorAll(".tag-pill").forEach(el=>{
+    el.onclick=()=>{
+      const t=el.dataset.tag;
+      activeTags.has(t)?activeTags.delete(t):activeTags.add(t);
+      renderTagPills();
+    };
+  });
+}
+
+function renderMetrics(){
+  const t=ALL_DATA.length,a=ALL_DATA.filter(d=>!["不合格","辞退"].includes(d.status)).length,
+        i=ALL_DATA.filter(d=>d.step.includes("面接")).length,p=ALL_DATA.filter(d=>d.status==="通過").length;
+  $("metrics").innerHTML=`
+    <div class="metric"><div class="metric-label">総応募数</div><div class="metric-val">${t}</div><div class="metric-sub">今月</div></div>
+    <div class="metric"><div class="metric-label">選考中</div><div class="metric-val">${a}</div><div class="metric-sub">アクティブ</div></div>
+    <div class="metric"><div class="metric-label">面接中</div><div class="metric-val">${i}</div><div class="metric-sub">今週</div></div>
+    <div class="metric"><div class="metric-label">通過者</div><div class="metric-val">${p}</div><div class="metric-sub">累計</div></div>`;
+}
+
+function applyFilter(){
+  const kw=$("f-kw").value.toLowerCase().trim();
+  const fs=$("f-step").value,fst=$("f-status").value,fj=$("f-job").value,fg=$("f-gender").value;
+  const fd1=$("f-d1").value,fd2=$("f-d2").value;
+  displayData=ALL_DATA.filter(d=>{
+    if(kw&&!d.name.includes(kw)&&!d.job.toLowerCase().includes(kw)&&!d.id.toLowerCase().includes(kw))return false;
+    if(fs&&d.step!==fs)return false;
+    if(fst&&d.status!==fst)return false;
+    if(fj&&d.job!==fj)return false;
+    if(fg&&d.gender!==fg)return false;
+    if(fd1&&d.date<fd1)return false;
+    if(fd2&&d.date>fd2)return false;
+    if(activeTags.size>0&&![...activeTags].every(t=>d.tags.includes(t)))return false;
+    return true;
+  });
+  if(sortKey)applySortToDisplay();
+  renderTable();
+  showToast(displayData.length+"件ヒット");
+}
+
+function resetFilter(){
+  $("f-kw").value="";
+  ["f-step","f-status","f-job","f-gender"].forEach(id=>$(id).value="");
+  $("f-d1").value="";$("f-d2").value="";
+  activeTags.clear();renderTagPills();
+  displayData=[...ALL_DATA];renderTable();
+}
+
+function sortBy(key){
+  sortKey===key?sortDir*=-1:(sortKey=key,sortDir=1);
+  updateSortIcons();applySortToDisplay();renderTable();
+}
+
+function applySortToDisplay(){
+  displayData.sort((a,b)=>{
+    let va=a[sortKey],vb=b[sortKey];
+    if(sortKey==="step"){va=STEP_ORD[va]||99;vb=STEP_ORD[vb]||99;}
+    else if(sortKey==="status"){va=ST_ORD[va]||99;vb=ST_ORD[vb]||99;}
+    if(typeof va==="string"&&typeof vb==="string")return va.localeCompare(vb,"ja")*sortDir;
+    return(va-vb)*sortDir;
+  });
+}
+
+function updateSortIcons(){
+  ["name","gender","age","job","step","status","stars"].forEach(k=>{
+    const el=$("si-"+k);if(!el)return;
+    const th=el.closest("th");
+    el.className="si"+(k===sortKey?(sortDir===1?" asc":" desc"):"");
+    th.className=k===sortKey?"sortable sort-on":"sortable";
+  });
+}
+
+function renderTable(){
+  $("result-info").textContent=displayData.length===ALL_DATA.length?`全${ALL_DATA.length}件`:`${displayData.length} / ${ALL_DATA.length}件`;
+  const tbody=$("tbody");
+  if(!displayData.length){tbody.innerHTML=`<tr><td colspan="9" class="empty">該当する応募者が見つかりません</td></tr>`;return;}
+  tbody.innerHTML=displayData.map(d=>{
+    const stars=[1,2,3,4,5].map(i=>`<span class="star${i<=d.stars?"":" off"}">★</span>`).join("");
+    const tags=d.tags.length?d.tags.map(t=>`<span class="tag ${TAG_CLS[t]||''}">${t}</span>`).join(""):`<span style="color:var(--text3)">―</span>`;
+    const chk=selected.has(d.id);
+    return `<tr class="${chk?"sel":""}" data-id="${d.id}">
+      <td><input type="checkbox" class="row-chk" data-id="${d.id}" ${chk?"checked":""}></td>
+      <td class="ell" style="font-weight:500">${d.name}</td>
+      <td><span class="${d.gender==="男"?"gm":"gf"}">${d.gender}</span></td>
+      <td style="white-space:nowrap;color:var(--text2)">${d.age}歳</td>
+      <td class="ell" style="color:var(--text2)">${d.job}</td>
+      <td style="white-space:nowrap"><span class="stepb ${STEP_CLS[d.step]||''}">${d.step}</span></td>
+      <td style="white-space:nowrap"><span class="badge ${ST_CLS[d.status]||''}">${d.status}</span></td>
+      <td>${tags}</td>
+      <td><div class="eval-date"><div>${stars}</div><div class="date-row">${d.date}</div></div></td>
+    </tr>`;
+  }).join("");
+  // row click
+  tbody.querySelectorAll("tr[data-id]").forEach(tr=>{
+    tr.onclick=e=>{
+      if(e.target.type==="checkbox")return;
+      openDetail(tr.dataset.id);
+    };
+  });
+  // checkbox
+  tbody.querySelectorAll(".row-chk").forEach(cb=>{
+    cb.onclick=e=>e.stopPropagation();
+    cb.onchange=()=>{
+      cb.checked?selected.add(cb.dataset.id):selected.delete(cb.dataset.id);
+      const tr=cb.closest("tr");tr.className=cb.checked?"sel":"";
+      $("check-all").checked=displayData.length>0&&displayData.every(d=>selected.has(d.id));
+      updateBulkBar();
+    };
+  });
+  $("check-all").checked=displayData.length>0&&displayData.every(d=>selected.has(d.id));
+}
+
+function updateBulkBar(){
+  const n=selected.size;
+  $("bulk-count").textContent=n+"件選択中";
+  $("bulk-bar").className="bulk-bar"+(n>0?" active":"");
+}
+
+function setupListEvents(){
+  $("adv-toggle-btn").onclick=()=>{advOpen=!advOpen;$("adv-panel").className="adv-panel"+(advOpen?" open":"");$("adv-toggle-btn").textContent="詳細検索 "+(advOpen?"▴":"▾");};
+  $("search-btn").onclick=applyFilter;
+  $("f-kw").onkeydown=e=>{if(e.key==="Enter")applyFilter();};
+  $("adv-search-btn").onclick=applyFilter;
+  $("reset-btn").onclick=resetFilter;
+  $("check-all").onchange=function(){displayData.forEach(d=>{this.checked?selected.add(d.id):selected.delete(d.id);});renderTable();};
+  $("bulk-clear-btn").onclick=()=>{selected.clear();renderTable();};
+  $("bulk-change-btn").onclick=openBulkModal;
+  $("bulk-mail-btn").onclick=()=>openMailModal(false);
+  $("bulk-csv-btn").onclick=openCsvModal;
+  $("new-btn").onclick=()=>showToast("新規応募者追加機能（実装予定）");
+  document.querySelectorAll("th.sortable").forEach(th=>{th.onclick=()=>sortBy(th.dataset.key);});
+}
+
+// ===== DETAIL =====
+function openDetail(id){
+  currentApplicantId=id;
+  showDetailInfo=false;editingInfo=false;
+  openAccs.clear();
+  const d=ALL_DATA.find(x=>x.id===id);
+  if(!d)return;
+  // init open accs for steps with evals
+  STEPS.forEach(s=>{if(d.evals[s]&&d.evals[s].ivs&&d.evals[s].ivs.length)openAccs.add(s);});
+  if(openAccs.size===0&&d.step)openAccs.add(d.step);
+
+  $("pane-list").style.display="none";
+  $("pane-detail").style.display="block";
+
+  $("d-name").textContent=d.name;
+  $("d-id").textContent=d.id;
+  $("d-av").innerHTML=`<svg width="24" height="24" viewBox="0 0 32 32" fill="none"><circle cx="16" cy="12" r="6" stroke="#aaa" stroke-width="1.5"/><path d="M4 28c0-6.627 5.373-12 12-12s12 5.373 12 12" stroke="#aaa" stroke-width="1.5" stroke-linecap="round"/></svg>`;
+  $("d-memo").value=d.memo||"";
+  renderBasicInfo(d);
+  renderDetailInfo(d);
+  $("detail-toggle").textContent="▶ 詳細情報を表示";
+  $("detail-info").style.display="none";
+  $("info-edit-btn").style.display="";
+  $("info-save-btn").style.display="none";
+  renderStepFlow(d);
+  // tabs
+  document.querySelectorAll(".tab[data-tab]").forEach(t=>t.className="tab"+(t.dataset.tab==="history"?" active":""));
+  document.querySelectorAll(".dpane").forEach(p=>p.className="dpane"+(p.id==="dpane-history"?" active":""));
+  renderHistory(d);
+  renderEval(d);
+  renderDocs(d);
+  renderMails(d);
+  renderITL(d);
+}
+
+function setupDetailEvents(){
+  $("back-btn").onclick=()=>{$("pane-detail").style.display="none";$("pane-list").style.display="";};
+  $("d-save-btn").onclick=()=>showToast("保存しました");
+  $("d-mail-btn").onclick=()=>openMailModal(true);
+  $("d-step-btn").onclick=openStepModal;
+  $("memo-save-btn").onclick=()=>{
+    const d=ALL_DATA.find(x=>x.id===currentApplicantId);
+    if(d)d.memo=$("d-memo").value;
+    showToast("メモを保存しました");
+  };
+  $("ph-hint").onclick=()=>$("ph-file").click();
+  $("d-av").onclick=()=>$("ph-file").click();
+  $("ph-file").onchange=function(){
+    if(!this.files||!this.files[0])return;
+    const r=new FileReader();
+    r.onload=e=>{$("d-av").innerHTML=`<img src="${e.target.result}"/>`;};
+    r.readAsDataURL(this.files[0]);
+  };
+  $("detail-toggle").onclick=()=>{
+    showDetailInfo=!showDetailInfo;
+    $("detail-info").style.display=showDetailInfo?"block":"none";
+    $("detail-toggle").textContent=(showDetailInfo?"▼ 詳細情報を非表示":"▶ 詳細情報を表示");
+    const d=ALL_DATA.find(x=>x.id===currentApplicantId);
+    if(d)renderDetailInfo(d);
+  };
+  $("info-edit-btn").onclick=()=>{
+    editingInfo=true;
+    const d=ALL_DATA.find(x=>x.id===currentApplicantId);
+    if(d){renderBasicInfo(d);if(showDetailInfo)renderDetailInfo(d);}
+    $("info-edit-btn").style.display="none";$("info-save-btn").style.display="";
+  };
+  $("info-save-btn").onclick=()=>{
+    const d=ALL_DATA.find(x=>x.id===currentApplicantId);
+    if(d){
+      [...d.basic,...d.detail].forEach(r=>{
+        const el=$("iinput-"+r.f);if(el)r.v=el.value;
+      });
+    }
+    editingInfo=false;
+    if(d){renderBasicInfo(d);if(showDetailInfo)renderDetailInfo(d);}
+    $("info-edit-btn").style.display="";$("info-save-btn").style.display="none";
+    showToast("候補者情報を保存しました");
+  };
+  // tabs
+  document.querySelectorAll(".tab[data-tab]").forEach(tab=>{
+    tab.onclick=()=>{
+      document.querySelectorAll(".tab[data-tab]").forEach(t=>t.className="tab");
+      document.querySelectorAll(".dpane").forEach(p=>p.className="dpane");
+      tab.className="tab active";
+      $("dpane-"+tab.dataset.tab).className="dpane active";
+    };
+  });
+}
+
+function renderBasicInfo(d){
+  const rows=[
+    {k:"性別",v:`<span class="${d.gender==="男"?"gm":"gf"}">${d.gender}</span>`,f:"gender",rawV:d.gender},
+    {k:"年齢",v:d.age+"歳",f:"age",rawV:d.age},
+    {k:"応募求人",v:d.job,f:"job",rawV:d.job},
+    ...d.basic,
+    {k:"タグ",v:d.tags.length?d.tags.map(t=>`<span class="tag ${TAG_CLS[t]||''}">${t}</span>`).join(""):"―",f:"tags",rawV:d.tags.join("/")}
+  ];
+  $("basic-info").innerHTML=rows.map(r=>{
+    if(editingInfo){
+      return `<div class="irow"><span class="ikey">${r.k}</span><input class="iinput" id="iinput-${r.f}" value="${r.rawV!==undefined?r.rawV:r.v}"/></div>`;
+    }
+    return `<div class="irow"><span class="ikey">${r.k}</span><span class="ival">${r.v}</span></div>`;
+  }).join("");
+}
+
+function renderDetailInfo(d){
+  if(!showDetailInfo)return;
+  $("detail-info").innerHTML=d.detail.map(r=>{
+    if(editingInfo)return `<div class="irow"><span class="ikey">${r.k}</span><input class="iinput" id="iinput-${r.f}" value="${r.v}"/></div>`;
+    return `<div class="irow"><span class="ikey">${r.k}</span><span class="ival">${r.v}</span></div>`;
+  }).join("");
+}
+
+function renderStepFlow(d){
+  const idx=STEP_ORD[d.step]||0;
+  $("d-step-flow").innerHTML=STEPS.map((s,i)=>{
+    const ord=i+1,isCur=d.step===s,isDone=idx>ord;
+    const cls=isCur?"snode cur":isDone?"snode done":"snode fut";
+    const dot=isCur?"sd-cur":isDone?"sd-done":"sd-fut";
+    const badge=isCur?`<span class="badge ${ST_CLS[d.status]||''}" style="font-size:10px">${d.status}</span>`:"";
+    return `<div class="${cls}"><div class="sdot ${dot}"></div><div class="sname">${s}</div>${badge}</div>`;
+  }).join("");
+}
+
+function renderHistory(d){
+  $("dpane-history").innerHTML=`<div class="tl">${
+    d.history.map((h,i)=>`<div class="tli">
+      <div class="tll"><div class="tdot ${h.c}"></div>${i<d.history.length-1?'<div class="tline"></div>':''}</div>
+      <div><div class="tdate">${h.date}</div><div class="ttitle">${h.title}</div>${h.body?`<div class="tbody2">${h.body}</div>`:''}</div>
+    </div>`).join("")
+  }</div>`;
+}
+
+function calcCritAvg(evals,step){
+  const e=evals[step];if(!e||!e.ivs||!e.ivs.length)return {};
+  const m={};
+  e.ivs.forEach(iv=>Object.entries(iv.crit).forEach(([k,v])=>{if(!m[k])m[k]={s:0,n:0};m[k].s+=v;m[k].n++;}));
+  const out={};Object.entries(m).forEach(([k,{s,n}])=>out[k]=(s/n).toFixed(1));return out;
+}
+function calcStepScore(evals,step){
+  const e=evals[step];if(!e||!e.ivs||!e.ivs.length)return null;
+  return(e.ivs.reduce((a,iv)=>a+iv.overall,0)/e.ivs.length).toFixed(1);
+}
+
+function renderEval(d){
+  $("dpane-eval").innerHTML=STEPS.map((s,si)=>{
+    const e=d.evals[s]||{ivs:[],adminComment:""};
+    const isOpen=openAccs.has(s);
+    const score=calcStepScore(d.evals,s);
+    return `<div class="acc" id="acc-${si}">
+      <div class="acc-head" data-si="${si}" data-step="${s}">
+        <span class="stepb ${STEP_CLS[s]||''}">${s}</span>
+        <span style="font-size:11px;color:var(--text3);margin-left:4px;">${score?"avg "+score:"未評価"}</span>
+        <span style="flex:1"></span>
+        <span style="font-size:11px;color:var(--text3);">${e.ivs.length}名</span>
+        <span class="acc-chev${isOpen?" open":""}" id="chev-${si}">▼</span>
+      </div>
+      <div class="acc-body" id="abody-${si}" style="display:${isOpen?"block":"none"}">
+        ${renderAccBody(d,s,si)}
+      </div>
+    </div>`;
+  }).join("");
+  // acc head clicks
+  document.querySelectorAll(".acc-head[data-si]").forEach(el=>{
+    el.onclick=()=>{
+      const si=parseInt(el.dataset.si),s=el.dataset.step;
+      const body=$("abody-"+si),chev=$("chev-"+si);
+      if(body.style.display==="block"){body.style.display="none";chev.classList.remove("open");openAccs.delete(s);}
+      else{body.style.display="block";chev.classList.add("open");openAccs.add(s);}
+    };
+  });
+}
+
+function renderAccBody(d,s,si){
+  if(!d.evals[s])d.evals[s]={ivs:[],adminComment:""};
+  const e=d.evals[s];
+  const avg=calcCritAvg(d.evals,s);
+  const bars=Object.keys(avg).length?`<div style="margin-bottom:10px;">${
+    Object.entries(avg).map(([k,v])=>`<div class="sbar"><div class="sbar-head"><span>${k}</span><span>${v}</span></div><div class="sbar-track"><div class="sbar-fill" style="width:${parseFloat(v)/5*100}%"></div></div></div>`).join("")
+  }</div>`:"";
+  const ivHtml=e.ivs.length?e.ivs.map((iv,ii)=>renderIVCard(d,s,si,iv,ii)).join(""):`<div style="font-size:12px;color:var(--text3);margin-bottom:8px;">評価がありません</div>`;
+  return `${bars}
+  <div class="assign-row">
+    <span style="font-size:12px;color:var(--text2);white-space:nowrap">面接官を追加</span>
+    <select class="asel" id="asel-${si}">
+      <option value="">選択してください</option>
+      ${AVAIL_IV.map(n=>`<option value="${n}">${n}</option>`).join("")}
+    </select>
+    <button class="btn sm pri" onclick="assignIV('${s}',${si})">追加</button>
+  </div>
+  <div id="iv-list-${si}">${ivHtml}</div>
+  <div class="admin-sect">
+    <div class="sect-label">管理者コメント</div>
+    <textarea class="cmt-ta" id="adcmt-${si}">${e.adminComment||""}</textarea>
+    <div class="row-btns"><button class="btn sm pri" onclick="saveAdminCmt('${s}',${si})">保存</button></div>
+  </div>`;
+}
+
+function renderIVCard(d,s,si,iv,ii){
+  const ov=iv.overall||0;
+  const stars=Array.from({length:5},(_,i)=>`<span class="si-star${i<ov?" on":""}" onclick="setOverall('${s}',${si},${ii},${i+1})">★</span>`).join("");
+  const crits=Object.entries(iv.crit).map(([k,v])=>{
+    const v2=v||0;
+    const cs=Array.from({length:5},(_,i)=>`<span class="csi${i<v2?" on":""}" onclick="setCrit('${s}',${si},${ii},'${k}',${i+1})">★</span>`).join("");
+    return `<div class="citem"><div class="clabel">${k}</div><div class="cstars">${cs}</div></div>`;
+  }).join("");
+  return `<div class="ecard">
+    <div class="ehead">
+      <div class="iav">${iv.ini}</div>
+      <div><div class="iname">${iv.name}<span class="edbadge e">編集可</span></div><div class="irole">${iv.role}</div></div>
+      <div class="idate">${iv.date}</div>
+    </div>
+    <div class="star-row">${stars}<span style="font-size:12px;font-weight:500;color:var(--text);margin-left:5px;">${ov}.0</span></div>
+    <div class="cgrid">${crits}</div>
+    <textarea class="cmt-ta" id="cmt-${s}-${ii}">${iv.comment||""}</textarea>
+    <div class="row-btns">
+      <button class="btn sm pri" onclick="saveIVCmt('${s}',${ii})">保存</button>
+      <button class="btn sm danger" onclick="removeIV('${s}',${si},${ii})">削除</button>
+    </div>
+  </div>`;
+}
+
+function getD(){return ALL_DATA.find(x=>x.id===currentApplicantId);}
+
+function assignIV(s,si){
+  const sel=$("asel-"+si),full=sel.value;
+  if(!full){showToast("面接官を選択してください");return;}
+  const name=full.split("（")[0],role=(full.match(/（(.+?)）/)||[])[1]||"";
+  const d=getD();if(!d)return;
+  if(!d.evals[s])d.evals[s]={ivs:[],adminComment:""};
+  if(d.evals[s].ivs.find(iv=>iv.name===name)){showToast("すでにアサイン済みです");return;}
+  d.evals[s].ivs.push({name,ini:name.slice(0,1),role,date:new Date().toISOString().slice(0,10),overall:0,crit:{技術力:0,コミュ力:0,カルチャー:0},comment:""});
+  sel.value="";showToast(name+" をアサインしました");refreshAcc(d,s,si);
+}
+function removeIV(s,si,ii){
+  const d=getD();if(!d)return;
+  d.evals[s].ivs.splice(ii,1);
+  showToast("削除しました");refreshAcc(d,s,si);
+}
+function setOverall(s,si,ii,v){
+  const d=getD();if(!d)return;
+  d.evals[s].ivs[ii].overall=v;refreshAcc(d,s,si);
+}
+function setCrit(s,si,ii,k,v){
+  const d=getD();if(!d)return;
+  d.evals[s].ivs[ii].crit[k]=v;refreshAcc(d,s,si);
+}
+function saveIVCmt(s,ii){
+  const el=$("cmt-"+s+"-"+ii);
+  const d=getD();if(d&&el)d.evals[s].ivs[ii].comment=el.value;
+  showToast("保存しました");
+}
+function saveAdminCmt(s,si){
+  const el=$("adcmt-"+si),d=getD();
+  if(d&&el){if(!d.evals[s])d.evals[s]={ivs:[],adminComment:""};d.evals[s].adminComment=el.value;}
+  showToast("保存しました");
+}
+function refreshAcc(d,s,si){
+  $("iv-list-"+si).innerHTML=d.evals[s].ivs.length?d.evals[s].ivs.map((iv,ii)=>renderIVCard(d,s,si,iv,ii)).join(""):`<div style="font-size:12px;color:var(--text3);margin-bottom:8px;">評価がありません</div>`;
+  const score=calcStepScore(d.evals,s);
+  const head=document.querySelector(`#acc-${si} .acc-head span:nth-child(2)`);
+  if(head)head.textContent=score?"avg "+score:"未評価";
+  const cnt=document.querySelector(`#acc-${si} .acc-head span:nth-child(4)`);
+  if(cnt)cnt.textContent=d.evals[s].ivs.length+"名";
+  const avg=calcCritAvg(d.evals,s);
+  const barsWrap=document.querySelector(`#abody-${si}>div:first-child`);
+  if(barsWrap&&Object.keys(avg).length){
+    barsWrap.innerHTML=Object.entries(avg).map(([k,v])=>`<div class="sbar"><div class="sbar-head"><span>${k}</span><span>${v}</span></div><div class="sbar-track"><div class="sbar-fill" style="width:${parseFloat(v)/5*100}%"></div></div></div>`).join("");
+  }
+}
+
+function renderDocs(d){
+  $("dpane-docs").innerHTML=d.docs.length?d.docs.map(doc=>`
+    <div class="ditem">
+      <div class="dicon"><svg width="14" height="14" viewBox="0 0 16 16" fill="none"><rect x="2" y="1" width="9" height="13" rx="1" stroke="currentColor" stroke-width="1.2"/><path d="M5 5h5M5 8h5M5 11h3" stroke="currentColor" stroke-width="1" stroke-linecap="round"/></svg></div>
+      <div><div class="dname">${doc.name}</div><div class="dmeta">${doc.type} · ${doc.size} · ${doc.date}</div></div>
+      <button class="ddl" onclick="showToast('${doc.name}をダウンロードしました')">DL</button>
+    </div>`).join(""):`<div style="font-size:13px;color:var(--text3);">書類がありません</div>`;
+}
+
+function renderMails(d){
+  if(!d.mails.length){$("dpane-mail").innerHTML=`<div style="font-size:13px;color:var(--text3);">メール履歴がありません</div>`;return;}
+  $("dpane-mail").innerHTML=d.mails.map((m,i)=>`
+    <div class="mitem">
+      <div class="mhead" data-mi="${i}">
+        <div class="mdir ${m.dir==="out"?"mo":"min"}">
+          <svg width="12" height="12" viewBox="0 0 16 16" fill="none">
+            ${m.dir==="out"?'<path d="M3 13L13 3M13 3H7M13 3v6" stroke="#3C3489" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>':'<path d="M13 3L3 13M3 13h6M3 13V7" stroke="#085041" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>'}
+          </svg>
+        </div>
+        <div class="msubj">${m.subj}</div>
+        <div class="mdt">${m.date}</div>
+        <div class="mchev" id="mchev-${i}">▼</div>
+      </div>
+      <div class="mbody" id="mbody-${i}">
+        <div class="mmeta">差出人: ${m.from}<br>宛先: ${m.to}</div>
+        <div class="mtext">${m.body}</div>
+      </div>
+    </div>`).join("");
+  $("dpane-mail").querySelectorAll(".mhead[data-mi]").forEach(el=>{
+    el.onclick=()=>{
+      const i=el.dataset.mi;
+      const b=$("mbody-"+i),c=$("mchev-"+i);
+      const open=b.style.display==="block";
+      b.style.display=open?"none":"block";
+      c.style.transform=open?"":"rotate(180deg)";
+    };
+  });
+}
+
+function renderITL(d){
+  $("dpane-itl").innerHTML=`
+    <div class="itl-compose">
+      <textarea class="itl-ta" id="itl-ta" placeholder="社内連絡・申し送り・相談事項を入力..."></textarea>
+      <div class="itl-foot">
+        <select class="itl-sel" id="itl-sel">
+          <option value="notify">連絡</option>
+          <option value="discuss">相談</option>
+          <option value="urgent">至急</option>
+        </select>
+        <button class="itl-post" onclick="postITL()">投稿</button>
+      </div>
+    </div>
+    <div id="itl-posts">${renderITLPosts(d)}</div>`;
+}
+function renderITLPosts(d){
+  const dd=d||getD();
+  if(!dd)return "";
+  return dd.itl.map((p,i)=>`
+    <div class="icard">
+      <div class="icard-head">
+        <div class="iav2">${p.ini}</div>
+        <span class="iwho">${p.who}</span>
+        <span class="itbadge ${ITL_TYPE[p.type]?.cls||'it-notify'}">${ITL_TYPE[p.type]?.label||p.type}</span>
+        <span class="iwhen">${p.time}</span>
+        <button class="btn sm danger" onclick="removeITL(${i})">削除</button>
+      </div>
+      <div class="itext">${p.text}</div>
+    </div>`).join("")||`<div style="font-size:13px;color:var(--text3);">投稿がありません</div>`;
+}
+function postITL(){
+  const ta=$("itl-ta"),sel=$("itl-sel");
+  const txt=ta.value.trim();if(!txt){showToast("内容を入力してください");return;}
+  const d=getD();if(!d)return;
+  const now=new Date();
+  const ts=now.toISOString().slice(0,10)+" "+now.toTimeString().slice(0,5);
+  d.itl.unshift({who:"管理者",ini:"管",type:sel.value,text:txt,time:ts});
+  ta.value="";
+  $("itl-posts").innerHTML=renderITLPosts();
+  showToast("投稿しました");
+}
+function removeITL(i){
+  const d=getD();if(!d)return;
+  d.itl.splice(i,1);
+  $("itl-posts").innerHTML=renderITLPosts();
+  showToast("削除しました");
+}
+
+// ===== STEP MODAL =====
+function openStepModal(){
+  const d=getD();if(!d)return;
+  selStep2=d.step;selStatus2=d.status;
+  renderStepModal();openModal("modal-step");
+}
+function renderStepModal(){
+  $("sm-steps").innerHTML=STEPS.map(s=>`
+    <div class="opt${selStep2===s?" sel":""}" data-sv="${s}" data-type="step">
+      <input type="radio" ${selStep2===s?"checked":""} readonly style="width:13px;height:13px;accent-color:var(--purple);flex-shrink:0"/>
+      <span class="stepb ${STEP_CLS[s]||''}">${s}</span>
+    </div>`).join("");
+  $("sm-statuses").innerHTML=STATUSES.map(s=>`
+    <div class="opt${selStatus2===s?" sel":""}" data-sv="${s}" data-type="status">
+      <input type="radio" ${selStatus2===s?"checked":""} readonly style="width:13px;height:13px;accent-color:var(--purple);flex-shrink:0"/>
+      <span class="badge ${ST_CLS[s]||''}">${s}</span>
+    </div>`).join("");
+  $("sm-steps").querySelectorAll(".opt").forEach(el=>{el.onclick=()=>{selStep2=el.dataset.sv;renderStepModal();};});
+  $("sm-statuses").querySelectorAll(".opt").forEach(el=>{el.onclick=()=>{selStatus2=el.dataset.sv;renderStepModal();};});
+}
+$("sm-cancel").onclick=()=>closeModal("modal-step");
+$("sm-ok").onclick=()=>{
+  const d=getD();if(d){d.step=selStep2;d.status=selStatus2;renderStepFlow(d);}
+  closeModal("modal-step");showToast("ステップ・ステータスを更新しました");
+};
+
+// ===== BULK MODAL =====
+function openBulkModal(){
+  selBulkVal=null;selTagsOp.clear();bulkTab="step";
+  renderBulkModal();openModal("modal-bulk");
+}
+function renderBulkModal(){
+  $("bulk-mtabs").innerHTML=["step","status","job","tag-add","tag-remove"].map((t,i)=>`
+    <button class="mtab${bulkTab===t?" active":""}" data-bt="${t}">${["ステップ","ステータス","求人","タグ付与","タグ削除"][i]}</button>`).join("");
+  $("bulk-mtabs").querySelectorAll(".mtab").forEach(b=>{b.onclick=()=>{bulkTab=b.dataset.bt;selBulkVal=null;selTagsOp.clear();renderBulkModal();};});
+  if(bulkTab==="tag-add"||bulkTab==="tag-remove"){
+    const isAdd=bulkTab==="tag-add";
+    $("bulk-mbody").innerHTML=`<div style="font-size:11px;color:var(--text3);margin-bottom:8px;">${isAdd?"付与するタグを選択":"削除するタグを選択"}</div>
+      <div class="tag-grid">${ALL_TAGS.map(t=>`<div class="tag-opt${selTagsOp.has(t)?(isAdd?" add":" remove"):""}" data-tag="${t}">${t}</div>`).join("")}</div>`;
+    $("bulk-mbody").querySelectorAll(".tag-opt").forEach(el=>{el.onclick=()=>{selTagsOp.has(el.dataset.tag)?selTagsOp.delete(el.dataset.tag):selTagsOp.add(el.dataset.tag);renderBulkModal();};});
+  } else {
+    const items=bulkTab==="step"?STEPS:bulkTab==="status"?STATUSES:[...new Set(ALL_DATA.map(d=>d.job))];
+    $("bulk-mbody").innerHTML=`<input class="msearch" id="bsearch" placeholder="検索..."/>
+      <div class="opt-list" id="blist"></div>`;
+    const renderBList=()=>{
+      const q=($("bsearch")||{value:""}).value.toLowerCase();
+      $("blist").innerHTML=items.filter(v=>v.toLowerCase().includes(q)).map(v=>{
+        const cls=bulkTab==="step"?(STEP_CLS[v]||""):bulkTab==="status"?(ST_CLS[v]||""):"";
+        const bt=bulkTab==="step"?"stepb":"badge";
+        return `<div class="opt${selBulkVal===v?" sel":""}" data-bv="${v}"><input type="radio" ${selBulkVal===v?"checked":""} readonly style="width:13px;height:13px;accent-color:var(--purple);flex-shrink:0"/><span class="${bt} ${cls}">${v}</span></div>`;
+      }).join("");
+      $("blist").querySelectorAll(".opt").forEach(el=>{el.onclick=()=>{selBulkVal=el.dataset.bv;renderBList();};});
+    };
+    renderBList();
+    if($("bsearch"))$("bsearch").oninput=renderBList;
+  }
+}
+$("bulk-mcancel").onclick=()=>closeModal("modal-bulk");
+$("bulk-mok").onclick=()=>{
+  if(bulkTab==="tag-add"||bulkTab==="tag-remove"){
+    if(!selTagsOp.size){showToast("タグを選択してください");return;}
+    selected.forEach(id=>{const d=ALL_DATA.find(x=>x.id===id);if(!d)return;
+      if(bulkTab==="tag-add")selTagsOp.forEach(t=>{if(!d.tags.includes(t))d.tags.push(t);});
+      else selTagsOp.forEach(t=>{d.tags=d.tags.filter(x=>x!==t);});});
+    showToast(`${selected.size}件のタグを${bulkTab==="tag-add"?"付与":"削除"}しました`);
+  } else {
+    if(!selBulkVal){showToast("変更先を選択してください");return;}
+    const field={"step":"step","status":"status","job":"job"}[bulkTab];
+    const label={"step":"ステップ","status":"ステータス","job":"求人"}[bulkTab];
+    selected.forEach(id=>{const d=ALL_DATA.find(x=>x.id===id);if(d)d[field]=selBulkVal;});
+    showToast(`${selected.size}件の${label}を「${selBulkVal}」に変更しました`);
+  }
+  renderMetrics();renderTable();closeModal("modal-bulk");
+};
+
+// ===== MAIL MODAL =====
+function openMailModal(single){
+  selMailTpl=null;
+  renderMailModal();openModal("modal-mail");
+}
+function renderMailModal(){
+  const q=($("mail-msearch")||{value:""}).value.toLowerCase();
+  $("mail-mlist").innerHTML=MAIL_TPLS.filter(t=>t.name.includes(q)||t.desc.includes(q)).map(t=>`
+    <div class="tpl-item${selMailTpl===t.id?" sel":""}" data-tid="${t.id}">
+      <div class="tpl-name">${t.name}</div><div class="tpl-desc">${t.desc}</div>
+    </div>`).join("");
+  $("mail-mlist").querySelectorAll(".tpl-item").forEach(el=>{el.onclick=()=>{selMailTpl=el.dataset.tid;renderMailModal();};});
+}
+$("mail-msearch").oninput=renderMailModal;
+$("mail-mcancel").onclick=()=>closeModal("modal-mail");
+$("mail-mok").onclick=()=>{
+  if(!selMailTpl){showToast("テンプレートを選択してください");return;}
+  showToast(`「${MAIL_TPLS.find(t=>t.id===selMailTpl).name}」を送付しました`);
+  closeModal("modal-mail");
+};
+
+// ===== CSV MODAL =====
+function openCsvModal(){
+  selCsvFmt=null;renderCsvModal();openModal("modal-csv");
+}
+function renderCsvModal(){
+  const q=($("csv-msearch")||{value:""}).value.toLowerCase();
+  $("csv-mlist").innerHTML=CSV_FORMATS.filter(f=>f.name.toLowerCase().includes(q)||f.cols.toLowerCase().includes(q)).map(f=>`
+    <div class="fmt-item${selCsvFmt===f.id?" sel":""}" data-fid="${f.id}">
+      <div class="fmt-name">${f.name}</div><div class="fmt-cols">${f.cols}</div>
+    </div>`).join("");
+  $("csv-mlist").querySelectorAll(".fmt-item").forEach(el=>{el.onclick=()=>{selCsvFmt=el.dataset.fid;renderCsvModal();};});
+}
+$("csv-msearch").oninput=renderCsvModal;
+$("csv-mcancel").onclick=()=>closeModal("modal-csv");
+$("csv-mok").onclick=()=>{
+  if(!selCsvFmt){showToast("フォーマットを選択してください");return;}
+  const rows=ALL_DATA.filter(d=>selected.has(d.id));
+  const fmt=CSV_FORMATS.find(f=>f.id===selCsvFmt);
+  const maps={
+    basic:d=>`${d.id},${d.name},${d.gender},${d.age},${d.job},${d.step},${d.status},${d.date}`,
+    full:d=>`${d.id},${d.name},${d.gender},${d.age},${d.job},${d.step},${d.status},${d.date},"${d.tags.join("/")}",${d.stars}`,
+    hr:d=>`${d.id},${d.name},${d.gender},${d.age},${d.step},${d.status},"${d.tags.join("/")}"`,
+    report:d=>`${d.job},${d.id},${d.name},${d.step},${d.status},${d.date},${d.stars}`,
+  };
+  const csv=[fmt.cols,...rows.map(maps[selCsvFmt])].join("\n");
+  const a=document.createElement("a");
+  a.href="data:text/csv;charset=utf-8,\uFEFF"+encodeURIComponent(csv);
+  a.download=`applicants_${selCsvFmt}.csv`;a.click();
+  showToast(`${rows.length}件をダウンロードしました`);closeModal("modal-csv");
+};
+
+// close modal on overlay click
+document.querySelectorAll(".overlay").forEach(ov=>{ov.onclick=e=>{if(e.target===ov)ov.classList.remove("open");};});
+</script>
+</body>
+</html>

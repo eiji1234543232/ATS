@@ -1,436 +1,400 @@
-<!DOCTYPE html>
+  <!DOCTYPE html>
 <html lang="ja">
 <head>
 <meta charset="UTF-8"/>
-<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
 <title>ATS Portal</title>
 <style>
 *{box-sizing:border-box;margin:0;padding:0;}
 body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:#f5f5f3;color:#1a1a18;min-height:100vh;}
-/* ===== TOKENS ===== */
 :root{
   --bg:#fff;--bg2:#f5f5f3;--bg3:#eeecea;
   --text:#1a1a18;--text2:#6b6b68;--text3:#a0a09c;
-  --border:rgba(0,0,0,0.12);--border2:rgba(0,0,0,0.22);
-  --purple:#534AB7;--purple-dark:#3C3489;--purple-light:#EEEDFE;
-  --green-light:#E1F5EE;--green:#085041;
-  --red-light:#FCEBEB;--red:#791F1F;
-  --amber-light:#FAEEDA;--amber:#633806;
-  --blue-light:#E6F1FB;--blue:#0C447C;
-  --gray-light:#F1EFE8;--gray:#444441;
+  --bdr:rgba(0,0,0,0.12);--bdr2:rgba(0,0,0,0.22);
+  --pur:#534AB7;--pur-d:#3C3489;--pur-l:#EEEDFE;
+  --grn-l:#E1F5EE;--grn:#085041;
+  --red-l:#FCEBEB;--red:#791F1F;
+  --amb-l:#FAEEDA;--amb:#633806;
+  --blu-l:#E6F1FB;--blu:#0C447C;
+  --gry-l:#F1EFE8;--gry:#444441;
   --r-md:8px;--r-lg:12px;
 }
 @media(prefers-color-scheme:dark){
-  :root{--bg:#1c1c1a;--bg2:#252523;--bg3:#2e2e2b;--text:#f0ede8;--text2:#a8a8a4;--text3:#6b6b68;--border:rgba(255,255,255,0.1);--border2:rgba(255,255,255,0.2);}
+  :root{--bg:#1c1c1a;--bg2:#252523;--bg3:#2e2e2b;--text:#f0ede8;--text2:#a8a8a4;--text3:#6b6b68;--bdr:rgba(255,255,255,0.1);--bdr2:rgba(255,255,255,0.2);}
 }
-/* ===== PAGES ===== */
-.page{display:none;}
-.page.active{display:block;}
-/* ===== LOGIN ===== */
-#page-login{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:1rem;background:var(--bg2);}
-.login-card{background:var(--bg);border:0.5px solid var(--border);border-radius:var(--r-lg);padding:2rem 2.5rem;width:100%;max-width:380px;}
+.page{display:none;}.page.active{display:block;}
+/* LOGIN */
+#pg-login{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:1rem;background:var(--bg2);}
+.lcard{background:var(--bg);border:0.5px solid var(--bdr);border-radius:var(--r-lg);padding:2rem 2.5rem;width:100%;max-width:380px;}
 .logo{display:flex;align-items:center;gap:10px;margin-bottom:2rem;}
-.logo-mark{width:36px;height:36px;background:var(--purple);border-radius:var(--r-md);display:flex;align-items:center;justify-content:center;}
-.logo-text{font-size:18px;font-weight:500;color:var(--text);}
-.logo-sub{font-size:12px;color:var(--text2);}
-.login-card h2{font-size:20px;font-weight:500;color:var(--text);margin-bottom:4px;}
-.login-sub{font-size:13px;color:var(--text2);margin-bottom:1.75rem;}
+.lmark{width:36px;height:36px;background:var(--pur);border-radius:var(--r-md);display:flex;align-items:center;justify-content:center;}
+.ltxt{font-size:18px;font-weight:500;color:var(--text);}
+.lsub{font-size:12px;color:var(--text2);}
+.lcard h2{font-size:20px;font-weight:500;margin-bottom:4px;}
+.lcard p{font-size:13px;color:var(--text2);margin-bottom:1.5rem;}
 .field{margin-bottom:1rem;}
-.field label{display:block;font-size:13px;color:var(--text2);margin-bottom:6px;}
-.field input{width:100%;height:40px;padding:0 12px;border:0.5px solid var(--border2);border-radius:var(--r-md);background:var(--bg);color:var(--text);font-size:14px;outline:none;}
-.field input:focus{border-color:var(--purple);box-shadow:0 0 0 3px rgba(83,74,183,0.12);}
-.forgot{text-align:right;font-size:12px;margin-top:4px;color:var(--purple);cursor:pointer;}
-.login-btn{width:100%;height:40px;background:var(--purple);color:#fff;border:none;border-radius:var(--r-md);font-size:14px;font-weight:500;cursor:pointer;margin-top:8px;}
-.login-btn:hover{background:var(--purple-dark);}
-.login-err{display:none;font-size:12px;color:#A32D2D;background:var(--red-light);border:0.5px solid #F09595;border-radius:var(--r-md);padding:8px 12px;margin-bottom:1rem;}
-/* ===== SHELL ===== */
-#page-app{min-height:100vh;display:flex;flex-direction:column;}
-.navbar{height:52px;background:var(--bg);border-bottom:0.5px solid var(--border);display:flex;align-items:center;padding:0 1.25rem;gap:12px;position:sticky;top:0;z-index:50;}
-.nav-logo{display:flex;align-items:center;gap:8px;}
-.nav-logo-mark{width:28px;height:28px;background:var(--purple);border-radius:6px;display:flex;align-items:center;justify-content:center;}
-.nav-title{font-size:15px;font-weight:500;color:var(--text);}
-.nav-spacer{flex:1;}
-.nav-user{font-size:13px;color:var(--text2);}
-.nav-logout{height:30px;padding:0 12px;font-size:12px;border:0.5px solid var(--border2);border-radius:var(--r-md);background:transparent;color:var(--text2);cursor:pointer;}
-.nav-logout:hover{background:var(--bg2);}
-.app-body{flex:1;padding:1.25rem;max-width:1200px;margin:0 auto;width:100%;}
-/* ===== COMMON COMPONENTS ===== */
-.btn{height:34px;padding:0 14px;font-size:13px;border:0.5px solid var(--border2);border-radius:var(--r-md);background:var(--bg);color:var(--text);cursor:pointer;white-space:nowrap;display:inline-flex;align-items:center;gap:6px;}
+.field label{display:block;font-size:13px;color:var(--text2);margin-bottom:5px;}
+.field input{width:100%;height:40px;padding:0 12px;border:0.5px solid var(--bdr2);border-radius:var(--r-md);background:var(--bg);color:var(--text);font-size:14px;outline:none;}
+.field input:focus{border-color:var(--pur);box-shadow:0 0 0 3px rgba(83,74,183,0.1);}
+.lerr{display:none;font-size:12px;color:#A32D2D;background:var(--red-l);border:0.5px solid #F09595;border-radius:var(--r-md);padding:8px 12px;margin-bottom:1rem;}
+.lbtn{width:100%;height:40px;background:var(--pur);color:#fff;border:none;border-radius:var(--r-md);font-size:14px;font-weight:500;cursor:pointer;}
+.lbtn:hover{background:var(--pur-d);}
+/* NAVBAR */
+#pg-app{min-height:100vh;display:flex;flex-direction:column;}
+.navbar{height:52px;background:var(--bg);border-bottom:0.5px solid var(--bdr);display:flex;align-items:center;padding:0 1.25rem;gap:12px;position:sticky;top:0;z-index:50;}
+.nmark{width:28px;height:28px;background:var(--pur);border-radius:6px;display:flex;align-items:center;justify-content:center;}
+.ntitle{font-size:15px;font-weight:500;color:var(--text);}
+.nspc{flex:1;}
+.nusr{font-size:13px;color:var(--text2);}
+.nbtn{height:30px;padding:0 12px;font-size:12px;border:0.5px solid var(--bdr2);border-radius:var(--r-md);background:transparent;color:var(--text2);cursor:pointer;}
+.nbtn:hover{background:var(--bg2);}
+.abody{flex:1;padding:1.25rem;max-width:1200px;margin:0 auto;width:100%;}
+/* BUTTONS */
+.btn{height:34px;padding:0 14px;font-size:13px;border:0.5px solid var(--bdr2);border-radius:var(--r-md);background:var(--bg);color:var(--text);cursor:pointer;white-space:nowrap;display:inline-flex;align-items:center;gap:6px;}
 .btn:hover{background:var(--bg2);}
-.btn.pri{background:var(--purple);color:#fff;border-color:var(--purple);}
-.btn.pri:hover{background:var(--purple-dark);}
+.btn.pri{background:var(--pur);color:#fff;border-color:var(--pur);}
+.btn.pri:hover{background:var(--pur-d);}
 .btn.sm{height:28px;font-size:12px;padding:0 10px;}
 .btn.danger{color:#A32D2D;border-color:#F09595;}
-.btn.danger:hover{background:var(--red-light);}
-.card{background:var(--bg);border:0.5px solid var(--border);border-radius:var(--r-lg);padding:13px 15px;}
+.btn.danger:hover{background:var(--red-l);}
+/* BADGES */
 .badge{display:inline-block;font-size:11px;padding:2px 7px;border-radius:99px;white-space:nowrap;}
 .stepb{display:inline-block;font-size:11px;padding:2px 7px;border-radius:4px;white-space:nowrap;}
-.step-doc{background:var(--blue-light);color:var(--blue);}
-.step-written{background:var(--purple-light);color:var(--purple-dark);}
-.step-1st{background:var(--amber-light);color:var(--amber);}
-.step-2nd{background:#FAC775;color:var(--amber);}
+.step-doc{background:var(--blu-l);color:var(--blu);}
+.step-written{background:var(--pur-l);color:var(--pur-d);}
+.step-1st{background:var(--amb-l);color:var(--amb);}
+.step-2nd{background:#FAC775;color:var(--amb);}
 .step-final{background:#FAECE7;color:#712B13;}
-.step-offer{background:var(--green-light);color:var(--green);}
-.st-pass{background:var(--green-light);color:var(--green);}
-.st-fail{background:var(--red-light);color:var(--red);}
-.st-hold{background:var(--gray-light);color:var(--gray);}
-.st-new{background:var(--blue-light);color:var(--blue);}
+.step-offer{background:var(--grn-l);color:var(--grn);}
+.st-pass{background:var(--grn-l);color:var(--grn);}
+.st-fail{background:var(--red-l);color:var(--red);}
+.st-hold{background:var(--gry-l);color:var(--gry);}
+.st-new{background:var(--blu-l);color:var(--blu);}
 .st-wd{background:#FBEAF0;color:#72243E;}
 .tag{display:inline-block;font-size:11px;padding:2px 6px;border-radius:99px;margin:1px;}
-.t-eng{background:var(--purple-light);color:var(--purple-dark);}
-.t-hr{background:var(--green-light);color:var(--green);}
+.t-eng{background:var(--pur-l);color:var(--pur-d);}
+.t-hr{background:var(--grn-l);color:var(--grn);}
 .t-hot{background:#FAECE7;color:#712B13;}
-.t-keep{background:var(--amber-light);color:var(--amber);}
-.gm{color:#185FA5;font-weight:500;}
-.gf{color:#993556;font-weight:500;}
-.toast{display:none;position:fixed;bottom:1.5rem;left:50%;transform:translateX(-50%);background:#2C2C2A;color:#F1EFE8;font-size:12px;padding:9px 18px;border-radius:var(--r-md);white-space:nowrap;z-index:9999;box-shadow:0 4px 12px rgba(0,0,0,0.2);}
+.t-keep{background:var(--amb-l);color:var(--amb);}
+.gm{color:#185FA5;font-weight:500;}.gf{color:#993556;font-weight:500;}
+/* TOAST */
+.toast{display:none;position:fixed;bottom:1.5rem;left:50%;transform:translateX(-50%);background:#2C2C2A;color:#F1EFE8;font-size:12px;padding:9px 18px;border-radius:var(--r-md);white-space:nowrap;z-index:9999;}
 .toast.show{display:block;}
-/* ===== LIST PAGE ===== */
-.list-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:1rem;flex-wrap:wrap;gap:8px;}
-.page-title{font-size:18px;font-weight:500;color:var(--text);}
+/* LIST */
+.list-hdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:1rem;flex-wrap:wrap;gap:8px;}
+.ptitle{font-size:18px;font-weight:500;}
 .metrics{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;margin-bottom:1rem;}
 @media(max-width:480px){.metrics{grid-template-columns:repeat(2,minmax(0,1fr));}}
 .metric{background:var(--bg2);border-radius:var(--r-md);padding:11px 13px;}
-.metric-label{font-size:12px;color:var(--text2);margin-bottom:3px;}
-.metric-val{font-size:20px;font-weight:500;color:var(--text);}
-.metric-sub{font-size:11px;color:var(--text3);}
-.search-bar{display:flex;align-items:center;gap:8px;margin-bottom:8px;flex-wrap:wrap;}
-.search-bar input{flex:1;min-width:160px;height:36px;padding:0 12px;font-size:13px;border:0.5px solid var(--border2);border-radius:var(--r-md);background:var(--bg);color:var(--text);outline:none;}
-.search-bar input:focus{border-color:var(--purple);}
-.adv-panel{display:none;background:var(--bg2);border:0.5px solid var(--border);border-radius:var(--r-md);padding:14px;margin-bottom:10px;}
+.mlabel{font-size:12px;color:var(--text2);margin-bottom:3px;}
+.mval{font-size:20px;font-weight:500;}
+.msub{font-size:11px;color:var(--text3);}
+.sbar-row{display:flex;align-items:center;gap:8px;margin-bottom:8px;flex-wrap:wrap;}
+.sbar-row input[type=text]{flex:1;min-width:160px;height:36px;padding:0 12px;font-size:13px;border:0.5px solid var(--bdr2);border-radius:var(--r-md);background:var(--bg);color:var(--text);outline:none;}
+.sbar-row input:focus{border-color:var(--pur);}
+.adv-panel{display:none;background:var(--bg2);border:0.5px solid var(--bdr);border-radius:var(--r-md);padding:14px;margin-bottom:10px;}
 .adv-panel.open{display:block;}
 .adv-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin-bottom:10px;}
 @media(max-width:520px){.adv-grid{grid-template-columns:1fr 1fr;}}
-@media(max-width:360px){.adv-grid{grid-template-columns:1fr;}}
-.adv-field{display:flex;flex-direction:column;gap:4px;}
-.adv-field label{font-size:11px;color:var(--text3);}
-.adv-field select,.adv-field input[type=date]{height:32px;padding:0 8px;font-size:13px;border:0.5px solid var(--border2);border-radius:var(--r-md);background:var(--bg);color:var(--text);outline:none;width:100%;}
-.adv-field select:focus,.adv-field input:focus{border-color:var(--purple);}
-.date-range{display:flex;align-items:center;gap:6px;}
-.date-range input{flex:1;}
-.date-range span{font-size:12px;color:var(--text3);}
-.tag-pills{display:flex;flex-wrap:wrap;gap:6px;}
-.tag-pill{font-size:12px;padding:4px 12px;border-radius:99px;border:0.5px solid var(--border2);background:var(--bg);color:var(--text2);cursor:pointer;}
-.tag-pill.active{background:var(--purple);color:#fff;border-color:var(--purple);}
-.adv-section-title{font-size:11px;font-weight:500;color:var(--text2);margin-bottom:8px;margin-top:10px;}
-.adv-actions{display:flex;gap:8px;justify-content:flex-end;border-top:0.5px solid var(--border);padding-top:10px;margin-top:10px;}
-.bulk-bar{display:none;align-items:center;gap:6px;background:var(--bg2);border:0.5px solid var(--border2);border-radius:var(--r-md);padding:8px 12px;margin-bottom:10px;flex-wrap:wrap;}
+.adf{display:flex;flex-direction:column;gap:4px;}
+.adf label{font-size:11px;color:var(--text3);}
+.adf select,.adf input[type=date]{height:32px;padding:0 8px;font-size:13px;border:0.5px solid var(--bdr2);border-radius:var(--r-md);background:var(--bg);color:var(--text);outline:none;width:100%;}
+.adf select:focus,.adf input:focus{border-color:var(--pur);}
+.drange{display:flex;align-items:center;gap:6px;}.drange input{flex:1;}
+.drange span{font-size:12px;color:var(--text3);}
+.tpills{display:flex;flex-wrap:wrap;gap:6px;}
+.tpill{font-size:12px;padding:4px 12px;border-radius:99px;border:0.5px solid var(--bdr2);background:var(--bg);color:var(--text2);cursor:pointer;}
+.tpill.active{background:var(--pur);color:#fff;border-color:var(--pur);}
+.asect-title{font-size:11px;font-weight:500;color:var(--text2);margin-bottom:6px;margin-top:10px;}
+.adv-acts{display:flex;gap:8px;justify-content:flex-end;border-top:0.5px solid var(--bdr);padding-top:10px;margin-top:10px;}
+.bulk-bar{display:none;align-items:center;gap:6px;background:var(--bg2);border:0.5px solid var(--bdr2);border-radius:var(--r-md);padding:8px 12px;margin-bottom:10px;flex-wrap:wrap;}
 .bulk-bar.active{display:flex;}
-.bsep{width:0.5px;height:20px;background:var(--border2);flex-shrink:0;}
-.result-info{font-size:12px;color:var(--text3);margin-bottom:6px;}
-.table-wrap{background:var(--bg);border:0.5px solid var(--border);border-radius:var(--r-lg);overflow-x:auto;}
+.bsep{width:0.5px;height:20px;background:var(--bdr2);flex-shrink:0;}
+.rinfo{font-size:12px;color:var(--text3);margin-bottom:6px;}
+.twrap{background:var(--bg);border:0.5px solid var(--bdr);border-radius:var(--r-lg);overflow-x:auto;}
 table{width:100%;border-collapse:collapse;font-size:12px;min-width:560px;}
-thead th{background:var(--bg2);padding:8px 10px;text-align:left;font-size:11px;font-weight:500;color:var(--text2);border-bottom:0.5px solid var(--border);white-space:nowrap;user-select:none;}
-th.sortable{cursor:pointer;}
-th.sortable:hover{color:var(--text);}
-th.sort-on{color:var(--purple);}
+thead th{background:var(--bg2);padding:8px 10px;text-align:left;font-size:11px;font-weight:500;color:var(--text2);border-bottom:0.5px solid var(--bdr);white-space:nowrap;user-select:none;}
+th.sth{cursor:pointer;}.th.sth:hover{color:var(--text);}
+th.son{color:var(--pur);}
 .si{display:inline-flex;flex-direction:column;gap:1px;vertical-align:middle;margin-left:3px;opacity:0.35;}
 .si svg{width:7px;height:5px;}
 .si.asc svg:first-child,.si.desc svg:last-child{opacity:1;}
-tbody tr{border-bottom:0.5px solid var(--border);cursor:pointer;transition:background 0.1s;}
+tbody tr{border-bottom:0.5px solid var(--bdr);cursor:pointer;transition:background 0.1s;}
 tbody tr:last-child{border-bottom:none;}
 tbody tr:hover{background:var(--bg2);}
-tbody tr.sel{background:var(--purple-light);}
-td{padding:8px 10px;color:var(--text);vertical-align:middle;}
+tbody tr.sel{background:var(--pur-l);}
+td{padding:8px 10px;vertical-align:middle;}
 td.ell{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:0;}
-input[type=checkbox]{width:14px;height:14px;cursor:pointer;accent-color:var(--purple);}
-.eval-date{display:flex;flex-direction:column;gap:1px;}
-.date-row{font-size:11px;color:var(--text3);}
-.star{color:#EF9F27;font-size:11px;}
-.star.off{color:var(--border2);}
+input[type=checkbox]{width:14px;height:14px;cursor:pointer;accent-color:var(--pur);}
+.star{color:#EF9F27;font-size:11px;}.star.off{color:var(--bdr2);}
+.drow{font-size:11px;color:var(--text3);}
 .empty{text-align:center;padding:2rem;color:var(--text3);font-size:13px;}
 /* MODAL */
 .overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.4);z-index:200;align-items:flex-start;justify-content:center;padding:40px 16px;}
 .overlay.open{display:flex;}
-.mbox{background:var(--bg);border:0.5px solid var(--border);border-radius:var(--r-lg);padding:1.25rem;width:100%;max-width:440px;max-height:calc(100vh - 80px);overflow-y:auto;}
-.mbox h3{font-size:15px;font-weight:500;color:var(--text);margin-bottom:1rem;}
-.modal-tabs{display:grid;gap:4px;margin-bottom:1rem;}
-.mtab{height:30px;font-size:12px;border:0.5px solid var(--border2);border-radius:var(--r-md);background:var(--bg);color:var(--text2);cursor:pointer;padding:0 4px;}
-.mtab.active{background:var(--purple);color:#fff;border-color:var(--purple);}
-.msearch{width:100%;height:32px;padding:0 10px;font-size:13px;border:0.5px solid var(--border2);border-radius:var(--r-md);background:var(--bg2);color:var(--text);outline:none;margin-bottom:8px;}
-.msearch:focus{border-color:var(--purple);}
-.opt-list{display:flex;flex-direction:column;gap:3px;max-height:180px;overflow-y:auto;}
-.opt{display:flex;align-items:center;gap:8px;padding:6px 10px;border:0.5px solid var(--border);border-radius:var(--r-md);cursor:pointer;font-size:13px;}
-.opt:hover{background:var(--bg2);}
-.opt.sel{background:var(--purple-light);border-color:#AFA9EC;}
-.opt input[type=radio]{width:13px;height:13px;accent-color:var(--purple);flex-shrink:0;}
-.tag-grid{display:flex;flex-wrap:wrap;gap:8px;padding:4px 0;}
-.tag-opt{padding:6px 12px;border:0.5px solid var(--border2);border-radius:99px;cursor:pointer;font-size:13px;color:var(--text2);}
-.tag-opt.add{background:var(--purple);color:#fff;border-color:var(--purple);}
-.tag-opt.remove{background:var(--red-light);color:#A32D2D;border-color:#F09595;}
+.mbox{background:var(--bg);border:0.5px solid var(--bdr);border-radius:var(--r-lg);padding:1.25rem;width:100%;max-width:440px;max-height:calc(100vh - 80px);overflow-y:auto;}
+.mbox h3{font-size:15px;font-weight:500;margin-bottom:1rem;}
+.mtabs{display:grid;gap:4px;margin-bottom:1rem;}
+.mtab{height:30px;font-size:12px;border:0.5px solid var(--bdr2);border-radius:var(--r-md);background:var(--bg);color:var(--text2);cursor:pointer;padding:0 4px;}
+.mtab.active{background:var(--pur);color:#fff;border-color:var(--pur);}
+.msearch{width:100%;height:32px;padding:0 10px;font-size:13px;border:0.5px solid var(--bdr2);border-radius:var(--r-md);background:var(--bg2);color:var(--text);outline:none;margin-bottom:8px;}
+.msearch:focus{border-color:var(--pur);}
+.olist{display:flex;flex-direction:column;gap:3px;max-height:180px;overflow-y:auto;}
+.oitem{display:flex;align-items:center;gap:8px;padding:6px 10px;border:0.5px solid var(--bdr);border-radius:var(--r-md);cursor:pointer;font-size:13px;}
+.oitem:hover{background:var(--bg2);}
+.oitem.sel{background:var(--pur-l);border-color:#AFA9EC;}
+.oitem input[type=radio]{width:13px;height:13px;accent-color:var(--pur);flex-shrink:0;}
+.taggrid{display:flex;flex-wrap:wrap;gap:8px;padding:4px 0;}
+.tagopt{padding:6px 12px;border:0.5px solid var(--bdr2);border-radius:99px;cursor:pointer;font-size:13px;color:var(--text2);}
+.tagopt.tadd{background:var(--pur);color:#fff;border-color:var(--pur);}
+.tagopt.tremove{background:var(--red-l);color:#A32D2D;border-color:#F09595;}
 .macts{display:flex;gap:8px;margin-top:1rem;justify-content:flex-end;}
-.tpl-item,.fmt-item{padding:8px 10px;border:0.5px solid var(--border);border-radius:var(--r-md);cursor:pointer;margin-bottom:4px;}
-.tpl-item:hover,.fmt-item:hover{background:var(--bg2);}
-.tpl-item.sel,.fmt-item.sel{background:var(--purple-light);border-color:#AFA9EC;}
-.tpl-name,.fmt-name{font-size:13px;font-weight:500;color:var(--text);}
-.tpl-desc,.fmt-cols{font-size:11px;color:var(--text2);margin-top:2px;}
-/* ===== DETAIL ===== */
-#pane-detail{display:none;}
-#pane-detail.active{display:block;}
-.detail-topbar{display:flex;align-items:center;justify-content:space-between;margin-bottom:1rem;gap:8px;flex-wrap:wrap;}
-.detail-layout{display:grid;grid-template-columns:220px 1fr;gap:12px;align-items:start;}
-@media(max-width:640px){.detail-layout{grid-template-columns:1fr;}}
-.d-side{display:flex;flex-direction:column;gap:10px;}
-.ph-head{display:flex;flex-direction:column;align-items:center;text-align:center;padding-bottom:10px;border-bottom:0.5px solid var(--border);margin-bottom:10px;}
-.av{width:52px;height:52px;border-radius:50%;overflow:hidden;background:var(--bg2);border:0.5px solid var(--border);display:flex;align-items:center;justify-content:center;margin-bottom:5px;cursor:pointer;}
+.titem,.fitem{padding:8px 10px;border:0.5px solid var(--bdr);border-radius:var(--r-md);cursor:pointer;margin-bottom:4px;}
+.titem:hover,.fitem:hover{background:var(--bg2);}
+.titem.sel,.fitem.sel{background:var(--pur-l);border-color:#AFA9EC;}
+.tn,.fn{font-size:13px;font-weight:500;}
+.td2,.fd{font-size:11px;color:var(--text2);margin-top:2px;}
+/* DETAIL */
+.det-hdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:1rem;gap:8px;flex-wrap:wrap;}
+.dlayout{display:grid;grid-template-columns:220px 1fr;gap:12px;align-items:start;}
+@media(max-width:640px){.dlayout{grid-template-columns:1fr;}}
+.dside{display:flex;flex-direction:column;gap:10px;}
+.card{background:var(--bg);border:0.5px solid var(--bdr);border-radius:var(--r-lg);padding:13px 15px;}
+.ph{display:flex;flex-direction:column;align-items:center;text-align:center;padding-bottom:10px;border-bottom:0.5px solid var(--bdr);margin-bottom:10px;}
+.av{width:52px;height:52px;border-radius:50%;overflow:hidden;background:var(--bg2);border:0.5px solid var(--bdr);display:flex;align-items:center;justify-content:center;margin-bottom:5px;cursor:pointer;}
 .av img{width:100%;height:100%;object-fit:cover;}
-.av svg{flex-shrink:0;}
-.ph-hint{font-size:10px;color:var(--purple);cursor:pointer;margin-bottom:2px;}
-.pname{font-size:15px;font-weight:500;color:var(--text);}
+.ph-hint{font-size:10px;color:var(--pur);cursor:pointer;margin-bottom:2px;}
+.pname{font-size:15px;font-weight:500;margin-top:4px;}
 .pid{font-size:10px;color:var(--text3);font-family:monospace;}
-.irow{display:flex;align-items:flex-start;padding:3px 0;border-bottom:0.5px solid var(--border);}
+.irow{display:flex;align-items:flex-start;padding:3px 0;border-bottom:0.5px solid var(--bdr);}
 .irow:last-child{border-bottom:none;}
 .ikey{font-size:11px;color:var(--text2);width:64px;flex-shrink:0;padding-top:2px;}
-.ival{font-size:12px;color:var(--text);flex:1;word-break:break-all;}
-.iinput{font-size:12px;width:100%;border:0.5px solid var(--border2);border-radius:4px;padding:2px 6px;background:var(--bg);color:var(--text);outline:none;}
-.iinput:focus{border-color:var(--purple);}
-.detail-toggle-link{font-size:11px;color:var(--purple);cursor:pointer;margin-top:6px;display:block;}
-.step-flow{display:flex;flex-direction:column;gap:4px;}
-.snode{display:flex;align-items:center;gap:6px;padding:5px 8px;border-radius:var(--r-md);border:0.5px solid var(--border);font-size:11px;}
-.snode.cur{border-color:var(--purple);background:var(--purple-light);}
+.ival{font-size:12px;flex:1;word-break:break-all;}
+.iinput{font-size:12px;width:100%;border:0.5px solid var(--bdr2);border-radius:4px;padding:2px 6px;background:var(--bg);color:var(--text);outline:none;}
+.iinput:focus{border-color:var(--pur);}
+.dtog{font-size:11px;color:var(--pur);cursor:pointer;margin-top:6px;display:block;}
+.sflow{display:flex;flex-direction:column;gap:4px;}
+.snode{display:flex;align-items:center;gap:6px;padding:5px 8px;border-radius:var(--r-md);border:0.5px solid var(--bdr);font-size:11px;}
+.snode.cur{border-color:var(--pur);background:var(--pur-l);}
 .snode.done{background:var(--bg2);color:var(--text3);}
 .snode.fut{color:var(--text3);}
 .sdot{width:6px;height:6px;border-radius:50%;flex-shrink:0;}
-.sd-done{background:#1D9E75;}.sd-cur{background:var(--purple);}.sd-fut{background:var(--border2);}
+.sd-done{background:#1D9E75;}.sd-cur{background:var(--pur);}.sd-fut{background:var(--bdr2);}
 .sname{flex:1;font-weight:500;}
-.memo-wrap{border-top:0.5px solid var(--border);padding-top:8px;margin-top:8px;}
-.mlabel{font-size:11px;color:var(--text2);margin-bottom:4px;}
-.mta{width:100%;min-height:52px;padding:6px 8px;font-size:12px;border:0.5px solid var(--border2);border-radius:var(--r-md);background:var(--bg);color:var(--text);outline:none;resize:vertical;line-height:1.5;}
-.mta:focus{border-color:var(--purple);}
-.tabs{display:flex;border-bottom:0.5px solid var(--border);margin-bottom:1rem;overflow-x:auto;}
+.memo-wrap{border-top:0.5px solid var(--bdr);padding-top:8px;margin-top:8px;}
+.memo-lbl{font-size:11px;color:var(--text2);margin-bottom:4px;}
+.mta{width:100%;min-height:52px;padding:6px 8px;font-size:12px;border:0.5px solid var(--bdr2);border-radius:var(--r-md);background:var(--bg);color:var(--text);outline:none;resize:vertical;line-height:1.5;}
+.mta:focus{border-color:var(--pur);}
+.tabs{display:flex;border-bottom:0.5px solid var(--bdr);margin-bottom:1rem;overflow-x:auto;}
 .tab{height:36px;padding:0 12px;font-size:13px;border:none;background:transparent;color:var(--text2);cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-0.5px;white-space:nowrap;}
-.tab.active{color:var(--purple);border-bottom-color:var(--purple);font-weight:500;}
+.tab.active{color:var(--pur);border-bottom-color:var(--pur);font-weight:500;}
 .dpane{display:none;}.dpane.active{display:block;}
-/* history */
+/* HISTORY */
 .tl{display:flex;flex-direction:column;}
 .tli{display:flex;gap:10px;padding-bottom:14px;}
 .tli:last-child{padding-bottom:0;}
 .tll{display:flex;flex-direction:column;align-items:center;width:16px;flex-shrink:0;}
 .tdot{width:9px;height:9px;border-radius:50%;flex-shrink:0;margin-top:3px;}
-.tline{width:1px;flex:1;background:var(--border);margin-top:3px;}
-.tg{background:#1D9E75;}.tp{background:var(--purple);}.ta{background:#EF9F27;}.tr{background:#E24B4A;}.tgr{background:#888780;}
+.tline{width:1px;flex:1;background:var(--bdr);margin-top:3px;}
+.tg{background:#1D9E75;}.tp{background:var(--pur);}.ta{background:#EF9F27;}.tr2{background:#E24B4A;}.tgr{background:#888780;}
 .tdate{font-size:11px;color:var(--text3);}
-.ttitle{font-size:13px;font-weight:500;color:var(--text);}
-.tbody2{font-size:12px;color:var(--text2);margin-top:2px;line-height:1.6;}
-/* eval */
-.acc{border:0.5px solid var(--border);border-radius:var(--r-lg);margin-bottom:8px;overflow:hidden;}
-.acc-head{display:flex;align-items:center;gap:8px;padding:10px 13px;cursor:pointer;background:var(--bg2);user-select:none;}
-.acc-head:hover{background:var(--bg3);}
-.acc-chev{font-size:9px;color:var(--text3);transition:transform 0.15s;}
-.acc-body{padding:12px 13px;border-top:0.5px solid var(--border);}
-.sbar{margin-bottom:4px;}
-.sbar-head{display:flex;justify-content:space-between;font-size:11px;color:var(--text2);margin-bottom:2px;}
-.sbar-track{height:4px;background:var(--border);border-radius:99px;overflow:hidden;}
-.sbar-fill{height:100%;background:var(--purple);border-radius:99px;}
-.assign-row{display:flex;align-items:center;gap:7px;margin-bottom:10px;flex-wrap:wrap;}
-.asel{height:30px;padding:0 8px;font-size:12px;border:0.5px solid var(--border2);border-radius:var(--r-md);background:var(--bg);color:var(--text);outline:none;flex:1;min-width:0;}
-.ecard{background:var(--bg);border:0.5px solid var(--border);border-radius:var(--r-md);padding:10px 12px;margin-bottom:7px;}
-.ehead{display:flex;align-items:center;gap:7px;margin-bottom:7px;flex-wrap:wrap;}
-.iav{width:28px;height:28px;border-radius:50%;background:var(--purple-light);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:500;color:var(--purple-dark);flex-shrink:0;}
-.iname{font-size:12px;font-weight:500;color:var(--text);}
+.ttitle{font-size:13px;font-weight:500;}
+.tbody3{font-size:12px;color:var(--text2);margin-top:2px;line-height:1.6;}
+/* EVAL */
+.acc{border:0.5px solid var(--bdr);border-radius:var(--r-lg);margin-bottom:8px;overflow:hidden;}
+.acc-hd{display:flex;align-items:center;gap:8px;padding:10px 13px;cursor:pointer;background:var(--bg2);user-select:none;}
+.acc-hd:hover{background:var(--bg3);}
+.acc-chev{font-size:9px;color:var(--text3);transition:transform 0.15s;margin-left:auto;}
+.acc-chev.open{transform:rotate(180deg);}
+.acc-bd{padding:12px 13px;border-top:0.5px solid var(--bdr);}
+.sbar2{margin-bottom:4px;}
+.sbar2-hd{display:flex;justify-content:space-between;font-size:11px;color:var(--text2);margin-bottom:2px;}
+.sbar2-tr{height:4px;background:var(--bdr);border-radius:99px;overflow:hidden;}
+.sbar2-fl{height:100%;background:var(--pur);border-radius:99px;}
+.asrow{display:flex;align-items:center;gap:7px;margin-bottom:10px;flex-wrap:wrap;}
+.asel{height:30px;padding:0 8px;font-size:12px;border:0.5px solid var(--bdr2);border-radius:var(--r-md);background:var(--bg);color:var(--text);outline:none;flex:1;min-width:0;}
+.ecard{background:var(--bg);border:0.5px solid var(--bdr);border-radius:var(--r-md);padding:10px 12px;margin-bottom:7px;}
+.ehd{display:flex;align-items:center;gap:7px;margin-bottom:7px;flex-wrap:wrap;}
+.iav{width:28px;height:28px;border-radius:50%;background:var(--pur-l);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:500;color:var(--pur-d);flex-shrink:0;}
+.iname{font-size:12px;font-weight:500;}
 .irole{font-size:11px;color:var(--text2);}
 .idate{font-size:11px;color:var(--text3);margin-left:auto;}
-.edbadge{font-size:10px;padding:1px 5px;border-radius:3px;margin-left:4px;}
-.edbadge.e{background:var(--amber-light);color:var(--amber);}
-.star-row{display:flex;gap:2px;align-items:center;margin-bottom:7px;}
-.si-star{font-size:20px;cursor:pointer;color:var(--border2);line-height:1;user-select:none;}
-.si-star.on{color:#EF9F27;}
+.ebadge{font-size:10px;padding:1px 5px;border-radius:3px;margin-left:4px;background:var(--amb-l);color:var(--amb);}
+.starrow{display:flex;gap:2px;align-items:center;margin-bottom:7px;}
+.osi{font-size:20px;cursor:pointer;color:var(--bdr2);line-height:1;user-select:none;}
+.osi.on{color:#EF9F27;}
 .cgrid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:5px;margin-bottom:7px;}
 @media(max-width:400px){.cgrid{grid-template-columns:repeat(2,minmax(0,1fr));}}
 .citem{background:var(--bg2);border-radius:var(--r-md);padding:6px 8px;}
 .clabel{font-size:10px;color:var(--text2);margin-bottom:3px;}
 .cstars{display:flex;gap:1px;}
-.csi{font-size:14px;cursor:pointer;color:var(--border2);user-select:none;}
+.csi{font-size:14px;cursor:pointer;color:var(--bdr2);user-select:none;}
 .csi.on{color:#EF9F27;}
-.cmt-ta{width:100%;min-height:56px;padding:7px 9px;font-size:12px;border:0.5px solid var(--border2);border-radius:var(--r-md);background:var(--bg);color:var(--text);outline:none;resize:vertical;line-height:1.5;}
-.cmt-ta:focus{border-color:var(--purple);}
-.row-btns{display:flex;gap:5px;margin-top:5px;justify-content:flex-end;}
-.admin-sect{margin-top:10px;border-top:0.5px solid var(--border);padding-top:10px;}
-.sect-label{font-size:11px;font-weight:500;color:var(--text2);margin-bottom:5px;}
-/* mail */
-.mitem{border:0.5px solid var(--border);border-radius:var(--r-md);margin-bottom:7px;overflow:hidden;}
-.mhead{display:flex;align-items:center;gap:8px;padding:9px 12px;cursor:pointer;}
-.mhead:hover{background:var(--bg2);}
+.cmtta{width:100%;min-height:56px;padding:7px 9px;font-size:12px;border:0.5px solid var(--bdr2);border-radius:var(--r-md);background:var(--bg);color:var(--text);outline:none;resize:vertical;line-height:1.5;}
+.cmtta:focus{border-color:var(--pur);}
+.rbtns{display:flex;gap:5px;margin-top:5px;justify-content:flex-end;}
+.asect{margin-top:10px;border-top:0.5px solid var(--bdr);padding-top:10px;}
+.asect-lbl{font-size:11px;font-weight:500;color:var(--text2);margin-bottom:5px;}
+/* MAIL */
+.mitem{border:0.5px solid var(--bdr);border-radius:var(--r-md);margin-bottom:7px;overflow:hidden;}
+.mhd{display:flex;align-items:center;gap:8px;padding:9px 12px;cursor:pointer;}
+.mhd:hover{background:var(--bg2);}
 .mdir{width:22px;height:22px;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
-.mo{background:var(--purple-light);}.min{background:var(--green-light);}
-.msubj{font-size:13px;font-weight:500;color:var(--text);flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.mo{background:var(--pur-l);}.mi{background:var(--grn-l);}
+.msubj{font-size:13px;font-weight:500;flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
 .mdt{font-size:11px;color:var(--text3);white-space:nowrap;}
 .mchev{font-size:9px;color:var(--text3);transition:transform 0.15s;margin-left:4px;}
-.mbody{display:none;padding:10px 12px;border-top:0.5px solid var(--border);background:var(--bg2);}
+.mbody{display:none;padding:10px 12px;border-top:0.5px solid var(--bdr);background:var(--bg2);}
 .mmeta{font-size:11px;color:var(--text2);margin-bottom:7px;line-height:1.7;}
-.mtext{font-size:12px;color:var(--text);line-height:1.7;white-space:pre-wrap;}
-/* docs */
-.ditem{display:flex;align-items:center;gap:9px;padding:8px 0;border-bottom:0.5px solid var(--border);}
+.mtext{font-size:12px;line-height:1.7;white-space:pre-wrap;}
+/* DOCS */
+.ditem{display:flex;align-items:center;gap:9px;padding:8px 0;border-bottom:0.5px solid var(--bdr);}
 .ditem:last-child{border-bottom:none;}
-.dicon{width:28px;height:28px;border-radius:var(--r-md);background:var(--blue-light);display:flex;align-items:center;justify-content:center;flex-shrink:0;}
-.dname{font-size:12px;font-weight:500;color:var(--text);}
+.dicon{width:28px;height:28px;border-radius:var(--r-md);background:var(--blu-l);display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.dname{font-size:12px;font-weight:500;}
 .dmeta{font-size:11px;color:var(--text3);}
-.ddl{margin-left:auto;height:24px;padding:0 9px;font-size:11px;border:0.5px solid var(--border2);border-radius:var(--r-md);background:transparent;color:var(--text2);cursor:pointer;}
+.ddl{margin-left:auto;height:24px;padding:0 9px;font-size:11px;border:0.5px solid var(--bdr2);border-radius:var(--r-md);background:transparent;color:var(--text2);cursor:pointer;}
 /* ITL */
 .itl-compose{background:var(--bg2);border-radius:var(--r-md);padding:10px 12px;margin-bottom:12px;}
-.itl-ta{width:100%;min-height:52px;padding:7px 9px;font-size:13px;border:0.5px solid var(--border2);border-radius:var(--r-md);background:var(--bg);color:var(--text);outline:none;resize:none;line-height:1.5;margin-bottom:6px;}
-.itl-ta:focus{border-color:var(--purple);}
+.itl-ta{width:100%;min-height:52px;padding:7px 9px;font-size:13px;border:0.5px solid var(--bdr2);border-radius:var(--r-md);background:var(--bg);color:var(--text);outline:none;resize:none;line-height:1.5;margin-bottom:6px;}
+.itl-ta:focus{border-color:var(--pur);}
 .itl-foot{display:flex;align-items:center;gap:7px;}
-.itl-sel{height:28px;padding:0 8px;font-size:12px;border:0.5px solid var(--border2);border-radius:var(--r-md);background:var(--bg);color:var(--text);outline:none;}
-.itl-post{height:28px;padding:0 12px;font-size:12px;font-weight:500;background:var(--purple);color:#fff;border:none;border-radius:var(--r-md);cursor:pointer;margin-left:auto;}
-.itl-post:hover{background:var(--purple-dark);}
-.icard{background:var(--bg);border:0.5px solid var(--border);border-radius:var(--r-md);padding:9px 11px;margin-bottom:7px;}
-.icard-head{display:flex;align-items:center;gap:7px;margin-bottom:5px;flex-wrap:wrap;}
-.iav2{width:26px;height:26px;border-radius:50%;background:var(--purple-light);display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:500;color:var(--purple-dark);flex-shrink:0;}
-.iwho{font-size:12px;font-weight:500;color:var(--text);}
+.itl-sel{height:28px;padding:0 8px;font-size:12px;border:0.5px solid var(--bdr2);border-radius:var(--r-md);background:var(--bg);color:var(--text);outline:none;}
+.itl-post{height:28px;padding:0 12px;font-size:12px;font-weight:500;background:var(--pur);color:#fff;border:none;border-radius:var(--r-md);cursor:pointer;margin-left:auto;}
+.itl-post:hover{background:var(--pur-d);}
+.icard{background:var(--bg);border:0.5px solid var(--bdr);border-radius:var(--r-md);padding:9px 11px;margin-bottom:7px;}
+.icard-hd{display:flex;align-items:center;gap:7px;margin-bottom:5px;flex-wrap:wrap;}
+.iav2{width:26px;height:26px;border-radius:50%;background:var(--pur-l);display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:500;color:var(--pur-d);flex-shrink:0;}
+.iwho{font-size:12px;font-weight:500;}
 .iwhen{font-size:11px;color:var(--text3);margin-left:auto;}
 .itbadge{font-size:10px;padding:1px 6px;border-radius:99px;}
-.it-notify{background:var(--blue-light);color:var(--blue);}
-.it-discuss{background:var(--purple-light);color:var(--purple-dark);}
-.it-urgent{background:var(--red-light);color:var(--red);}
+.itn{background:var(--blu-l);color:var(--blu);}
+.ita{background:var(--pur-l);color:var(--pur-d);}
+.itu{background:var(--red-l);color:var(--red);}
 .itext{font-size:12px;color:var(--text2);line-height:1.6;}
 </style>
 </head>
 <body>
-
-<!-- ===== LOGIN ===== -->
-<div id="page-login" class="page active">
-  <div class="login-card">
+<!-- LOGIN -->
+<div id="pg-login" class="page active">
+  <div class="lcard">
     <div class="logo">
-      <div class="logo-mark">
-        <svg width="20" height="20" viewBox="0 0 20 20" fill="none"><path d="M10 2L3 6v8l7 4 7-4V6L10 2z" stroke="#fff" stroke-width="1.5" stroke-linejoin="round"/><path d="M10 2v12M3 6l7 4 7-4" stroke="#fff" stroke-width="1.5" stroke-linejoin="round"/></svg>
-      </div>
-      <div>
-        <div class="logo-text">ATS Portal</div>
-        <div class="logo-sub">採用管理システム</div>
-      </div>
+      <div class="lmark"><svg width="20" height="20" viewBox="0 0 20 20" fill="none"><path d="M10 2L3 6v8l7 4 7-4V6L10 2z" stroke="#fff" stroke-width="1.5" stroke-linejoin="round"/><path d="M10 2v12M3 6l7 4 7-4" stroke="#fff" stroke-width="1.5" stroke-linejoin="round"/></svg></div>
+      <div><div class="ltxt">ATS Portal</div><div class="lsub">採用管理システム</div></div>
     </div>
     <h2>ログイン</h2>
-    <p class="login-sub">アカウント情報を入力してください</p>
-    <div id="login-err" class="login-err">ユーザー名またはパスワードが正しくありません</div>
-    <div class="field">
-      <label>ユーザー名</label>
-      <input type="text" id="login-user" placeholder="ユーザー名"/>
-    </div>
-    <div class="field">
-      <label>パスワード</label>
-      <input type="password" id="login-pass" placeholder="••••••••"/>
-      <div class="forgot">パスワードを忘れた方</div>
-    </div>
-    <button class="login-btn" id="login-btn">ログイン</button>
+    <p>アカウント情報を入力してください</p>
+    <div id="lerr" class="lerr">ユーザー名またはパスワードが正しくありません</div>
+    <div class="field"><label>ユーザー名</label><input type="text" id="l-user" placeholder="ユーザー名"/></div>
+    <div class="field"><label>パスワード</label><input type="password" id="l-pass" placeholder="••••••••"/></div>
+    <button class="lbtn" id="l-btn">ログイン</button>
   </div>
 </div>
-
-<!-- ===== APP ===== -->
-<div id="page-app" class="page">
+<!-- APP -->
+<div id="pg-app" class="page">
   <nav class="navbar">
-    <div class="nav-logo">
-      <div class="nav-logo-mark">
-        <svg width="16" height="16" viewBox="0 0 20 20" fill="none"><path d="M10 2L3 6v8l7 4 7-4V6L10 2z" stroke="#fff" stroke-width="1.5" stroke-linejoin="round"/><path d="M10 2v12M3 6l7 4 7-4" stroke="#fff" stroke-width="1.5" stroke-linejoin="round"/></svg>
-      </div>
-      <span class="nav-title">ATS Portal</span>
-    </div>
-    <div class="nav-spacer"></div>
-    <span class="nav-user" id="nav-user"></span>
-    <button class="nav-logout" id="nav-logout">ログアウト</button>
+    <div class="nmark"><svg width="16" height="16" viewBox="0 0 20 20" fill="none"><path d="M10 2L3 6v8l7 4 7-4V6L10 2z" stroke="#fff" stroke-width="1.5" stroke-linejoin="round"/><path d="M10 2v12M3 6l7 4 7-4" stroke="#fff" stroke-width="1.5" stroke-linejoin="round"/></svg></div>
+    <span class="ntitle">ATS Portal</span>
+    <div class="nspc"></div>
+    <span class="nusr" id="nav-user"></span>
+    <button class="nbtn" id="logout-btn">ログアウト</button>
   </nav>
-  <div class="app-body">
-
-    <!-- LIST -->
-    <div id="pane-list">
-      <div class="list-header">
-        <div class="page-title">応募者管理</div>
+  <div class="abody">
+    <!-- LIST PAGE -->
+    <div id="pg-list">
+      <div class="list-hdr">
+        <div class="ptitle">応募者管理</div>
         <button class="btn pri" id="new-btn">+ 新規応募者</button>
       </div>
       <div class="metrics" id="metrics"></div>
-      <div class="search-bar">
+      <div class="sbar-row">
         <input type="text" id="f-kw" placeholder="氏名・求人・応募者IDで検索..."/>
-        <button class="btn" id="adv-toggle-btn">詳細検索 ▾</button>
+        <button class="btn" id="adv-btn">詳細検索 ▾</button>
         <button class="btn pri" id="search-btn">検索</button>
       </div>
       <div class="adv-panel" id="adv-panel">
         <div class="adv-grid">
-          <div class="adv-field"><label>選考ステップ</label><select id="f-step"><option value="">すべて</option></select></div>
-          <div class="adv-field"><label>ステータス</label><select id="f-status"><option value="">すべて</option></select></div>
-          <div class="adv-field"><label>応募求人</label><select id="f-job"><option value="">すべて</option></select></div>
-          <div class="adv-field"><label>性別</label><select id="f-gender"><option value="">すべて</option><option value="男">男性</option><option value="女">女性</option></select></div>
-          <div class="adv-field" style="grid-column:span 2;"><label>応募期間</label><div class="date-range"><input type="date" id="f-d1"/><span>〜</span><input type="date" id="f-d2"/></div></div>
+          <div class="adf"><label>選考ステップ</label><select id="f-step"><option value="">すべて</option></select></div>
+          <div class="adf"><label>ステータス</label><select id="f-status"><option value="">すべて</option></select></div>
+          <div class="adf"><label>応募求人</label><select id="f-job"><option value="">すべて</option></select></div>
+          <div class="adf"><label>性別</label><select id="f-gender"><option value="">すべて</option><option value="男">男性</option><option value="女">女性</option></select></div>
+          <div class="adf" style="grid-column:span 2"><label>応募期間</label><div class="drange"><input type="date" id="f-d1"/><span>〜</span><input type="date" id="f-d2"/></div></div>
         </div>
-        <div class="adv-section-title">タグ（AND条件）</div>
-        <div class="tag-pills" id="tag-pills"></div>
-        <div class="adv-actions">
+        <div class="asect-title">タグ（AND条件）</div>
+        <div class="tpills" id="tpills"></div>
+        <div class="adv-acts">
           <button class="btn" id="reset-btn">リセット</button>
-          <button class="btn pri" id="adv-search-btn">この条件で検索</button>
+          <button class="btn pri" id="advsearch-btn">この条件で検索</button>
         </div>
       </div>
       <div class="bulk-bar" id="bulk-bar">
-        <span style="font-size:13px;font-weight:500;color:var(--text);" id="bulk-count">0件選択中</span>
+        <span id="bulk-cnt" style="font-size:13px;font-weight:500;">0件選択中</span>
         <div class="bsep"></div>
-        <button class="btn sm" id="bulk-change-btn">一括変更</button>
-        <button class="btn sm" id="bulk-mail-btn">メール送付</button>
-        <button class="btn sm" id="bulk-csv-btn">CSV</button>
+        <button class="btn sm" id="bbulk-btn">一括変更</button>
+        <button class="btn sm" id="bmail-btn">メール送付</button>
+        <button class="btn sm" id="bcsv-btn">CSV</button>
         <div class="bsep"></div>
-        <button class="btn sm danger" id="bulk-clear-btn">解除</button>
+        <button class="btn sm danger" id="bclear-btn">解除</button>
       </div>
-      <div class="result-info" id="result-info"></div>
-      <div class="table-wrap">
+      <div class="rinfo" id="rinfo"></div>
+      <div class="twrap">
         <table>
           <colgroup><col style="width:32px"><col style="width:13%"><col style="width:38px"><col style="width:44px"><col style="width:16%"><col style="width:12%"><col style="width:10%"><col style="width:14%"><col style="width:11%"></colgroup>
-          <thead>
-            <tr>
-              <th><input type="checkbox" id="check-all"/></th>
-              <th class="sortable" data-key="name">氏名 <span class="si" id="si-name"><svg viewBox="0 0 8 5"><path d="M4 0L8 5H0z" fill="currentColor"/></svg><svg viewBox="0 0 8 5"><path d="M4 5L0 0h8z" fill="currentColor"/></svg></span></th>
-              <th class="sortable" data-key="gender">性別 <span class="si" id="si-gender"><svg viewBox="0 0 8 5"><path d="M4 0L8 5H0z" fill="currentColor"/></svg><svg viewBox="0 0 8 5"><path d="M4 5L0 0h8z" fill="currentColor"/></svg></span></th>
-              <th class="sortable" data-key="age">年齢 <span class="si" id="si-age"><svg viewBox="0 0 8 5"><path d="M4 0L8 5H0z" fill="currentColor"/></svg><svg viewBox="0 0 8 5"><path d="M4 5L0 0h8z" fill="currentColor"/></svg></span></th>
-              <th class="sortable" data-key="job">応募求人 <span class="si" id="si-job"><svg viewBox="0 0 8 5"><path d="M4 0L8 5H0z" fill="currentColor"/></svg><svg viewBox="0 0 8 5"><path d="M4 5L0 0h8z" fill="currentColor"/></svg></span></th>
-              <th class="sortable" data-key="step">ステップ <span class="si" id="si-step"><svg viewBox="0 0 8 5"><path d="M4 0L8 5H0z" fill="currentColor"/></svg><svg viewBox="0 0 8 5"><path d="M4 5L0 0h8z" fill="currentColor"/></svg></span></th>
-              <th class="sortable" data-key="status">ステータス <span class="si" id="si-status"><svg viewBox="0 0 8 5"><path d="M4 0L8 5H0z" fill="currentColor"/></svg><svg viewBox="0 0 8 5"><path d="M4 5L0 0h8z" fill="currentColor"/></svg></span></th>
-              <th>タグ</th>
-              <th class="sortable" data-key="stars">評価 / 応募日 <span class="si" id="si-stars"><svg viewBox="0 0 8 5"><path d="M4 0L8 5H0z" fill="currentColor"/></svg><svg viewBox="0 0 8 5"><path d="M4 5L0 0h8z" fill="currentColor"/></svg></span></th>
-            </tr>
-          </thead>
+          <thead><tr>
+            <th><input type="checkbox" id="chk-all"/></th>
+            <th class="sth" data-k="name">氏名 <span class="si" id="si-name"><svg viewBox="0 0 8 5"><path d="M4 0L8 5H0z" fill="currentColor"/></svg><svg viewBox="0 0 8 5"><path d="M4 5L0 0h8z" fill="currentColor"/></svg></span></th>
+            <th class="sth" data-k="gender">性別 <span class="si" id="si-gender"><svg viewBox="0 0 8 5"><path d="M4 0L8 5H0z" fill="currentColor"/></svg><svg viewBox="0 0 8 5"><path d="M4 5L0 0h8z" fill="currentColor"/></svg></span></th>
+            <th class="sth" data-k="age">年齢 <span class="si" id="si-age"><svg viewBox="0 0 8 5"><path d="M4 0L8 5H0z" fill="currentColor"/></svg><svg viewBox="0 0 8 5"><path d="M4 5L0 0h8z" fill="currentColor"/></svg></span></th>
+            <th class="sth" data-k="job">応募求人 <span class="si" id="si-job"><svg viewBox="0 0 8 5"><path d="M4 0L8 5H0z" fill="currentColor"/></svg><svg viewBox="0 0 8 5"><path d="M4 5L0 0h8z" fill="currentColor"/></svg></span></th>
+            <th class="sth" data-k="step">ステップ <span class="si" id="si-step"><svg viewBox="0 0 8 5"><path d="M4 0L8 5H0z" fill="currentColor"/></svg><svg viewBox="0 0 8 5"><path d="M4 5L0 0h8z" fill="currentColor"/></svg></span></th>
+            <th class="sth" data-k="status">ステータス <span class="si" id="si-status"><svg viewBox="0 0 8 5"><path d="M4 0L8 5H0z" fill="currentColor"/></svg><svg viewBox="0 0 8 5"><path d="M4 5L0 0h8z" fill="currentColor"/></svg></span></th>
+            <th>タグ</th>
+            <th class="sth" data-k="stars">評価 / 応募日 <span class="si" id="si-stars"><svg viewBox="0 0 8 5"><path d="M4 0L8 5H0z" fill="currentColor"/></svg><svg viewBox="0 0 8 5"><path d="M4 5L0 0h8z" fill="currentColor"/></svg></span></th>
+          </tr></thead>
           <tbody id="tbody"></tbody>
         </table>
       </div>
     </div>
-
-    <!-- DETAIL -->
-    <div id="pane-detail">
-      <div class="detail-topbar">
+    <!-- DETAIL PAGE -->
+    <div id="pg-detail" style="display:none">
+      <div class="det-hdr">
         <button class="btn" id="back-btn">← 一覧に戻る</button>
-        <div style="display:flex;gap:7px;flex-wrap:wrap;">
+        <div style="display:flex;gap:7px;flex-wrap:wrap">
           <button class="btn" id="d-mail-btn">メール送付</button>
           <button class="btn" id="d-step-btn">ステップ更新</button>
           <button class="btn pri" id="d-save-btn">保存</button>
         </div>
       </div>
-      <div class="detail-layout">
-        <div class="d-side">
+      <div class="dlayout">
+        <div class="dside">
           <div class="card">
-            <div class="ph-head">
-              <div class="av" id="d-av">
-                <svg width="24" height="24" viewBox="0 0 32 32" fill="none"><circle cx="16" cy="12" r="6" stroke="#aaa" stroke-width="1.5"/><path d="M4 28c0-6.627 5.373-12 12-12s12 5.373 12 12" stroke="#aaa" stroke-width="1.5" stroke-linecap="round"/></svg>
-              </div>
+            <div class="ph">
+              <div class="av" id="d-av"><svg width="24" height="24" viewBox="0 0 32 32" fill="none"><circle cx="16" cy="12" r="6" stroke="#aaa" stroke-width="1.5"/><path d="M4 28c0-6.627 5.373-12 12-12s12 5.373 12 12" stroke="#aaa" stroke-width="1.5" stroke-linecap="round"/></svg></div>
               <input type="file" id="ph-file" accept="image/*" style="display:none"/>
               <div class="ph-hint" id="ph-hint">写真をアップロード</div>
               <div class="pname" id="d-name"></div>
               <div class="pid" id="d-id"></div>
             </div>
             <div id="basic-info"></div>
-            <span class="detail-toggle-link" id="detail-toggle">▶ 詳細情報を表示</span>
-            <div id="detail-info" style="display:none;margin-top:4px;"></div>
-            <div style="display:flex;gap:6px;margin-top:7px;justify-content:flex-end;">
+            <span class="dtog" id="dtog">▶ 詳細情報を表示</span>
+            <div id="detail-info" style="display:none;margin-top:4px"></div>
+            <div style="display:flex;gap:6px;margin-top:7px;justify-content:flex-end">
               <button class="btn sm" id="info-edit-btn">編集</button>
               <button class="btn sm pri" id="info-save-btn" style="display:none">保存</button>
             </div>
             <div class="memo-wrap">
-              <div class="mlabel">メモ</div>
+              <div class="memo-lbl">メモ</div>
               <textarea class="mta" id="d-memo"></textarea>
-              <div style="display:flex;justify-content:flex-end;"><button class="btn sm pri" id="memo-save-btn" style="margin-top:4px;">保存</button></div>
+              <div style="display:flex;justify-content:flex-end"><button class="btn sm pri" id="memo-save" style="margin-top:4px">保存</button></div>
             </div>
           </div>
           <div class="card">
-            <div style="font-size:11px;font-weight:500;color:var(--text2);margin-bottom:8px;">選考ステップ</div>
-            <div class="step-flow" id="d-step-flow"></div>
+            <div style="font-size:11px;font-weight:500;color:var(--text2);margin-bottom:8px">選考ステップ</div>
+            <div class="sflow" id="d-sflow"></div>
           </div>
         </div>
         <div>
-          <div class="tabs">
+          <div class="tabs" id="det-tabs">
             <button class="tab active" data-tab="history">選考履歴</button>
             <button class="tab" data-tab="eval">評価</button>
             <button class="tab" data-tab="docs">提出書類</button>
@@ -447,569 +411,664 @@ input[type=checkbox]{width:14px;height:14px;cursor:pointer;accent-color:var(--pu
     </div>
   </div>
 </div>
-
 <!-- MODALS -->
-<div class="overlay" id="modal-bulk"><div class="mbox">
-  <h3>一括変更</h3>
-  <div class="modal-tabs" id="bulk-mtabs" style="grid-template-columns:repeat(5,1fr);"></div>
-  <div id="bulk-mbody"></div>
-  <div class="macts"><button class="btn" id="bulk-mcancel">キャンセル</button><button class="btn pri" id="bulk-mok">変更する</button></div>
-</div></div>
-
-<div class="overlay" id="modal-mail"><div class="mbox">
-  <h3>メールテンプレート選択</h3>
-  <input class="msearch" id="mail-msearch" placeholder="テンプレートを検索..."/>
-  <div id="mail-mlist"></div>
-  <div class="macts"><button class="btn" id="mail-mcancel">キャンセル</button><button class="btn pri" id="mail-mok">送付する</button></div>
-</div></div>
-
-<div class="overlay" id="modal-csv"><div class="mbox">
-  <h3>CSVフォーマット選択</h3>
-  <input class="msearch" id="csv-msearch" placeholder="フォーマットを検索..."/>
-  <div id="csv-mlist"></div>
-  <div class="macts"><button class="btn" id="csv-mcancel">キャンセル</button><button class="btn pri" id="csv-mok">ダウンロード</button></div>
-</div></div>
-
-<div class="overlay" id="modal-step"><div class="mbox">
-  <h3>ステップ・ステータス更新</h3>
-  <div style="margin-bottom:10px;"><div style="font-size:11px;font-weight:500;color:var(--text2);margin-bottom:5px;">選考ステップ</div><div id="sm-steps" class="opt-list"></div></div>
-  <div><div style="font-size:11px;font-weight:500;color:var(--text2);margin-bottom:5px;">ステータス</div><div id="sm-statuses" class="opt-list"></div></div>
-  <div class="macts"><button class="btn" id="sm-cancel">キャンセル</button><button class="btn pri" id="sm-ok">更新する</button></div>
-</div></div>
-
+<div class="overlay" id="mod-bulk">
+  <div class="mbox">
+    <h3>一括変更</h3>
+    <div class="mtabs" id="bulk-mtabs" style="grid-template-columns:repeat(5,1fr)"></div>
+    <div id="bulk-mbody"></div>
+    <div class="macts"><button class="btn" id="bulk-mcancel">キャンセル</button><button class="btn pri" id="bulk-mok">変更する</button></div>
+  </div>
+</div>
+<div class="overlay" id="mod-mail">
+  <div class="mbox">
+    <h3>メールテンプレート選択</h3>
+    <input class="msearch" id="mail-search" placeholder="テンプレートを検索..."/>
+    <div id="mail-list"></div>
+    <div class="macts"><button class="btn" id="mail-cancel">キャンセル</button><button class="btn pri" id="mail-ok">送付する</button></div>
+  </div>
+</div>
+<div class="overlay" id="mod-csv">
+  <div class="mbox">
+    <h3>CSVフォーマット選択</h3>
+    <input class="msearch" id="csv-search" placeholder="フォーマットを検索..."/>
+    <div id="csv-list"></div>
+    <div class="macts"><button class="btn" id="csv-cancel">キャンセル</button><button class="btn pri" id="csv-ok">ダウンロード</button></div>
+  </div>
+</div>
+<div class="overlay" id="mod-step">
+  <div class="mbox">
+    <h3>ステップ・ステータス更新</h3>
+    <div style="margin-bottom:10px"><div style="font-size:11px;font-weight:500;color:var(--text2);margin-bottom:5px">選考ステップ</div><div class="olist" id="sm-steps"></div></div>
+    <div><div style="font-size:11px;font-weight:500;color:var(--text2);margin-bottom:5px">ステータス</div><div class="olist" id="sm-statuses"></div></div>
+    <div class="macts"><button class="btn" id="sm-cancel">キャンセル</button><button class="btn pri" id="sm-ok">更新する</button></div>
+  </div>
+</div>
 <div class="toast" id="toast"></div>
-
 <script>
+document.addEventListener("DOMContentLoaded", function() {
+
 // ===== CONSTANTS =====
-const USERS={"admin":"demo1234","hr":"hr2024"};
-const STEPS=["書類選考","筆記試験","1次面接","2次面接","最終面接","内定"];
-const STEP_CLS={"書類選考":"step-doc","筆記試験":"step-written","1次面接":"step-1st","2次面接":"step-2nd","最終面接":"step-final","内定":"step-offer"};
-const STATUSES=["未対応","通過","不合格","保留","辞退"];
-const ST_CLS={"通過":"st-pass","不合格":"st-fail","保留":"st-hold","未対応":"st-new","辞退":"st-wd"};
-const STEP_ORD={"書類選考":1,"筆記試験":2,"1次面接":3,"2次面接":4,"最終面接":5,"内定":6};
-const ST_ORD={"未対応":1,"通過":2,"保留":3,"不合格":4,"辞退":5};
-const ALL_TAGS=["エンジニア","HR","HOT","KEEP"];
-const TAG_CLS={"エンジニア":"t-eng","HR":"t-hr","HOT":"t-hot","KEEP":"t-keep"};
-const AVAIL_IV=["鈴木 一郎（EMgr）","佐藤 花子（人事）","高橋 健（CTO）","中島 彩（PM）"];
-const ITL_TYPE={notify:{label:"連絡",cls:"it-notify"},discuss:{label:"相談",cls:"it-discuss"},urgent:{label:"至急",cls:"it-urgent"}};
-const CSV_FORMATS=[
+const USERS = { "admin": "demo1234", "hr": "hr2024" };
+const STEPS = ["書類選考","筆記試験","1次面接","2次面接","最終面接","内定"];
+const STEP_CLS = {"書類選考":"step-doc","筆記試験":"step-written","1次面接":"step-1st","2次面接":"step-2nd","最終面接":"step-final","内定":"step-offer"};
+const STATUSES = ["未対応","通過","不合格","保留","辞退"];
+const ST_CLS = {"通過":"st-pass","不合格":"st-fail","保留":"st-hold","未対応":"st-new","辞退":"st-wd"};
+const STEP_ORD = {"書類選考":1,"筆記試験":2,"1次面接":3,"2次面接":4,"最終面接":5,"内定":6};
+const ST_ORD = {"未対応":1,"通過":2,"保留":3,"不合格":4,"辞退":5};
+const ALL_TAGS = ["エンジニア","HR","HOT","KEEP"];
+const TAG_CLS = {"エンジニア":"t-eng","HR":"t-hr","HOT":"t-hot","KEEP":"t-keep"};
+const AVAIL_IV = ["鈴木 一郎（EMgr）","佐藤 花子（人事）","高橋 健（CTO）","中島 彩（PM）"];
+const ITL_TYPE = {notify:{label:"連絡",cls:"itn"},discuss:{label:"相談",cls:"ita"},urgent:{label:"至急",cls:"itu"}};
+const CSV_FORMATS = [
   {id:"basic",name:"基本フォーマット",cols:"ID,氏名,性別,年齢,応募求人,ステップ,ステータス,応募日"},
   {id:"full",name:"詳細フォーマット",cols:"ID,氏名,性別,年齢,応募求人,ステップ,ステータス,応募日,タグ,評価"},
   {id:"hr",name:"HR連携フォーマット",cols:"ID,氏名,性別,年齢,ステップ,ステータス,タグ"},
-  {id:"report",name:"レポートフォーマット",cols:"応募求人,ID,氏名,ステップ,ステータス,応募日,評価"},
+  {id:"report",name:"レポートフォーマット",cols:"応募求人,ID,氏名,ステップ,ステータス,応募日,評価"}
 ];
-const MAIL_TPLS=[
+const MAIL_TPLS = [
   {id:"pass_doc",name:"書類選考通過",desc:"書類選考通過のご連絡と次ステップ案内"},
   {id:"interview",name:"面接日程調整",desc:"面接日程の確認・調整依頼"},
   {id:"offer",name:"内定通知",desc:"内定のご連絡と条件提示"},
   {id:"reject",name:"不合格通知",desc:"選考終了のご連絡"},
-  {id:"remind",name:"書類提出リマインド",desc:"未提出者へのリマインド"},
+  {id:"remind",name:"書類提出リマインド",desc:"未提出者へのリマインド"}
 ];
 
 // ===== APPLICANT DATA =====
-const ALL_DATA=[
+const ALL_DATA = [
   {id:"AP-0001",name:"田中 涼子",gender:"女",age:28,job:"フロントエンドエンジニア",step:"1次面接",status:"通過",date:"2025-04-08",stars:4,tags:["エンジニア","HOT"],
    basic:[{k:"現年収",f:"cur_sal",v:"450万円"},{k:"希望年収",f:"des_sal",v:"600万円"}],
    detail:[{k:"生年月日",f:"dob",v:"1997-01-15"},{k:"メール",f:"email",v:"tanaka.r@example.com"},{k:"電話",f:"tel",v:"090-1234-5678"},{k:"住所",f:"addr",v:"東京都渋谷区"},{k:"最終学歴",f:"edu",v:"〇〇大学 工学部"},{k:"現職",f:"job_now",v:"株式会社△△ FEエンジニア"},{k:"経験年数",f:"exp",v:"5年"},{k:"応募日",f:"app_date",v:"2025-04-08"}],
    memo:"コミュニケーション能力高い。次回最終面接を調整中。",
    evals:{"書類選考":{adminComment:"書類は申し分なし。",ivs:[{name:"佐藤 花子",ini:"佐",role:"人事リード",date:"2025-04-09",overall:4,crit:{書類品質:4,印象:4,意欲:4},comment:"職務経歴書の記述が具体的で好印象。"}]},"1次面接":{adminComment:"最終面接へ進める。",ivs:[{name:"鈴木 一郎",ini:"鈴",role:"EMgr",date:"2025-04-13",overall:4,crit:{技術力:4,コミュ力:5,カルチャー:3},comment:"技術力は申し分ない。"},{name:"佐藤 花子",ini:"佐",role:"人事リード",date:"2025-04-14",overall:4,crit:{技術力:4,コミュ力:5,カルチャー:3},comment:"入社意欲が高い。"}]}},
    history:[{c:"tg",date:"2025-04-08",title:"応募受付",body:"フロントエンドエンジニア職に応募。"},{c:"tg",date:"2025-04-09",title:"書類選考 通過",body:"書類審査通過。面接案内メール送付。"},{c:"tp",date:"2025-04-12",title:"1次面接 実施",body:"オンライン60分。鈴木・佐藤が担当。"},{c:"ta",date:"2025-04-15",title:"最終面接 調整中",body:"日程調整メール送付済み。"}],
-   mails:[{dir:"out",subj:"【書類選考通過のご連絡】",from:"佐藤花子 <hr@co.jp>",to:"田中涼子 <tanaka.r@example.com>",date:"2025-04-09 14:32",body:"田中 涼子 様\n\n書類選考の結果、次の選考にお進みいただけることとなりました。\n面接日程の調整をお願いいたします。\n\n採用担当 佐藤花子"},{dir:"in",subj:"Re: 【書類選考通過のご連絡】",from:"田中涼子 <tanaka.r@example.com>",to:"佐藤花子 <hr@co.jp>",date:"2025-04-09 18:15",body:"佐藤様\n\n4月12日（土）13:00にてお願いいたします。\n\n田中 涼子"}],
+   mails:[{dir:"out",subj:"【書類選考通過のご連絡】",from:"佐藤花子 <hr@co.jp>",to:"田中涼子 <tanaka.r@example.com>",date:"2025-04-09 14:32",body:"田中 涼子 様\n\n書類選考の結果、次の選考にお進みいただけることとなりました。\n面接日程の調整をお願いいたします。\n\n採用担当 佐藤花子"},{dir:"in",subj:"Re: 【書類選考通過のご連絡】",from:"田中涼子 <tanaka.r@example.com>",to:"佐藤花子 <hr@co.jp>",date:"2025-04-09 18:15",body:"佐藤様\n\n4月12日（土）13:00にてよろしくお願いいたします。\n\n田中 涼子"}],
    docs:[{name:"履歴書.pdf",type:"PDF",date:"2025-04-08",size:"1.2MB"},{name:"職務経歴書.pdf",type:"PDF",date:"2025-04-08",size:"0.8MB"},{name:"ポートフォリオ.zip",type:"ZIP",date:"2025-04-09",size:"12.4MB"}],
    itl:[{who:"佐藤 花子",ini:"佐",type:"discuss",text:"1次面接の総評：全員通過票。最終面接の日程調整をお願いします。",time:"2025-04-14 15:20"}]},
   {id:"AP-0002",name:"山本 健二",gender:"男",age:35,job:"バックエンドエンジニア",step:"書類選考",status:"保留",date:"2025-04-10",stars:3,tags:["エンジニア"],basic:[{k:"現年収",f:"cur_sal",v:"550万円"},{k:"希望年収",f:"des_sal",v:"700万円"}],detail:[{k:"生年月日",f:"dob",v:"1990-03-22"},{k:"メール",f:"email",v:"yamamoto.k@example.com"},{k:"電話",f:"tel",v:"080-2345-6789"},{k:"住所",f:"addr",v:"神奈川県横浜市"},{k:"最終学歴",f:"edu",v:"△△大学 情報学部"},{k:"現職",f:"job_now",v:"株式会社□□ バックエンドエンジニア"},{k:"経験年数",f:"exp",v:"10年"},{k:"応募日",f:"app_date",v:"2025-04-10"}],memo:"経験豊富だが年収要望が高め。",evals:{},history:[{c:"tg",date:"2025-04-10",title:"応募受付",body:"バックエンドエンジニア職に応募。"}],mails:[],docs:[{name:"履歴書.pdf",type:"PDF",date:"2025-04-10",size:"0.9MB"}],itl:[]},
-  {id:"AP-0003",name:"佐々木 美咲",gender:"女",age:31,job:"人事マネージャー",step:"内定",status:"通過",date:"2025-03-28",stars:5,tags:["HR","HOT"],basic:[{k:"現年収",f:"cur_sal",v:"480万円"},{k:"希望年収",f:"des_sal",v:"550万円"}],detail:[{k:"生年月日",f:"dob",v:"1994-07-05"},{k:"メール",f:"email",v:"sasaki.m@example.com"},{k:"電話",f:"tel",v:"070-3456-7890"},{k:"住所",f:"addr",v:"東京都港区"},{k:"最終学歴",f:"edu",v:"○○大学 経営学部"},{k:"現職",f:"job_now",v:"株式会社★★ 人事"},{k:"経験年数",f:"exp",v:"7年"},{k:"応募日",f:"app_date",v:"2025-03-28"}],memo:"即戦力。入社日調整中。",evals:{},history:[{c:"tg",date:"2025-03-28",title:"応募受付",body:"人事マネージャー職に応募。"},{c:"tg",date:"2025-04-01",title:"書類選考 通過",body:""},{c:"tg",date:"2025-04-05",title:"最終面接 通過",body:""},{c:"tp",date:"2025-04-10",title:"内定通知",body:"内定通知書送付済み。"}],mails:[],docs:[{name:"履歴書.pdf",type:"PDF",date:"2025-03-28",size:"1.0MB"}],itl:[]},
-  {id:"AP-0004",name:"中村 大輔",gender:"男",age:26,job:"フロントエンドエンジニア",step:"書類選考",status:"未対応",date:"2025-04-12",stars:0,tags:[],basic:[{k:"現年収",f:"cur_sal",v:"320万円"},{k:"希望年収",f:"des_sal",v:"420万円"}],detail:[{k:"生年月日",f:"dob",v:"1999-11-30"},{k:"メール",f:"email",v:"nakamura.d@example.com"},{k:"電話",f:"tel",v:"090-4567-8901"},{k:"住所",f:"addr",v:"大阪府大阪市"},{k:"最終学歴",f:"edu",v:"□□工業大学 情報工学部"},{k:"現職",f:"job_now",v:"フリーランス"},{k:"経験年数",f:"exp",v:"2年"},{k:"応募日",f:"app_date",v:"2025-04-12"}],memo:"",evals:{},history:[{c:"tg",date:"2025-04-12",title:"応募受付",body:"フロントエンドエンジニア職に応募。"}],mails:[],docs:[{name:"履歴書.pdf",type:"PDF",date:"2025-04-12",size:"0.7MB"}],itl:[]},
+  {id:"AP-0003",name:"佐々木 美咲",gender:"女",age:31,job:"人事マネージャー",step:"内定",status:"通過",date:"2025-03-28",stars:5,tags:["HR","HOT"],basic:[{k:"現年収",f:"cur_sal",v:"480万円"},{k:"希望年収",f:"des_sal",v:"550万円"}],detail:[{k:"生年月日",f:"dob",v:"1994-07-05"},{k:"メール",f:"email",v:"sasaki.m@example.com"},{k:"電話",f:"tel",v:"070-3456-7890"},{k:"住所",f:"addr",v:"東京都港区"},{k:"最終学歴",f:"edu",v:"○○大学 経営学部"},{k:"現職",f:"job_now",v:"株式会社★★ 人事"},{k:"経験年数",f:"exp",v:"7年"},{k:"応募日",f:"app_date",v:"2025-03-28"}],memo:"即戦力。入社日調整中。",evals:{},history:[{c:"tg",date:"2025-03-28",title:"応募受付",body:""},{c:"tg",date:"2025-04-01",title:"書類選考 通過",body:""},{c:"tg",date:"2025-04-05",title:"最終面接 通過",body:""},{c:"tp",date:"2025-04-10",title:"内定通知",body:"内定通知書送付済み。"}],mails:[],docs:[{name:"履歴書.pdf",type:"PDF",date:"2025-03-28",size:"1.0MB"}],itl:[]},
+  {id:"AP-0004",name:"中村 大輔",gender:"男",age:26,job:"フロントエンドエンジニア",step:"書類選考",status:"未対応",date:"2025-04-12",stars:0,tags:[],basic:[{k:"現年収",f:"cur_sal",v:"320万円"},{k:"希望年収",f:"des_sal",v:"420万円"}],detail:[{k:"生年月日",f:"dob",v:"1999-11-30"},{k:"メール",f:"email",v:"nakamura.d@example.com"},{k:"電話",f:"tel",v:"090-4567-8901"},{k:"住所",f:"addr",v:"大阪府大阪市"},{k:"最終学歴",f:"edu",v:"□□工業大学 情報工学部"},{k:"現職",f:"job_now",v:"フリーランス"},{k:"経験年数",f:"exp",v:"2年"},{k:"応募日",f:"app_date",v:"2025-04-12"}],memo:"",evals:{},history:[{c:"tg",date:"2025-04-12",title:"応募受付",body:""}],mails:[],docs:[{name:"履歴書.pdf",type:"PDF",date:"2025-04-12",size:"0.7MB"}],itl:[]},
   {id:"AP-0005",name:"小林 彩",gender:"女",age:29,job:"プロダクトマネージャー",step:"最終面接",status:"通過",date:"2025-03-15",stars:5,tags:["KEEP"],basic:[{k:"現年収",f:"cur_sal",v:"520万円"},{k:"希望年収",f:"des_sal",v:"650万円"}],detail:[{k:"生年月日",f:"dob",v:"1996-04-18"},{k:"メール",f:"email",v:"kobayashi.a@example.com"},{k:"電話",f:"tel",v:"080-5678-9012"},{k:"住所",f:"addr",v:"東京都新宿区"},{k:"最終学歴",f:"edu",v:"△△大学 経済学部"},{k:"現職",f:"job_now",v:"株式会社◎◎ PM"},{k:"経験年数",f:"exp",v:"5年"},{k:"応募日",f:"app_date",v:"2025-03-15"}],memo:"",evals:{},history:[{c:"tg",date:"2025-03-15",title:"応募受付",body:""},{c:"tg",date:"2025-03-20",title:"書類選考 通過",body:""},{c:"tp",date:"2025-04-02",title:"最終面接 実施",body:""}],mails:[],docs:[],itl:[]},
-  {id:"AP-0006",name:"伊藤 拓也",gender:"男",age:42,job:"バックエンドエンジニア",step:"2次面接",status:"不合格",date:"2025-04-01",stars:2,tags:[],basic:[{k:"現年収",f:"cur_sal",v:"700万円"},{k:"希望年収",f:"des_sal",v:"800万円"}],detail:[{k:"生年月日",f:"dob",v:"1983-08-14"},{k:"メール",f:"email",v:"ito.t@example.com"},{k:"電話",f:"tel",v:"070-6789-0123"},{k:"住所",f:"addr",v:"埼玉県さいたま市"},{k:"最終学歴",f:"edu",v:"○○大学 理工学部"},{k:"現職",f:"job_now",v:"株式会社▲▲ シニアエンジニア"},{k:"経験年数",f:"exp",v:"17年"},{k:"応募日",f:"app_date",v:"2025-04-01"}],memo:"技術力は高いがカルチャーフィット懸念。",evals:{},history:[{c:"tg",date:"2025-04-01",title:"応募受付",body:""},{c:"tr",date:"2025-04-10",title:"2次面接 不合格",body:""}],mails:[],docs:[],itl:[]},
+  {id:"AP-0006",name:"伊藤 拓也",gender:"男",age:42,job:"バックエンドエンジニア",step:"2次面接",status:"不合格",date:"2025-04-01",stars:2,tags:[],basic:[{k:"現年収",f:"cur_sal",v:"700万円"},{k:"希望年収",f:"des_sal",v:"800万円"}],detail:[{k:"生年月日",f:"dob",v:"1983-08-14"},{k:"メール",f:"email",v:"ito.t@example.com"},{k:"電話",f:"tel",v:"070-6789-0123"},{k:"住所",f:"addr",v:"埼玉県さいたま市"},{k:"最終学歴",f:"edu",v:"○○大学 理工学部"},{k:"現職",f:"job_now",v:"株式会社▲▲ シニアエンジニア"},{k:"経験年数",f:"exp",v:"17年"},{k:"応募日",f:"app_date",v:"2025-04-01"}],memo:"技術力は高いがカルチャーフィット懸念。",evals:{},history:[{c:"tg",date:"2025-04-01",title:"応募受付",body:""},{c:"tr2",date:"2025-04-10",title:"2次面接 不合格",body:""}],mails:[],docs:[],itl:[]},
   {id:"AP-0007",name:"渡辺 さくら",gender:"女",age:24,job:"人事マネージャー",step:"書類選考",status:"通過",date:"2025-04-11",stars:3,tags:["HR"],basic:[{k:"現年収",f:"cur_sal",v:"300万円"},{k:"希望年収",f:"des_sal",v:"380万円"}],detail:[{k:"生年月日",f:"dob",v:"2001-02-28"},{k:"メール",f:"email",v:"watanabe.s@example.com"},{k:"電話",f:"tel",v:"090-7890-1234"},{k:"住所",f:"addr",v:"東京都世田谷区"},{k:"最終学歴",f:"edu",v:"□□大学 文学部"},{k:"現職",f:"job_now",v:"株式会社●● 人事補佐"},{k:"経験年数",f:"exp",v:"2年"},{k:"応募日",f:"app_date",v:"2025-04-11"}],memo:"",evals:{},history:[{c:"tg",date:"2025-04-11",title:"応募受付",body:""}],mails:[],docs:[],itl:[]},
-  {id:"AP-0008",name:"加藤 誠",gender:"男",age:38,job:"プロダクトマネージャー",step:"2次面接",status:"保留",date:"2025-04-07",stars:4,tags:["HOT","KEEP"],basic:[{k:"現年収",f:"cur_sal",v:"600万円"},{k:"希望年収",f:"des_sal",v:"720万円"}],detail:[{k:"生年月日",f:"dob",v:"1987-06-10"},{k:"メール",f:"email",v:"kato.m@example.com"},{k:"電話",f:"tel",v:"080-8901-2345"},{k:"住所",f:"addr",v:"東京都品川区"},{k:"最終学歴",f:"edu",v:"△△大学 工学部"},{k:"現職",f:"job_now",v:"株式会社■■ PM"},{k:"経験年数",f:"exp",v:"12年"},{k:"応募日",f:"app_date",v:"2025-04-07"}],memo:"",evals:{},history:[{c:"tg",date:"2025-04-07",title:"応募受付",body:""}],mails:[],docs:[],itl:[]},
+  {id:"AP-0008",name:"加藤 誠",gender:"男",age:38,job:"プロダクトマネージャー",step:"2次面接",status:"保留",date:"2025-04-07",stars:4,tags:["HOT","KEEP"],basic:[{k:"現年収",f:"cur_sal",v:"600万円"},{k:"希望年収",f:"des_sal",v:"720万円"}],detail:[{k:"生年月日",f:"dob",v:"1987-06-10"},{k:"メール",f:"email",v:"kato.m@example.com"},{k:"電話",f:"tel",v:"080-8901-2345"},{k:"住所",f:"addr",v:"東京都品川区"},{k:"最終学歴",f:"edu",v:"△△大学 工学部"},{k:"現職",f:"job_now",v:"株式会社■■ PM"},{k:"経験年数",f:"exp",v:"12年"},{k:"応募日",f:"app_date",v:"2025-04-07"}],memo:"",evals:{},history:[{c:"tg",date:"2025-04-07",title:"応募受付",body:""}],mails:[],docs:[],itl:[]}
 ];
 
 // ===== STATE =====
-let currentUser="";
-let displayData=[...ALL_DATA];
-let selected=new Set();
-let sortKey=null,sortDir=1;
-let activeTags=new Set();
-let advOpen=false;
-let currentApplicantId=null;
-let showDetailInfo=false;
-let editingInfo=false;
-let openAccs=new Set();
-let selStep2=null,selStatus2=null;
-let bulkTab="step",selBulkVal=null,selTagsOp=new Set();
-let selCsvFmt=null,selMailTpl=null;
+let currentUser = "";
+let dispData = [...ALL_DATA];
+let selected = new Set();
+let sortKey = null, sortDir = 1;
+let activeTags = new Set();
+let advOpen = false;
+let curDetId = null;
+let showDet = false, editingInfo = false;
+let openAccs = new Set();
+let selStep2 = null, selStatus2 = null;
+let bulkTab = "step", selBulkVal = null, selTagsOp = new Set();
+let selCsvFmt = null, selMailTpl = null;
 
 // ===== UTILS =====
-function $(id){return document.getElementById(id);}
-function showToast(msg){const t=$("toast");t.textContent=msg;t.className="toast show";setTimeout(()=>t.className="toast",2500);}
-function openModal(id){$(id).classList.add("open");}
-function closeModal(id){$(id).classList.remove("open");}
+const G = id => document.getElementById(id);
+const showToast = msg => { const t = G("toast"); t.textContent = msg; t.className = "toast show"; setTimeout(() => t.className = "toast", 2500); };
+const openMod = id => G(id).classList.add("open");
+const closeMod = id => G(id).classList.remove("open");
+const getD = () => ALL_DATA.find(x => x.id === curDetId);
 
 // ===== LOGIN =====
-$("login-btn").onclick=doLogin;
-$("login-pass").onkeydown=e=>{if(e.key==="Enter")doLogin();};
-function doLogin(){
-  const u=$("login-user").value.trim(),p=$("login-pass").value;
-  if(USERS[u]&&USERS[u]===p){
-    currentUser=u;
-    $("page-login").classList.remove("active");
-    $("page-app").classList.add("active");
-    $("nav-user").textContent=u;
+G("l-btn").addEventListener("click", doLogin);
+G("l-pass").addEventListener("keydown", e => { if (e.key === "Enter") doLogin(); });
+
+function doLogin() {
+  const u = G("l-user").value.trim(), p = G("l-pass").value;
+  if (USERS[u] && USERS[u] === p) {
+    currentUser = u;
+    G("pg-login").classList.remove("active");
+    G("pg-app").classList.add("active");
+    G("nav-user").textContent = u;
+    G("lerr").style.display = "none";
     initApp();
   } else {
-    $("login-err").style.display="block";
-    $("login-pass").value="";
+    G("lerr").style.display = "block";
+    G("l-pass").value = "";
   }
 }
-$("nav-logout").onclick=()=>{
-  $("page-app").classList.remove("active");
-  $("page-login").classList.add("active");
-  $("login-user").value="";$("login-pass").value="";
-  $("login-err").style.display="none";
-};
+
+G("logout-btn").addEventListener("click", () => {
+  G("pg-app").classList.remove("active");
+  G("pg-login").classList.add("active");
+  G("l-user").value = ""; G("l-pass").value = "";
+  G("lerr").style.display = "none";
+  G("pg-list").style.display = "";
+  G("pg-detail").style.display = "none";
+  selected.clear(); dispData = [...ALL_DATA];
+});
 
 // ===== APP INIT =====
-function initApp(){
+function initApp() {
   populateFilters();
   renderTagPills();
   renderMetrics();
   renderTable();
   setupListEvents();
   setupDetailEvents();
-  setupModalEvents();
+  setupModals();
 }
 
-function populateFilters(){
-  const fs=$("f-step"),fst=$("f-status"),fj=$("f-job");
-  STEPS.forEach(s=>{const o=document.createElement("option");o.value=s;o.textContent=s;fs.appendChild(o);});
-  STATUSES.forEach(s=>{const o=document.createElement("option");o.value=s;o.textContent=s;fst.appendChild(o);});
-  [...new Set(ALL_DATA.map(d=>d.job))].forEach(j=>{const o=document.createElement("option");o.value=j;o.textContent=j;fj.appendChild(o);});
+// ===== FILTERS =====
+function populateFilters() {
+  STEPS.forEach(s => { const o = document.createElement("option"); o.value = s; o.textContent = s; G("f-step").appendChild(o); });
+  STATUSES.forEach(s => { const o = document.createElement("option"); o.value = s; o.textContent = s; G("f-status").appendChild(o); });
+  [...new Set(ALL_DATA.map(d => d.job))].forEach(j => { const o = document.createElement("option"); o.value = j; o.textContent = j; G("f-job").appendChild(o); });
 }
 
-function renderTagPills(){
-  $("tag-pills").innerHTML=ALL_TAGS.map(t=>`<span class="tag-pill${activeTags.has(t)?" active":""}" data-tag="${t}">${t}</span>`).join("");
-  $("tag-pills").querySelectorAll(".tag-pill").forEach(el=>{
-    el.onclick=()=>{
-      const t=el.dataset.tag;
-      activeTags.has(t)?activeTags.delete(t):activeTags.add(t);
+function renderTagPills() {
+  G("tpills").innerHTML = ALL_TAGS.map(t =>
+    `<span class="tpill${activeTags.has(t) ? " active" : ""}" data-tag="${t}">${t}</span>`
+  ).join("");
+  G("tpills").querySelectorAll(".tpill").forEach(el => {
+    el.addEventListener("click", () => {
+      activeTags.has(el.dataset.tag) ? activeTags.delete(el.dataset.tag) : activeTags.add(el.dataset.tag);
       renderTagPills();
-    };
+    });
   });
 }
 
-function renderMetrics(){
-  const t=ALL_DATA.length,a=ALL_DATA.filter(d=>!["不合格","辞退"].includes(d.status)).length,
-        i=ALL_DATA.filter(d=>d.step.includes("面接")).length,p=ALL_DATA.filter(d=>d.status==="通過").length;
-  $("metrics").innerHTML=`
-    <div class="metric"><div class="metric-label">総応募数</div><div class="metric-val">${t}</div><div class="metric-sub">今月</div></div>
-    <div class="metric"><div class="metric-label">選考中</div><div class="metric-val">${a}</div><div class="metric-sub">アクティブ</div></div>
-    <div class="metric"><div class="metric-label">面接中</div><div class="metric-val">${i}</div><div class="metric-sub">今週</div></div>
-    <div class="metric"><div class="metric-label">通過者</div><div class="metric-val">${p}</div><div class="metric-sub">累計</div></div>`;
-}
-
-function applyFilter(){
-  const kw=$("f-kw").value.toLowerCase().trim();
-  const fs=$("f-step").value,fst=$("f-status").value,fj=$("f-job").value,fg=$("f-gender").value;
-  const fd1=$("f-d1").value,fd2=$("f-d2").value;
-  displayData=ALL_DATA.filter(d=>{
-    if(kw&&!d.name.includes(kw)&&!d.job.toLowerCase().includes(kw)&&!d.id.toLowerCase().includes(kw))return false;
-    if(fs&&d.step!==fs)return false;
-    if(fst&&d.status!==fst)return false;
-    if(fj&&d.job!==fj)return false;
-    if(fg&&d.gender!==fg)return false;
-    if(fd1&&d.date<fd1)return false;
-    if(fd2&&d.date>fd2)return false;
-    if(activeTags.size>0&&![...activeTags].every(t=>d.tags.includes(t)))return false;
+function applyFilter() {
+  const kw = G("f-kw").value.toLowerCase().trim();
+  const fs = G("f-step").value, fst = G("f-status").value;
+  const fj = G("f-job").value, fg = G("f-gender").value;
+  const fd1 = G("f-d1").value, fd2 = G("f-d2").value;
+  dispData = ALL_DATA.filter(d => {
+    if (kw && !d.name.includes(kw) && !d.job.toLowerCase().includes(kw) && !d.id.toLowerCase().includes(kw)) return false;
+    if (fs && d.step !== fs) return false;
+    if (fst && d.status !== fst) return false;
+    if (fj && d.job !== fj) return false;
+    if (fg && d.gender !== fg) return false;
+    if (fd1 && d.date < fd1) return false;
+    if (fd2 && d.date > fd2) return false;
+    if (activeTags.size > 0 && ![...activeTags].every(t => d.tags.includes(t))) return false;
     return true;
   });
-  if(sortKey)applySortToDisplay();
+  if (sortKey) applySortToDisp();
   renderTable();
-  showToast(displayData.length+"件ヒット");
+  showToast(dispData.length + "件ヒット");
 }
 
-function resetFilter(){
-  $("f-kw").value="";
-  ["f-step","f-status","f-job","f-gender"].forEach(id=>$(id).value="");
-  $("f-d1").value="";$("f-d2").value="";
-  activeTags.clear();renderTagPills();
-  displayData=[...ALL_DATA];renderTable();
+function resetFilter() {
+  G("f-kw").value = "";
+  ["f-step","f-status","f-job","f-gender"].forEach(id => G(id).value = "");
+  G("f-d1").value = ""; G("f-d2").value = "";
+  activeTags.clear(); renderTagPills();
+  dispData = [...ALL_DATA]; renderTable();
 }
 
-function sortBy(key){
-  sortKey===key?sortDir*=-1:(sortKey=key,sortDir=1);
-  updateSortIcons();applySortToDisplay();renderTable();
+// ===== SORT =====
+function sortBy(key) {
+  sortKey === key ? sortDir *= -1 : (sortKey = key, sortDir = 1);
+  updateSortIcons(); applySortToDisp(); renderTable();
 }
 
-function applySortToDisplay(){
-  displayData.sort((a,b)=>{
-    let va=a[sortKey],vb=b[sortKey];
-    if(sortKey==="step"){va=STEP_ORD[va]||99;vb=STEP_ORD[vb]||99;}
-    else if(sortKey==="status"){va=ST_ORD[va]||99;vb=ST_ORD[vb]||99;}
-    if(typeof va==="string"&&typeof vb==="string")return va.localeCompare(vb,"ja")*sortDir;
-    return(va-vb)*sortDir;
+function applySortToDisp() {
+  dispData.sort((a, b) => {
+    let va = a[sortKey], vb = b[sortKey];
+    if (sortKey === "step") { va = STEP_ORD[va] || 99; vb = STEP_ORD[vb] || 99; }
+    else if (sortKey === "status") { va = ST_ORD[va] || 99; vb = ST_ORD[vb] || 99; }
+    if (typeof va === "string" && typeof vb === "string") return va.localeCompare(vb, "ja") * sortDir;
+    return (va - vb) * sortDir;
   });
 }
 
-function updateSortIcons(){
-  ["name","gender","age","job","step","status","stars"].forEach(k=>{
-    const el=$("si-"+k);if(!el)return;
-    const th=el.closest("th");
-    el.className="si"+(k===sortKey?(sortDir===1?" asc":" desc"):"");
-    th.className=k===sortKey?"sortable sort-on":"sortable";
+function updateSortIcons() {
+  ["name","gender","age","job","step","status","stars"].forEach(k => {
+    const el = G("si-" + k); if (!el) return;
+    const th = el.closest("th");
+    el.className = "si" + (k === sortKey ? (sortDir === 1 ? " asc" : " desc") : "");
+    th.className = k === sortKey ? "sth son" : "sth";
   });
 }
 
-function renderTable(){
-  $("result-info").textContent=displayData.length===ALL_DATA.length?`全${ALL_DATA.length}件`:`${displayData.length} / ${ALL_DATA.length}件`;
-  const tbody=$("tbody");
-  if(!displayData.length){tbody.innerHTML=`<tr><td colspan="9" class="empty">該当する応募者が見つかりません</td></tr>`;return;}
-  tbody.innerHTML=displayData.map(d=>{
-    const stars=[1,2,3,4,5].map(i=>`<span class="star${i<=d.stars?"":" off"}">★</span>`).join("");
-    const tags=d.tags.length?d.tags.map(t=>`<span class="tag ${TAG_CLS[t]||''}">${t}</span>`).join(""):`<span style="color:var(--text3)">―</span>`;
-    const chk=selected.has(d.id);
-    return `<tr class="${chk?"sel":""}" data-id="${d.id}">
-      <td><input type="checkbox" class="row-chk" data-id="${d.id}" ${chk?"checked":""}></td>
+// ===== METRICS =====
+function renderMetrics() {
+  const t = ALL_DATA.length;
+  const a = ALL_DATA.filter(d => !["不合格","辞退"].includes(d.status)).length;
+  const i = ALL_DATA.filter(d => d.step.includes("面接")).length;
+  const p = ALL_DATA.filter(d => d.status === "通過").length;
+  G("metrics").innerHTML = `
+    <div class="metric"><div class="mlabel">総応募数</div><div class="mval">${t}</div><div class="msub">今月</div></div>
+    <div class="metric"><div class="mlabel">選考中</div><div class="mval">${a}</div><div class="msub">アクティブ</div></div>
+    <div class="metric"><div class="mlabel">面接中</div><div class="mval">${i}</div><div class="msub">今週</div></div>
+    <div class="metric"><div class="mlabel">通過者</div><div class="mval">${p}</div><div class="msub">累計</div></div>`;
+}
+
+// ===== TABLE =====
+function renderTable() {
+  const ri = G("rinfo");
+  ri.textContent = dispData.length === ALL_DATA.length ? `全${ALL_DATA.length}件` : `${dispData.length} / ${ALL_DATA.length}件`;
+  const tbody = G("tbody");
+  if (!dispData.length) { tbody.innerHTML = `<tr><td colspan="9" class="empty">該当する応募者が見つかりません</td></tr>`; return; }
+  tbody.innerHTML = dispData.map(d => {
+    const stars = [1,2,3,4,5].map(i => `<span class="star${i <= d.stars ? "" : " off"}">★</span>`).join("");
+    const tags = d.tags.length ? d.tags.map(t => `<span class="tag ${TAG_CLS[t] || ""}">${t}</span>`).join("") : `<span style="color:var(--text3)">―</span>`;
+    return `<tr class="${selected.has(d.id) ? "sel" : ""}" data-id="${d.id}">
+      <td><input type="checkbox" class="rchk" data-id="${d.id}" ${selected.has(d.id) ? "checked" : ""}></td>
       <td class="ell" style="font-weight:500">${d.name}</td>
-      <td><span class="${d.gender==="男"?"gm":"gf"}">${d.gender}</span></td>
+      <td><span class="${d.gender === "男" ? "gm" : "gf"}">${d.gender}</span></td>
       <td style="white-space:nowrap;color:var(--text2)">${d.age}歳</td>
       <td class="ell" style="color:var(--text2)">${d.job}</td>
-      <td style="white-space:nowrap"><span class="stepb ${STEP_CLS[d.step]||''}">${d.step}</span></td>
-      <td style="white-space:nowrap"><span class="badge ${ST_CLS[d.status]||''}">${d.status}</span></td>
+      <td style="white-space:nowrap"><span class="stepb ${STEP_CLS[d.step] || ""}">${d.step}</span></td>
+      <td style="white-space:nowrap"><span class="badge ${ST_CLS[d.status] || ""}">${d.status}</span></td>
       <td>${tags}</td>
-      <td><div class="eval-date"><div>${stars}</div><div class="date-row">${d.date}</div></div></td>
+      <td><div style="display:flex;flex-direction:column;gap:1px"><div>${stars}</div><div class="drow">${d.date}</div></div></td>
     </tr>`;
   }).join("");
-  // row click
-  tbody.querySelectorAll("tr[data-id]").forEach(tr=>{
-    tr.onclick=e=>{
-      if(e.target.type==="checkbox")return;
+  tbody.querySelectorAll("tr[data-id]").forEach(tr => {
+    tr.addEventListener("click", e => {
+      if (e.target.type === "checkbox") return;
       openDetail(tr.dataset.id);
-    };
+    });
   });
-  // checkbox
-  tbody.querySelectorAll(".row-chk").forEach(cb=>{
-    cb.onclick=e=>e.stopPropagation();
-    cb.onchange=()=>{
-      cb.checked?selected.add(cb.dataset.id):selected.delete(cb.dataset.id);
-      const tr=cb.closest("tr");tr.className=cb.checked?"sel":"";
-      $("check-all").checked=displayData.length>0&&displayData.every(d=>selected.has(d.id));
+  tbody.querySelectorAll(".rchk").forEach(cb => {
+    cb.addEventListener("click", e => e.stopPropagation());
+    cb.addEventListener("change", () => {
+      cb.checked ? selected.add(cb.dataset.id) : selected.delete(cb.dataset.id);
+      const tr = cb.closest("tr"); tr.className = cb.checked ? "sel" : "";
+      G("chk-all").checked = dispData.length > 0 && dispData.every(d => selected.has(d.id));
       updateBulkBar();
-    };
+    });
   });
-  $("check-all").checked=displayData.length>0&&displayData.every(d=>selected.has(d.id));
+  G("chk-all").checked = dispData.length > 0 && dispData.every(d => selected.has(d.id));
 }
 
-function updateBulkBar(){
-  const n=selected.size;
-  $("bulk-count").textContent=n+"件選択中";
-  $("bulk-bar").className="bulk-bar"+(n>0?" active":"");
+function updateBulkBar() {
+  const n = selected.size;
+  G("bulk-cnt").textContent = n + "件選択中";
+  G("bulk-bar").className = "bulk-bar" + (n > 0 ? " active" : "");
 }
 
-function setupListEvents(){
-  $("adv-toggle-btn").onclick=()=>{advOpen=!advOpen;$("adv-panel").className="adv-panel"+(advOpen?" open":"");$("adv-toggle-btn").textContent="詳細検索 "+(advOpen?"▴":"▾");};
-  $("search-btn").onclick=applyFilter;
-  $("f-kw").onkeydown=e=>{if(e.key==="Enter")applyFilter();};
-  $("adv-search-btn").onclick=applyFilter;
-  $("reset-btn").onclick=resetFilter;
-  $("check-all").onchange=function(){displayData.forEach(d=>{this.checked?selected.add(d.id):selected.delete(d.id);});renderTable();};
-  $("bulk-clear-btn").onclick=()=>{selected.clear();renderTable();};
-  $("bulk-change-btn").onclick=openBulkModal;
-  $("bulk-mail-btn").onclick=()=>openMailModal(false);
-  $("bulk-csv-btn").onclick=openCsvModal;
-  $("new-btn").onclick=()=>showToast("新規応募者追加機能（実装予定）");
-  document.querySelectorAll("th.sortable").forEach(th=>{th.onclick=()=>sortBy(th.dataset.key);});
+// ===== LIST EVENTS =====
+function setupListEvents() {
+  G("adv-btn").addEventListener("click", () => {
+    advOpen = !advOpen;
+    G("adv-panel").className = "adv-panel" + (advOpen ? " open" : "");
+    G("adv-btn").textContent = "詳細検索 " + (advOpen ? "▴" : "▾");
+  });
+  G("search-btn").addEventListener("click", applyFilter);
+  G("advsearch-btn").addEventListener("click", applyFilter);
+  G("f-kw").addEventListener("keydown", e => { if (e.key === "Enter") applyFilter(); });
+  G("reset-btn").addEventListener("click", resetFilter);
+  G("new-btn").addEventListener("click", () => showToast("新規応募者追加機能（実装予定）"));
+  G("chk-all").addEventListener("change", function() {
+    dispData.forEach(d => { this.checked ? selected.add(d.id) : selected.delete(d.id); });
+    renderTable();
+  });
+  G("bclear-btn").addEventListener("click", () => { selected.clear(); renderTable(); });
+  G("bbulk-btn").addEventListener("click", openBulkModal);
+  G("bmail-btn").addEventListener("click", () => openMailModal());
+  G("bcsv-btn").addEventListener("click", openCsvModal);
+  document.querySelectorAll("th.sth").forEach(th => {
+    th.addEventListener("click", () => sortBy(th.dataset.k));
+  });
 }
 
 // ===== DETAIL =====
-function openDetail(id){
-  currentApplicantId=id;
-  showDetailInfo=false;editingInfo=false;
+function openDetail(id) {
+  curDetId = id;
+  showDet = false; editingInfo = false;
   openAccs.clear();
-  const d=ALL_DATA.find(x=>x.id===id);
-  if(!d)return;
-  // init open accs for steps with evals
-  STEPS.forEach(s=>{if(d.evals[s]&&d.evals[s].ivs&&d.evals[s].ivs.length)openAccs.add(s);});
-  if(openAccs.size===0&&d.step)openAccs.add(d.step);
-
-  $("pane-list").style.display="none";
-  $("pane-detail").style.display="block";
-
-  $("d-name").textContent=d.name;
-  $("d-id").textContent=d.id;
-  $("d-av").innerHTML=`<svg width="24" height="24" viewBox="0 0 32 32" fill="none"><circle cx="16" cy="12" r="6" stroke="#aaa" stroke-width="1.5"/><path d="M4 28c0-6.627 5.373-12 12-12s12 5.373 12 12" stroke="#aaa" stroke-width="1.5" stroke-linecap="round"/></svg>`;
-  $("d-memo").value=d.memo||"";
+  const d = ALL_DATA.find(x => x.id === id);
+  if (!d) return;
+  STEPS.forEach(s => { if (d.evals[s] && d.evals[s].ivs && d.evals[s].ivs.length) openAccs.add(s); });
+  if (openAccs.size === 0) openAccs.add(d.step);
+  G("pg-list").style.display = "none";
+  G("pg-detail").style.display = "block";
+  G("d-name").textContent = d.name;
+  G("d-id").textContent = d.id;
+  G("d-av").innerHTML = `<svg width="24" height="24" viewBox="0 0 32 32" fill="none"><circle cx="16" cy="12" r="6" stroke="#aaa" stroke-width="1.5"/><path d="M4 28c0-6.627 5.373-12 12-12s12 5.373 12 12" stroke="#aaa" stroke-width="1.5" stroke-linecap="round"/></svg>`;
+  G("d-memo").value = d.memo || "";
   renderBasicInfo(d);
-  renderDetailInfo(d);
-  $("detail-toggle").textContent="▶ 詳細情報を表示";
-  $("detail-info").style.display="none";
-  $("info-edit-btn").style.display="";
-  $("info-save-btn").style.display="none";
-  renderStepFlow(d);
-  // tabs
-  document.querySelectorAll(".tab[data-tab]").forEach(t=>t.className="tab"+(t.dataset.tab==="history"?" active":""));
-  document.querySelectorAll(".dpane").forEach(p=>p.className="dpane"+(p.id==="dpane-history"?" active":""));
+  G("detail-info").style.display = "none";
+  G("detail-info").innerHTML = "";
+  G("dtog").textContent = "▶ 詳細情報を表示";
+  G("info-edit-btn").style.display = "";
+  G("info-save-btn").style.display = "none";
+  // reset tabs
+  document.querySelectorAll("#det-tabs .tab").forEach(t => t.className = "tab" + (t.dataset.tab === "history" ? " active" : ""));
+  document.querySelectorAll(".dpane").forEach(p => p.className = "dpane" + (p.id === "dpane-history" ? " active" : ""));
   renderHistory(d);
   renderEval(d);
   renderDocs(d);
-  renderMails(d);
+  renderMailsPane(d);
   renderITL(d);
 }
 
-function setupDetailEvents(){
-  $("back-btn").onclick=()=>{$("pane-detail").style.display="none";$("pane-list").style.display="";};
-  $("d-save-btn").onclick=()=>showToast("保存しました");
-  $("d-mail-btn").onclick=()=>openMailModal(true);
-  $("d-step-btn").onclick=openStepModal;
-  $("memo-save-btn").onclick=()=>{
-    const d=ALL_DATA.find(x=>x.id===currentApplicantId);
-    if(d)d.memo=$("d-memo").value;
+function setupDetailEvents() {
+  G("back-btn").addEventListener("click", () => {
+    G("pg-detail").style.display = "none";
+    G("pg-list").style.display = "";
+  });
+  G("d-save-btn").addEventListener("click", () => showToast("保存しました"));
+  G("d-mail-btn").addEventListener("click", () => openMailModal());
+  G("d-step-btn").addEventListener("click", openStepModal);
+  G("memo-save").addEventListener("click", () => {
+    const d = getD(); if (d) d.memo = G("d-memo").value;
     showToast("メモを保存しました");
-  };
-  $("ph-hint").onclick=()=>$("ph-file").click();
-  $("d-av").onclick=()=>$("ph-file").click();
-  $("ph-file").onchange=function(){
-    if(!this.files||!this.files[0])return;
-    const r=new FileReader();
-    r.onload=e=>{$("d-av").innerHTML=`<img src="${e.target.result}"/>`;};
+  });
+  G("ph-hint").addEventListener("click", () => G("ph-file").click());
+  G("d-av").addEventListener("click", () => G("ph-file").click());
+  G("ph-file").addEventListener("change", function() {
+    if (!this.files || !this.files[0]) return;
+    const r = new FileReader();
+    r.onload = e => { G("d-av").innerHTML = `<img src="${e.target.result}"/>`; };
     r.readAsDataURL(this.files[0]);
-  };
-  $("detail-toggle").onclick=()=>{
-    showDetailInfo=!showDetailInfo;
-    $("detail-info").style.display=showDetailInfo?"block":"none";
-    $("detail-toggle").textContent=(showDetailInfo?"▼ 詳細情報を非表示":"▶ 詳細情報を表示");
-    const d=ALL_DATA.find(x=>x.id===currentApplicantId);
-    if(d)renderDetailInfo(d);
-  };
-  $("info-edit-btn").onclick=()=>{
-    editingInfo=true;
-    const d=ALL_DATA.find(x=>x.id===currentApplicantId);
-    if(d){renderBasicInfo(d);if(showDetailInfo)renderDetailInfo(d);}
-    $("info-edit-btn").style.display="none";$("info-save-btn").style.display="";
-  };
-  $("info-save-btn").onclick=()=>{
-    const d=ALL_DATA.find(x=>x.id===currentApplicantId);
-    if(d){
-      [...d.basic,...d.detail].forEach(r=>{
-        const el=$("iinput-"+r.f);if(el)r.v=el.value;
-      });
+  });
+  G("dtog").addEventListener("click", () => {
+    showDet = !showDet;
+    G("detail-info").style.display = showDet ? "block" : "none";
+    G("dtog").textContent = showDet ? "▼ 詳細情報を非表示" : "▶ 詳細情報を表示";
+    const d = getD(); if (d && showDet) renderDetailInfo(d);
+  });
+  G("info-edit-btn").addEventListener("click", () => {
+    editingInfo = true;
+    const d = getD(); if (d) { renderBasicInfo(d); if (showDet) renderDetailInfo(d); }
+    G("info-edit-btn").style.display = "none";
+    G("info-save-btn").style.display = "";
+  });
+  G("info-save-btn").addEventListener("click", () => {
+    const d = getD();
+    if (d) {
+      [...d.basic, ...d.detail].forEach(r => { const el = G("iinput-" + r.f); if (el) r.v = el.value; });
     }
-    editingInfo=false;
-    if(d){renderBasicInfo(d);if(showDetailInfo)renderDetailInfo(d);}
-    $("info-edit-btn").style.display="";$("info-save-btn").style.display="none";
+    editingInfo = false;
+    if (d) { renderBasicInfo(d); if (showDet) renderDetailInfo(d); }
+    G("info-edit-btn").style.display = "";
+    G("info-save-btn").style.display = "none";
     showToast("候補者情報を保存しました");
-  };
-  // tabs
-  document.querySelectorAll(".tab[data-tab]").forEach(tab=>{
-    tab.onclick=()=>{
-      document.querySelectorAll(".tab[data-tab]").forEach(t=>t.className="tab");
-      document.querySelectorAll(".dpane").forEach(p=>p.className="dpane");
-      tab.className="tab active";
-      $("dpane-"+tab.dataset.tab).className="dpane active";
-    };
+  });
+  document.querySelectorAll("#det-tabs .tab").forEach(tab => {
+    tab.addEventListener("click", () => {
+      document.querySelectorAll("#det-tabs .tab").forEach(t => t.className = "tab");
+      document.querySelectorAll(".dpane").forEach(p => p.className = "dpane");
+      tab.className = "tab active";
+      G("dpane-" + tab.dataset.tab).className = "dpane active";
+    });
   });
 }
 
-function renderBasicInfo(d){
-  const rows=[
-    {k:"性別",v:`<span class="${d.gender==="男"?"gm":"gf"}">${d.gender}</span>`,f:"gender",rawV:d.gender},
-    {k:"年齢",v:d.age+"歳",f:"age",rawV:d.age},
-    {k:"応募求人",v:d.job,f:"job",rawV:d.job},
-    ...d.basic,
-    {k:"タグ",v:d.tags.length?d.tags.map(t=>`<span class="tag ${TAG_CLS[t]||''}">${t}</span>`).join(""):"―",f:"tags",rawV:d.tags.join("/")}
-  ];
-  $("basic-info").innerHTML=rows.map(r=>{
-    if(editingInfo){
-      return `<div class="irow"><span class="ikey">${r.k}</span><input class="iinput" id="iinput-${r.f}" value="${r.rawV!==undefined?r.rawV:r.v}"/></div>`;
+// ===== INFO RENDER =====
+function renderInfoRows(arr) {
+  return arr.map(r => {
+    if (editingInfo) {
+      return `<div class="irow"><span class="ikey">${r.k}</span><input class="iinput" id="iinput-${r.f}" value="${r.rawV !== undefined ? r.rawV : r.v}"/></div>`;
     }
     return `<div class="irow"><span class="ikey">${r.k}</span><span class="ival">${r.v}</span></div>`;
   }).join("");
 }
 
-function renderDetailInfo(d){
-  if(!showDetailInfo)return;
-  $("detail-info").innerHTML=d.detail.map(r=>{
-    if(editingInfo)return `<div class="irow"><span class="ikey">${r.k}</span><input class="iinput" id="iinput-${r.f}" value="${r.v}"/></div>`;
-    return `<div class="irow"><span class="ikey">${r.k}</span><span class="ival">${r.v}</span></div>`;
-  }).join("");
+function renderBasicInfo(d) {
+  const rows = [
+    {k:"性別", f:"gender", v:`<span class="${d.gender==="男"?"gm":"gf"}">${d.gender}</span>`, rawV:d.gender},
+    {k:"年齢", f:"age", v:d.age+"歳", rawV:d.age},
+    {k:"応募求人", f:"job", v:d.job, rawV:d.job},
+    ...d.basic,
+    {k:"タグ", f:"tags", v:d.tags.length?d.tags.map(t=>`<span class="tag ${TAG_CLS[t]||''}">${t}</span>`).join("") :"―", rawV:d.tags.join("/")}
+  ];
+  G("basic-info").innerHTML = renderInfoRows(rows);
 }
 
-function renderStepFlow(d){
-  const idx=STEP_ORD[d.step]||0;
-  $("d-step-flow").innerHTML=STEPS.map((s,i)=>{
-    const ord=i+1,isCur=d.step===s,isDone=idx>ord;
-    const cls=isCur?"snode cur":isDone?"snode done":"snode fut";
-    const dot=isCur?"sd-cur":isDone?"sd-done":"sd-fut";
-    const badge=isCur?`<span class="badge ${ST_CLS[d.status]||''}" style="font-size:10px">${d.status}</span>`:"";
+function renderDetailInfo(d) {
+  G("detail-info").innerHTML = renderInfoRows(d.detail);
+}
+
+// ===== STEP FLOW =====
+function renderStepFlow(d) {
+  const idx = STEP_ORD[d.step] || 0;
+  G("d-sflow").innerHTML = STEPS.map((s, i) => {
+    const ord = i + 1, isCur = d.step === s, isDone = idx > ord;
+    const cls = isCur ? "snode cur" : isDone ? "snode done" : "snode fut";
+    const dot = isCur ? "sd-cur" : isDone ? "sd-done" : "sd-fut";
+    const badge = isCur ? `<span class="badge ${ST_CLS[d.status]||''}" style="font-size:10px">${d.status}</span>` : "";
     return `<div class="${cls}"><div class="sdot ${dot}"></div><div class="sname">${s}</div>${badge}</div>`;
   }).join("");
 }
 
-function renderHistory(d){
-  $("dpane-history").innerHTML=`<div class="tl">${
-    d.history.map((h,i)=>`<div class="tli">
-      <div class="tll"><div class="tdot ${h.c}"></div>${i<d.history.length-1?'<div class="tline"></div>':''}</div>
-      <div><div class="tdate">${h.date}</div><div class="ttitle">${h.title}</div>${h.body?`<div class="tbody2">${h.body}</div>`:''}</div>
+// ===== HISTORY =====
+function renderHistory(d) {
+  G("dpane-history").innerHTML = `<div class="tl">${
+    d.history.map((h, i) => `<div class="tli">
+      <div class="tll"><div class="tdot ${h.c}"></div>${i < d.history.length - 1 ? '<div class="tline"></div>' : ''}</div>
+      <div><div class="tdate">${h.date}</div><div class="ttitle">${h.title}</div>${h.body ? `<div class="tbody3">${h.body}</div>` : ""}</div>
     </div>`).join("")
   }</div>`;
 }
 
-function calcCritAvg(evals,step){
-  const e=evals[step];if(!e||!e.ivs||!e.ivs.length)return {};
-  const m={};
-  e.ivs.forEach(iv=>Object.entries(iv.crit).forEach(([k,v])=>{if(!m[k])m[k]={s:0,n:0};m[k].s+=v;m[k].n++;}));
-  const out={};Object.entries(m).forEach(([k,{s,n}])=>out[k]=(s/n).toFixed(1));return out;
-}
-function calcStepScore(evals,step){
-  const e=evals[step];if(!e||!e.ivs||!e.ivs.length)return null;
-  return(e.ivs.reduce((a,iv)=>a+iv.overall,0)/e.ivs.length).toFixed(1);
+// ===== EVAL =====
+function calcStepScore(evals, step) {
+  const e = evals[step]; if (!e || !e.ivs || !e.ivs.length) return null;
+  return (e.ivs.reduce((a, iv) => a + iv.overall, 0) / e.ivs.length).toFixed(1);
 }
 
-function renderEval(d){
-  $("dpane-eval").innerHTML=STEPS.map((s,si)=>{
-    const e=d.evals[s]||{ivs:[],adminComment:""};
-    const isOpen=openAccs.has(s);
-    const score=calcStepScore(d.evals,s);
+function calcCritAvg(evals, step) {
+  const e = evals[step]; if (!e || !e.ivs || !e.ivs.length) return {};
+  const m = {};
+  e.ivs.forEach(iv => Object.entries(iv.crit).forEach(([k, v]) => { if (!m[k]) m[k] = {s:0,n:0}; m[k].s += v; m[k].n++; }));
+  const out = {}; Object.entries(m).forEach(([k, {s, n}]) => out[k] = (s/n).toFixed(1));
+  return out;
+}
+
+function renderEval(d) {
+  G("dpane-eval").innerHTML = STEPS.map((s, si) => {
+    const e = d.evals[s] || {ivs:[], adminComment:""};
+    const isOpen = openAccs.has(s);
+    const score = calcStepScore(d.evals, s);
     return `<div class="acc" id="acc-${si}">
-      <div class="acc-head" data-si="${si}" data-step="${s}">
+      <div class="acc-hd" id="acchd-${si}">
         <span class="stepb ${STEP_CLS[s]||''}">${s}</span>
-        <span style="font-size:11px;color:var(--text3);margin-left:4px;">${score?"avg "+score:"未評価"}</span>
+        <span style="font-size:11px;color:var(--text3);margin-left:4px">${score ? "avg " + score : "未評価"}</span>
         <span style="flex:1"></span>
-        <span style="font-size:11px;color:var(--text3);">${e.ivs.length}名</span>
-        <span class="acc-chev${isOpen?" open":""}" id="chev-${si}">▼</span>
+        <span style="font-size:11px;color:var(--text3)">${e.ivs.length}名</span>
+        <span class="acc-chev${isOpen ? " open" : ""}" id="chev-${si}">▼</span>
       </div>
-      <div class="acc-body" id="abody-${si}" style="display:${isOpen?"block":"none"}">
-        ${renderAccBody(d,s,si)}
+      <div class="acc-bd" id="accbd-${si}" style="display:${isOpen ? "block" : "none"}">
+        ${renderAccBody(d, s, si)}
       </div>
     </div>`;
   }).join("");
-  // acc head clicks
-  document.querySelectorAll(".acc-head[data-si]").forEach(el=>{
-    el.onclick=()=>{
-      const si=parseInt(el.dataset.si),s=el.dataset.step;
-      const body=$("abody-"+si),chev=$("chev-"+si);
-      if(body.style.display==="block"){body.style.display="none";chev.classList.remove("open");openAccs.delete(s);}
-      else{body.style.display="block";chev.classList.add("open");openAccs.add(s);}
-    };
+  // Wire accordion heads
+  STEPS.forEach((s, si) => {
+    G("acchd-" + si).addEventListener("click", () => {
+      const bd = G("accbd-" + si), chev = G("chev-" + si);
+      if (bd.style.display === "block") { bd.style.display = "none"; chev.classList.remove("open"); openAccs.delete(s); }
+      else { bd.style.display = "block"; chev.classList.add("open"); openAccs.add(s); }
+    });
   });
 }
 
-function renderAccBody(d,s,si){
-  if(!d.evals[s])d.evals[s]={ivs:[],adminComment:""};
-  const e=d.evals[s];
-  const avg=calcCritAvg(d.evals,s);
-  const bars=Object.keys(avg).length?`<div style="margin-bottom:10px;">${
-    Object.entries(avg).map(([k,v])=>`<div class="sbar"><div class="sbar-head"><span>${k}</span><span>${v}</span></div><div class="sbar-track"><div class="sbar-fill" style="width:${parseFloat(v)/5*100}%"></div></div></div>`).join("")
-  }</div>`:"";
-  const ivHtml=e.ivs.length?e.ivs.map((iv,ii)=>renderIVCard(d,s,si,iv,ii)).join(""):`<div style="font-size:12px;color:var(--text3);margin-bottom:8px;">評価がありません</div>`;
+function renderAccBody(d, s, si) {
+  if (!d.evals[s]) d.evals[s] = {ivs:[], adminComment:""};
+  const e = d.evals[s];
+  const avg = calcCritAvg(d.evals, s);
+  const bars = Object.keys(avg).length ? `<div style="margin-bottom:10px">${
+    Object.entries(avg).map(([k,v]) =>
+      `<div class="sbar2"><div class="sbar2-hd"><span>${k}</span><span>${v}</span></div><div class="sbar2-tr"><div class="sbar2-fl" style="width:${parseFloat(v)/5*100}%"></div></div></div>`
+    ).join("")
+  }</div>` : "";
+  const ivHtml = e.ivs.length ? e.ivs.map((iv, ii) => renderIVCard(d, s, si, iv, ii)).join("") :
+    `<div style="font-size:12px;color:var(--text3);margin-bottom:8px">評価がありません</div>`;
   return `${bars}
-  <div class="assign-row">
+  <div class="asrow">
     <span style="font-size:12px;color:var(--text2);white-space:nowrap">面接官を追加</span>
     <select class="asel" id="asel-${si}">
       <option value="">選択してください</option>
-      ${AVAIL_IV.map(n=>`<option value="${n}">${n}</option>`).join("")}
+      ${AVAIL_IV.map(n => `<option value="${n}">${n}</option>`).join("")}
     </select>
-    <button class="btn sm pri" onclick="assignIV('${s}',${si})">追加</button>
+    <button class="btn sm pri" id="assign-${si}">追加</button>
   </div>
-  <div id="iv-list-${si}">${ivHtml}</div>
-  <div class="admin-sect">
-    <div class="sect-label">管理者コメント</div>
-    <textarea class="cmt-ta" id="adcmt-${si}">${e.adminComment||""}</textarea>
-    <div class="row-btns"><button class="btn sm pri" onclick="saveAdminCmt('${s}',${si})">保存</button></div>
+  <div id="ivlist-${si}">${ivHtml}</div>
+  <div class="asect">
+    <div class="asect-lbl">管理者コメント</div>
+    <textarea class="cmtta" id="adcmt-${si}">${e.adminComment||""}</textarea>
+    <div class="rbtns"><button class="btn sm pri" id="adcmtsave-${si}">保存</button></div>
   </div>`;
 }
 
-function renderIVCard(d,s,si,iv,ii){
-  const ov=iv.overall||0;
-  const stars=Array.from({length:5},(_,i)=>`<span class="si-star${i<ov?" on":""}" onclick="setOverall('${s}',${si},${ii},${i+1})">★</span>`).join("");
-  const crits=Object.entries(iv.crit).map(([k,v])=>{
-    const v2=v||0;
-    const cs=Array.from({length:5},(_,i)=>`<span class="csi${i<v2?" on":""}" onclick="setCrit('${s}',${si},${ii},'${k}',${i+1})">★</span>`).join("");
+function renderIVCard(d, s, si, iv, ii) {
+  const ov = iv.overall || 0;
+  const stars = Array.from({length:5}, (_, i) =>
+    `<span class="osi${i < ov ? " on" : ""}" id="osi-${s}-${ii}-${i+1}">★</span>`
+  ).join("");
+  const crits = Object.entries(iv.crit).map(([k, v]) => {
+    const v2 = v || 0;
+    const cs = Array.from({length:5}, (_, i) =>
+      `<span class="csi${i < v2 ? " on" : ""}" id="csi-${s}-${ii}-${k}-${i+1}">★</span>`
+    ).join("");
     return `<div class="citem"><div class="clabel">${k}</div><div class="cstars">${cs}</div></div>`;
   }).join("");
-  return `<div class="ecard">
-    <div class="ehead">
+  return `<div class="ecard" id="ecard-${s}-${ii}">
+    <div class="ehd">
       <div class="iav">${iv.ini}</div>
-      <div><div class="iname">${iv.name}<span class="edbadge e">編集可</span></div><div class="irole">${iv.role}</div></div>
+      <div><div class="iname">${iv.name}<span class="ebadge">編集可</span></div><div class="irole">${iv.role}</div></div>
       <div class="idate">${iv.date}</div>
     </div>
-    <div class="star-row">${stars}<span style="font-size:12px;font-weight:500;color:var(--text);margin-left:5px;">${ov}.0</span></div>
+    <div class="starrow">${stars}<span style="font-size:12px;font-weight:500;margin-left:5px" id="oscore-${s}-${ii}">${ov}.0</span></div>
     <div class="cgrid">${crits}</div>
-    <textarea class="cmt-ta" id="cmt-${s}-${ii}">${iv.comment||""}</textarea>
-    <div class="row-btns">
-      <button class="btn sm pri" onclick="saveIVCmt('${s}',${ii})">保存</button>
-      <button class="btn sm danger" onclick="removeIV('${s}',${si},${ii})">削除</button>
+    <textarea class="cmtta" id="cmt-${s}-${ii}">${iv.comment||""}</textarea>
+    <div class="rbtns">
+      <button class="btn sm pri" id="cmtsave-${s}-${ii}">保存</button>
+      <button class="btn sm danger" id="ivdel-${s}-${si}-${ii}">削除</button>
     </div>
   </div>`;
 }
 
-function getD(){return ALL_DATA.find(x=>x.id===currentApplicantId);}
-
-function assignIV(s,si){
-  const sel=$("asel-"+si),full=sel.value;
-  if(!full){showToast("面接官を選択してください");return;}
-  const name=full.split("（")[0],role=(full.match(/（(.+?)）/)||[])[1]||"";
-  const d=getD();if(!d)return;
-  if(!d.evals[s])d.evals[s]={ivs:[],adminComment:""};
-  if(d.evals[s].ivs.find(iv=>iv.name===name)){showToast("すでにアサイン済みです");return;}
-  d.evals[s].ivs.push({name,ini:name.slice(0,1),role,date:new Date().toISOString().slice(0,10),overall:0,crit:{技術力:0,コミュ力:0,カルチャー:0},comment:""});
-  sel.value="";showToast(name+" をアサインしました");refreshAcc(d,s,si);
-}
-function removeIV(s,si,ii){
-  const d=getD();if(!d)return;
-  d.evals[s].ivs.splice(ii,1);
-  showToast("削除しました");refreshAcc(d,s,si);
-}
-function setOverall(s,si,ii,v){
-  const d=getD();if(!d)return;
-  d.evals[s].ivs[ii].overall=v;refreshAcc(d,s,si);
-}
-function setCrit(s,si,ii,k,v){
-  const d=getD();if(!d)return;
-  d.evals[s].ivs[ii].crit[k]=v;refreshAcc(d,s,si);
-}
-function saveIVCmt(s,ii){
-  const el=$("cmt-"+s+"-"+ii);
-  const d=getD();if(d&&el)d.evals[s].ivs[ii].comment=el.value;
-  showToast("保存しました");
-}
-function saveAdminCmt(s,si){
-  const el=$("adcmt-"+si),d=getD();
-  if(d&&el){if(!d.evals[s])d.evals[s]={ivs:[],adminComment:""};d.evals[s].adminComment=el.value;}
-  showToast("保存しました");
-}
-function refreshAcc(d,s,si){
-  $("iv-list-"+si).innerHTML=d.evals[s].ivs.length?d.evals[s].ivs.map((iv,ii)=>renderIVCard(d,s,si,iv,ii)).join(""):`<div style="font-size:12px;color:var(--text3);margin-bottom:8px;">評価がありません</div>`;
-  const score=calcStepScore(d.evals,s);
-  const head=document.querySelector(`#acc-${si} .acc-head span:nth-child(2)`);
-  if(head)head.textContent=score?"avg "+score:"未評価";
-  const cnt=document.querySelector(`#acc-${si} .acc-head span:nth-child(4)`);
-  if(cnt)cnt.textContent=d.evals[s].ivs.length+"名";
-  const avg=calcCritAvg(d.evals,s);
-  const barsWrap=document.querySelector(`#abody-${si}>div:first-child`);
-  if(barsWrap&&Object.keys(avg).length){
-    barsWrap.innerHTML=Object.entries(avg).map(([k,v])=>`<div class="sbar"><div class="sbar-head"><span>${k}</span><span>${v}</span></div><div class="sbar-track"><div class="sbar-fill" style="width:${parseFloat(v)/5*100}%"></div></div></div>`).join("");
-  }
+function wireEvalEvents(d, s, si) {
+  // assign button
+  const assignBtn = G("assign-" + si);
+  if (assignBtn) assignBtn.addEventListener("click", () => assignIV(d, s, si));
+  // admin comment save
+  const adBtn = G("adcmtsave-" + si);
+  if (adBtn) adBtn.addEventListener("click", () => {
+    const el = G("adcmt-" + si);
+    if (!d.evals[s]) d.evals[s] = {ivs:[], adminComment:""};
+    if (el) d.evals[s].adminComment = el.value;
+    showToast("管理者コメントを保存しました");
+  });
+  // per-IV events
+  d.evals[s] && d.evals[s].ivs.forEach((iv, ii) => {
+    // overall stars
+    for (let v = 1; v <= 5; v++) {
+      const el = G(`osi-${s}-${ii}-${v}`);
+      if (el) el.addEventListener("click", () => { d.evals[s].ivs[ii].overall = v; refreshAcc(d, s, si); });
+    }
+    // crit stars
+    Object.keys(iv.crit).forEach(k => {
+      for (let v = 1; v <= 5; v++) {
+        const el = G(`csi-${s}-${ii}-${k}-${v}`);
+        if (el) el.addEventListener("click", () => { d.evals[s].ivs[ii].crit[k] = v; refreshAcc(d, s, si); });
+      }
+    });
+    // comment save
+    const cmtBtn = G(`cmtsave-${s}-${ii}`);
+    if (cmtBtn) cmtBtn.addEventListener("click", () => {
+      const el = G(`cmt-${s}-${ii}`);
+      if (el) d.evals[s].ivs[ii].comment = el.value;
+      showToast("コメントを保存しました");
+    });
+    // delete
+    const delBtn = G(`ivdel-${s}-${si}-${ii}`);
+    if (delBtn) delBtn.addEventListener("click", () => {
+      d.evals[s].ivs.splice(ii, 1);
+      showToast("削除しました");
+      refreshAcc(d, s, si);
+    });
+  });
 }
 
-function renderDocs(d){
-  $("dpane-docs").innerHTML=d.docs.length?d.docs.map(doc=>`
+function assignIV(d, s, si) {
+  const sel = G("asel-" + si);
+  const full = sel.value; if (!full) { showToast("面接官を選択してください"); return; }
+  const name = full.split("（")[0];
+  const role = (full.match(/（(.+?)）/) || [])[1] || "";
+  if (!d.evals[s]) d.evals[s] = {ivs:[], adminComment:""};
+  if (d.evals[s].ivs.find(iv => iv.name === name)) { showToast("すでにアサイン済みです"); return; }
+  d.evals[s].ivs.push({name, ini:name.slice(0,1), role, date:new Date().toISOString().slice(0,10), overall:0, crit:{技術力:0,コミュ力:0,カルチャー:0}, comment:""});
+  sel.value = "";
+  showToast(name + " をアサインしました");
+  refreshAcc(d, s, si);
+}
+
+function refreshAcc(d, s, si) {
+  const bd = G("accbd-" + si); if (!bd) return;
+  // rebuild body
+  if (!d.evals[s]) d.evals[s] = {ivs:[], adminComment:""};
+  const e = d.evals[s];
+  const avg = calcCritAvg(d.evals, s);
+  const bars = Object.keys(avg).length ? `<div style="margin-bottom:10px">${
+    Object.entries(avg).map(([k,v]) =>
+      `<div class="sbar2"><div class="sbar2-hd"><span>${k}</span><span>${v}</span></div><div class="sbar2-tr"><div class="sbar2-fl" style="width:${parseFloat(v)/5*100}%"></div></div></div>`
+    ).join("")
+  }</div>` : "";
+  const ivHtml = e.ivs.length ? e.ivs.map((iv, ii) => renderIVCard(d, s, si, iv, ii)).join("") :
+    `<div style="font-size:12px;color:var(--text3);margin-bottom:8px">評価がありません</div>`;
+  bd.innerHTML = `${bars}
+  <div class="asrow">
+    <span style="font-size:12px;color:var(--text2);white-space:nowrap">面接官を追加</span>
+    <select class="asel" id="asel-${si}">
+      <option value="">選択してください</option>
+      ${AVAIL_IV.map(n => `<option value="${n}">${n}</option>`).join("")}
+    </select>
+    <button class="btn sm pri" id="assign-${si}">追加</button>
+  </div>
+  <div id="ivlist-${si}">${ivHtml}</div>
+  <div class="asect">
+    <div class="asect-lbl">管理者コメント</div>
+    <textarea class="cmtta" id="adcmt-${si}">${e.adminComment||""}</textarea>
+    <div class="rbtns"><button class="btn sm pri" id="adcmtsave-${si}">保存</button></div>
+  </div>`;
+  wireEvalEvents(d, s, si);
+  // update header score/count
+  const scoreEl = document.querySelector(`#acc-${si} .acc-hd span:nth-child(2)`);
+  if (scoreEl) { const sc = calcStepScore(d.evals, s); scoreEl.textContent = sc ? "avg " + sc : "未評価"; }
+  const cntEl = document.querySelector(`#acc-${si} .acc-hd span:nth-child(4)`);
+  if (cntEl) cntEl.textContent = e.ivs.length + "名";
+}
+
+// Wire eval events after first render
+function wireAllEvalEvents(d) {
+  STEPS.forEach((s, si) => wireEvalEvents(d, s, si));
+}
+
+// override renderEval to also wire events after render
+const _origRenderEval = renderEval;
+function renderEvalAndWire(d) {
+  _origRenderEval(d);
+  wireAllEvalEvents(d);
+}
+
+// patch openDetail to use wired version
+const _origOpenDetail = openDetail;
+
+// ===== DOCS =====
+function renderDocs(d) {
+  G("dpane-docs").innerHTML = d.docs.length ? d.docs.map(doc => `
     <div class="ditem">
       <div class="dicon"><svg width="14" height="14" viewBox="0 0 16 16" fill="none"><rect x="2" y="1" width="9" height="13" rx="1" stroke="currentColor" stroke-width="1.2"/><path d="M5 5h5M5 8h5M5 11h3" stroke="currentColor" stroke-width="1" stroke-linecap="round"/></svg></div>
       <div><div class="dname">${doc.name}</div><div class="dmeta">${doc.type} · ${doc.size} · ${doc.date}</div></div>
-      <button class="ddl" onclick="showToast('${doc.name}をダウンロードしました')">DL</button>
-    </div>`).join(""):`<div style="font-size:13px;color:var(--text3);">書類がありません</div>`;
+      <button class="ddl" data-name="${doc.name}">DL</button>
+    </div>`).join("") : `<div style="font-size:13px;color:var(--text3)">書類がありません</div>`;
+  G("dpane-docs").querySelectorAll(".ddl").forEach(btn => {
+    btn.addEventListener("click", () => showToast(btn.dataset.name + "をダウンロードしました"));
+  });
 }
 
-function renderMails(d){
-  if(!d.mails.length){$("dpane-mail").innerHTML=`<div style="font-size:13px;color:var(--text3);">メール履歴がありません</div>`;return;}
-  $("dpane-mail").innerHTML=d.mails.map((m,i)=>`
+// ===== MAILS =====
+function renderMailsPane(d) {
+  if (!d.mails.length) { G("dpane-mail").innerHTML = `<div style="font-size:13px;color:var(--text3)">メール履歴がありません</div>`; return; }
+  G("dpane-mail").innerHTML = d.mails.map((m, i) => `
     <div class="mitem">
-      <div class="mhead" data-mi="${i}">
-        <div class="mdir ${m.dir==="out"?"mo":"min"}">
+      <div class="mhd" data-mi="${i}">
+        <div class="mdir ${m.dir==="out"?"mo":"mi"}">
           <svg width="12" height="12" viewBox="0 0 16 16" fill="none">
-            ${m.dir==="out"?'<path d="M3 13L13 3M13 3H7M13 3v6" stroke="#3C3489" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>':'<path d="M13 3L3 13M3 13h6M3 13V7" stroke="#085041" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>'}
+            ${m.dir==="out" ? '<path d="M3 13L13 3M13 3H7M13 3v6" stroke="#3C3489" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>' : '<path d="M13 3L3 13M3 13h6M3 13V7" stroke="#085041" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>'}
           </svg>
         </div>
         <div class="msubj">${m.subj}</div>
@@ -1021,19 +1080,20 @@ function renderMails(d){
         <div class="mtext">${m.body}</div>
       </div>
     </div>`).join("");
-  $("dpane-mail").querySelectorAll(".mhead[data-mi]").forEach(el=>{
-    el.onclick=()=>{
-      const i=el.dataset.mi;
-      const b=$("mbody-"+i),c=$("mchev-"+i);
-      const open=b.style.display==="block";
-      b.style.display=open?"none":"block";
-      c.style.transform=open?"":"rotate(180deg)";
-    };
+  G("dpane-mail").querySelectorAll(".mhd[data-mi]").forEach(el => {
+    el.addEventListener("click", () => {
+      const i = el.dataset.mi;
+      const b = G("mbody-" + i), c = G("mchev-" + i);
+      const open = b.style.display === "block";
+      b.style.display = open ? "none" : "block";
+      c.style.transform = open ? "" : "rotate(180deg)";
+    });
   });
 }
 
-function renderITL(d){
-  $("dpane-itl").innerHTML=`
+// ===== ITL =====
+function renderITL(d) {
+  G("dpane-itl").innerHTML = `
     <div class="itl-compose">
       <textarea class="itl-ta" id="itl-ta" placeholder="社内連絡・申し送り・相談事項を入力..."></textarea>
       <div class="itl-foot">
@@ -1042,173 +1102,240 @@ function renderITL(d){
           <option value="discuss">相談</option>
           <option value="urgent">至急</option>
         </select>
-        <button class="itl-post" onclick="postITL()">投稿</button>
+        <button class="itl-post" id="itl-post">投稿</button>
       </div>
     </div>
     <div id="itl-posts">${renderITLPosts(d)}</div>`;
+  G("itl-post").addEventListener("click", () => {
+    const ta = G("itl-ta"), sel = G("itl-sel");
+    const txt = ta.value.trim(); if (!txt) { showToast("内容を入力してください"); return; }
+    const dd = getD(); if (!dd) return;
+    const now = new Date();
+    const ts = now.toISOString().slice(0,10) + " " + now.toTimeString().slice(0,5);
+    dd.itl.unshift({who:"管理者", ini:"管", type:sel.value, text:txt, time:ts});
+    ta.value = "";
+    G("itl-posts").innerHTML = renderITLPosts(dd);
+    wireITLDeletes(dd);
+    showToast("投稿しました");
+  });
+  wireITLDeletes(d);
 }
-function renderITLPosts(d){
-  const dd=d||getD();
-  if(!dd)return "";
-  return dd.itl.map((p,i)=>`
+
+function renderITLPosts(d) {
+  return d.itl.map((p, i) => `
     <div class="icard">
-      <div class="icard-head">
+      <div class="icard-hd">
         <div class="iav2">${p.ini}</div>
         <span class="iwho">${p.who}</span>
-        <span class="itbadge ${ITL_TYPE[p.type]?.cls||'it-notify'}">${ITL_TYPE[p.type]?.label||p.type}</span>
+        <span class="itbadge ${ITL_TYPE[p.type]?.cls||'itn'}">${ITL_TYPE[p.type]?.label||p.type}</span>
         <span class="iwhen">${p.time}</span>
-        <button class="btn sm danger" onclick="removeITL(${i})">削除</button>
+        <button class="btn sm danger itl-del" data-i="${i}">削除</button>
       </div>
       <div class="itext">${p.text}</div>
-    </div>`).join("")||`<div style="font-size:13px;color:var(--text3);">投稿がありません</div>`;
+    </div>`).join("") || `<div style="font-size:13px;color:var(--text3)">投稿がありません</div>`;
 }
-function postITL(){
-  const ta=$("itl-ta"),sel=$("itl-sel");
-  const txt=ta.value.trim();if(!txt){showToast("内容を入力してください");return;}
-  const d=getD();if(!d)return;
-  const now=new Date();
-  const ts=now.toISOString().slice(0,10)+" "+now.toTimeString().slice(0,5);
-  d.itl.unshift({who:"管理者",ini:"管",type:sel.value,text:txt,time:ts});
-  ta.value="";
-  $("itl-posts").innerHTML=renderITLPosts();
-  showToast("投稿しました");
-}
-function removeITL(i){
-  const d=getD();if(!d)return;
-  d.itl.splice(i,1);
-  $("itl-posts").innerHTML=renderITLPosts();
-  showToast("削除しました");
+
+function wireITLDeletes(d) {
+  document.querySelectorAll(".itl-del").forEach(btn => {
+    btn.addEventListener("click", () => {
+      d.itl.splice(parseInt(btn.dataset.i), 1);
+      G("itl-posts").innerHTML = renderITLPosts(d);
+      wireITLDeletes(d);
+      showToast("削除しました");
+    });
+  });
 }
 
 // ===== STEP MODAL =====
-function openStepModal(){
-  const d=getD();if(!d)return;
-  selStep2=d.step;selStatus2=d.status;
-  renderStepModal();openModal("modal-step");
+function openStepModal() {
+  const d = getD(); if (!d) return;
+  selStep2 = d.step; selStatus2 = d.status;
+  renderStepModal();
+  openMod("mod-step");
 }
-function renderStepModal(){
-  $("sm-steps").innerHTML=STEPS.map(s=>`
-    <div class="opt${selStep2===s?" sel":""}" data-sv="${s}" data-type="step">
-      <input type="radio" ${selStep2===s?"checked":""} readonly style="width:13px;height:13px;accent-color:var(--purple);flex-shrink:0"/>
+
+function renderStepModal() {
+  G("sm-steps").innerHTML = STEPS.map(s => `
+    <div class="oitem${selStep2===s?" sel":""}" data-sv="${s}" data-type="step">
+      <input type="radio" ${selStep2===s?"checked":""} readonly/>
       <span class="stepb ${STEP_CLS[s]||''}">${s}</span>
     </div>`).join("");
-  $("sm-statuses").innerHTML=STATUSES.map(s=>`
-    <div class="opt${selStatus2===s?" sel":""}" data-sv="${s}" data-type="status">
-      <input type="radio" ${selStatus2===s?"checked":""} readonly style="width:13px;height:13px;accent-color:var(--purple);flex-shrink:0"/>
+  G("sm-statuses").innerHTML = STATUSES.map(s => `
+    <div class="oitem${selStatus2===s?" sel":""}" data-sv="${s}" data-type="status">
+      <input type="radio" ${selStatus2===s?"checked":""} readonly/>
       <span class="badge ${ST_CLS[s]||''}">${s}</span>
     </div>`).join("");
-  $("sm-steps").querySelectorAll(".opt").forEach(el=>{el.onclick=()=>{selStep2=el.dataset.sv;renderStepModal();};});
-  $("sm-statuses").querySelectorAll(".opt").forEach(el=>{el.onclick=()=>{selStatus2=el.dataset.sv;renderStepModal();};});
+  G("sm-steps").querySelectorAll(".oitem").forEach(el => {
+    el.addEventListener("click", () => { selStep2 = el.dataset.sv; renderStepModal(); });
+  });
+  G("sm-statuses").querySelectorAll(".oitem").forEach(el => {
+    el.addEventListener("click", () => { selStatus2 = el.dataset.sv; renderStepModal(); });
+  });
 }
-$("sm-cancel").onclick=()=>closeModal("modal-step");
-$("sm-ok").onclick=()=>{
-  const d=getD();if(d){d.step=selStep2;d.status=selStatus2;renderStepFlow(d);}
-  closeModal("modal-step");showToast("ステップ・ステータスを更新しました");
-};
 
 // ===== BULK MODAL =====
-function openBulkModal(){
-  selBulkVal=null;selTagsOp.clear();bulkTab="step";
-  renderBulkModal();openModal("modal-bulk");
+function openBulkModal() {
+  selBulkVal = null; selTagsOp.clear(); bulkTab = "step";
+  renderBulkModal(); openMod("mod-bulk");
 }
-function renderBulkModal(){
-  $("bulk-mtabs").innerHTML=["step","status","job","tag-add","tag-remove"].map((t,i)=>`
-    <button class="mtab${bulkTab===t?" active":""}" data-bt="${t}">${["ステップ","ステータス","求人","タグ付与","タグ削除"][i]}</button>`).join("");
-  $("bulk-mtabs").querySelectorAll(".mtab").forEach(b=>{b.onclick=()=>{bulkTab=b.dataset.bt;selBulkVal=null;selTagsOp.clear();renderBulkModal();};});
-  if(bulkTab==="tag-add"||bulkTab==="tag-remove"){
-    const isAdd=bulkTab==="tag-add";
-    $("bulk-mbody").innerHTML=`<div style="font-size:11px;color:var(--text3);margin-bottom:8px;">${isAdd?"付与するタグを選択":"削除するタグを選択"}</div>
-      <div class="tag-grid">${ALL_TAGS.map(t=>`<div class="tag-opt${selTagsOp.has(t)?(isAdd?" add":" remove"):""}" data-tag="${t}">${t}</div>`).join("")}</div>`;
-    $("bulk-mbody").querySelectorAll(".tag-opt").forEach(el=>{el.onclick=()=>{selTagsOp.has(el.dataset.tag)?selTagsOp.delete(el.dataset.tag):selTagsOp.add(el.dataset.tag);renderBulkModal();};});
+
+function renderBulkModal() {
+  G("bulk-mtabs").innerHTML = ["step","status","job","tag-add","tag-remove"].map((t, i) =>
+    `<button class="mtab${bulkTab===t?" active":""}" data-bt="${t}">${["ステップ","ステータス","求人","タグ付与","タグ削除"][i]}</button>`
+  ).join("");
+  G("bulk-mtabs").querySelectorAll(".mtab").forEach(b => {
+    b.addEventListener("click", () => { bulkTab = b.dataset.bt; selBulkVal = null; selTagsOp.clear(); renderBulkModal(); });
+  });
+  if (bulkTab === "tag-add" || bulkTab === "tag-remove") {
+    const isAdd = bulkTab === "tag-add";
+    G("bulk-mbody").innerHTML = `<div style="font-size:11px;color:var(--text3);margin-bottom:8px">${isAdd?"付与するタグを選択":"削除するタグを選択"}</div>
+      <div class="taggrid">${ALL_TAGS.map(t => `<div class="tagopt${selTagsOp.has(t)?(isAdd?" tadd":" tremove"):""}" data-tag="${t}">${t}</div>`).join("")}</div>`;
+    G("bulk-mbody").querySelectorAll(".tagopt").forEach(el => {
+      el.addEventListener("click", () => { selTagsOp.has(el.dataset.tag) ? selTagsOp.delete(el.dataset.tag) : selTagsOp.add(el.dataset.tag); renderBulkModal(); });
+    });
   } else {
-    const items=bulkTab==="step"?STEPS:bulkTab==="status"?STATUSES:[...new Set(ALL_DATA.map(d=>d.job))];
-    $("bulk-mbody").innerHTML=`<input class="msearch" id="bsearch" placeholder="検索..."/>
-      <div class="opt-list" id="blist"></div>`;
-    const renderBList=()=>{
-      const q=($("bsearch")||{value:""}).value.toLowerCase();
-      $("blist").innerHTML=items.filter(v=>v.toLowerCase().includes(q)).map(v=>{
-        const cls=bulkTab==="step"?(STEP_CLS[v]||""):bulkTab==="status"?(ST_CLS[v]||""):"";
-        const bt=bulkTab==="step"?"stepb":"badge";
-        return `<div class="opt${selBulkVal===v?" sel":""}" data-bv="${v}"><input type="radio" ${selBulkVal===v?"checked":""} readonly style="width:13px;height:13px;accent-color:var(--purple);flex-shrink:0"/><span class="${bt} ${cls}">${v}</span></div>`;
+    const items = bulkTab === "step" ? STEPS : bulkTab === "status" ? STATUSES : [...new Set(ALL_DATA.map(d => d.job))];
+    G("bulk-mbody").innerHTML = `<input class="msearch" id="bsearch" placeholder="検索..."/><div class="olist" id="blist"></div>`;
+    const fillBList = () => {
+      const q = G("bsearch").value.toLowerCase();
+      G("blist").innerHTML = items.filter(v => v.toLowerCase().includes(q)).map(v => {
+        const cls = bulkTab === "step" ? (STEP_CLS[v]||"") : bulkTab === "status" ? (ST_CLS[v]||"") : "";
+        const bt = bulkTab === "step" ? "stepb" : "badge";
+        return `<div class="oitem${selBulkVal===v?" sel":""}" data-bv="${v}"><input type="radio" ${selBulkVal===v?"checked":""} readonly/><span class="${bt} ${cls}">${v}</span></div>`;
       }).join("");
-      $("blist").querySelectorAll(".opt").forEach(el=>{el.onclick=()=>{selBulkVal=el.dataset.bv;renderBList();};});
+      G("blist").querySelectorAll(".oitem").forEach(el => {
+        el.addEventListener("click", () => { selBulkVal = el.dataset.bv; fillBList(); });
+      });
     };
-    renderBList();
-    if($("bsearch"))$("bsearch").oninput=renderBList;
+    fillBList();
+    G("bsearch").addEventListener("input", fillBList);
   }
 }
-$("bulk-mcancel").onclick=()=>closeModal("modal-bulk");
-$("bulk-mok").onclick=()=>{
-  if(bulkTab==="tag-add"||bulkTab==="tag-remove"){
-    if(!selTagsOp.size){showToast("タグを選択してください");return;}
-    selected.forEach(id=>{const d=ALL_DATA.find(x=>x.id===id);if(!d)return;
-      if(bulkTab==="tag-add")selTagsOp.forEach(t=>{if(!d.tags.includes(t))d.tags.push(t);});
-      else selTagsOp.forEach(t=>{d.tags=d.tags.filter(x=>x!==t);});});
-    showToast(`${selected.size}件のタグを${bulkTab==="tag-add"?"付与":"削除"}しました`);
-  } else {
-    if(!selBulkVal){showToast("変更先を選択してください");return;}
-    const field={"step":"step","status":"status","job":"job"}[bulkTab];
-    const label={"step":"ステップ","status":"ステータス","job":"求人"}[bulkTab];
-    selected.forEach(id=>{const d=ALL_DATA.find(x=>x.id===id);if(d)d[field]=selBulkVal;});
-    showToast(`${selected.size}件の${label}を「${selBulkVal}」に変更しました`);
-  }
-  renderMetrics();renderTable();closeModal("modal-bulk");
-};
 
 // ===== MAIL MODAL =====
-function openMailModal(single){
-  selMailTpl=null;
-  renderMailModal();openModal("modal-mail");
+function openMailModal() {
+  selMailTpl = null; G("mail-search").value = "";
+  renderMailModal(); openMod("mod-mail");
 }
-function renderMailModal(){
-  const q=($("mail-msearch")||{value:""}).value.toLowerCase();
-  $("mail-mlist").innerHTML=MAIL_TPLS.filter(t=>t.name.includes(q)||t.desc.includes(q)).map(t=>`
-    <div class="tpl-item${selMailTpl===t.id?" sel":""}" data-tid="${t.id}">
-      <div class="tpl-name">${t.name}</div><div class="tpl-desc">${t.desc}</div>
+
+function renderMailModal() {
+  const q = G("mail-search").value.toLowerCase();
+  G("mail-list").innerHTML = MAIL_TPLS.filter(t => t.name.includes(q) || t.desc.includes(q)).map(t => `
+    <div class="titem${selMailTpl===t.id?" sel":""}" data-tid="${t.id}">
+      <div class="tn">${t.name}</div><div class="td2">${t.desc}</div>
     </div>`).join("");
-  $("mail-mlist").querySelectorAll(".tpl-item").forEach(el=>{el.onclick=()=>{selMailTpl=el.dataset.tid;renderMailModal();};});
+  G("mail-list").querySelectorAll(".titem").forEach(el => {
+    el.addEventListener("click", () => { selMailTpl = el.dataset.tid; renderMailModal(); });
+  });
 }
-$("mail-msearch").oninput=renderMailModal;
-$("mail-mcancel").onclick=()=>closeModal("modal-mail");
-$("mail-mok").onclick=()=>{
-  if(!selMailTpl){showToast("テンプレートを選択してください");return;}
-  showToast(`「${MAIL_TPLS.find(t=>t.id===selMailTpl).name}」を送付しました`);
-  closeModal("modal-mail");
-};
 
 // ===== CSV MODAL =====
-function openCsvModal(){
-  selCsvFmt=null;renderCsvModal();openModal("modal-csv");
+function openCsvModal() {
+  selCsvFmt = null; G("csv-search").value = "";
+  renderCsvModal(); openMod("mod-csv");
 }
-function renderCsvModal(){
-  const q=($("csv-msearch")||{value:""}).value.toLowerCase();
-  $("csv-mlist").innerHTML=CSV_FORMATS.filter(f=>f.name.toLowerCase().includes(q)||f.cols.toLowerCase().includes(q)).map(f=>`
-    <div class="fmt-item${selCsvFmt===f.id?" sel":""}" data-fid="${f.id}">
-      <div class="fmt-name">${f.name}</div><div class="fmt-cols">${f.cols}</div>
-    </div>`).join("");
-  $("csv-mlist").querySelectorAll(".fmt-item").forEach(el=>{el.onclick=()=>{selCsvFmt=el.dataset.fid;renderCsvModal();};});
-}
-$("csv-msearch").oninput=renderCsvModal;
-$("csv-mcancel").onclick=()=>closeModal("modal-csv");
-$("csv-mok").onclick=()=>{
-  if(!selCsvFmt){showToast("フォーマットを選択してください");return;}
-  const rows=ALL_DATA.filter(d=>selected.has(d.id));
-  const fmt=CSV_FORMATS.find(f=>f.id===selCsvFmt);
-  const maps={
-    basic:d=>`${d.id},${d.name},${d.gender},${d.age},${d.job},${d.step},${d.status},${d.date}`,
-    full:d=>`${d.id},${d.name},${d.gender},${d.age},${d.job},${d.step},${d.status},${d.date},"${d.tags.join("/")}",${d.stars}`,
-    hr:d=>`${d.id},${d.name},${d.gender},${d.age},${d.step},${d.status},"${d.tags.join("/")}"`,
-    report:d=>`${d.job},${d.id},${d.name},${d.step},${d.status},${d.date},${d.stars}`,
-  };
-  const csv=[fmt.cols,...rows.map(maps[selCsvFmt])].join("\n");
-  const a=document.createElement("a");
-  a.href="data:text/csv;charset=utf-8,\uFEFF"+encodeURIComponent(csv);
-  a.download=`applicants_${selCsvFmt}.csv`;a.click();
-  showToast(`${rows.length}件をダウンロードしました`);closeModal("modal-csv");
-};
 
-// close modal on overlay click
-document.querySelectorAll(".overlay").forEach(ov=>{ov.onclick=e=>{if(e.target===ov)ov.classList.remove("open");};});
+function renderCsvModal() {
+  const q = G("csv-search").value.toLowerCase();
+  G("csv-list").innerHTML = CSV_FORMATS.filter(f => f.name.toLowerCase().includes(q) || f.cols.toLowerCase().includes(q)).map(f => `
+    <div class="fitem${selCsvFmt===f.id?" sel":""}" data-fid="${f.id}">
+      <div class="fn">${f.name}</div><div class="fd">${f.cols}</div>
+    </div>`).join("");
+  G("csv-list").querySelectorAll(".fitem").forEach(el => {
+    el.addEventListener("click", () => { selCsvFmt = el.dataset.fid; renderCsvModal(); });
+  });
+}
+
+// ===== SETUP MODALS =====
+function setupModals() {
+  G("sm-cancel").addEventListener("click", () => closeMod("mod-step"));
+  G("sm-ok").addEventListener("click", () => {
+    const d = getD();
+    if (d) { d.step = selStep2; d.status = selStatus2; renderStepFlow(d); }
+    closeMod("mod-step"); showToast("ステップ・ステータスを更新しました");
+  });
+  G("bulk-mcancel").addEventListener("click", () => closeMod("mod-bulk"));
+  G("bulk-mok").addEventListener("click", () => {
+    if (bulkTab === "tag-add" || bulkTab === "tag-remove") {
+      if (!selTagsOp.size) { showToast("タグを選択してください"); return; }
+      selected.forEach(id => {
+        const d = ALL_DATA.find(x => x.id === id); if (!d) return;
+        if (bulkTab === "tag-add") selTagsOp.forEach(t => { if (!d.tags.includes(t)) d.tags.push(t); });
+        else selTagsOp.forEach(t => { d.tags = d.tags.filter(x => x !== t); });
+      });
+      showToast(`${selected.size}件のタグを${bulkTab==="tag-add"?"付与":"削除"}しました`);
+    } else {
+      if (!selBulkVal) { showToast("変更先を選択してください"); return; }
+      const field = {step:"step",status:"status",job:"job"}[bulkTab];
+      const label = {step:"ステップ",status:"ステータス",job:"求人"}[bulkTab];
+      selected.forEach(id => { const d = ALL_DATA.find(x => x.id === id); if (d) d[field] = selBulkVal; });
+      showToast(`${selected.size}件の${label}を「${selBulkVal}」に変更しました`);
+    }
+    renderMetrics(); renderTable(); closeMod("mod-bulk");
+  });
+  G("mail-cancel").addEventListener("click", () => closeMod("mod-mail"));
+  G("mail-ok").addEventListener("click", () => {
+    if (!selMailTpl) { showToast("テンプレートを選択してください"); return; }
+    showToast(`「${MAIL_TPLS.find(t => t.id === selMailTpl).name}」を送付しました`);
+    closeMod("mod-mail");
+  });
+  G("csv-cancel").addEventListener("click", () => closeMod("mod-csv"));
+  G("csv-ok").addEventListener("click", () => {
+    if (!selCsvFmt) { showToast("フォーマットを選択してください"); return; }
+    const rows = ALL_DATA.filter(d => selected.has(d.id));
+    const fmt = CSV_FORMATS.find(f => f.id === selCsvFmt);
+    const maps = {
+      basic: d => `${d.id},${d.name},${d.gender},${d.age},${d.job},${d.step},${d.status},${d.date}`,
+      full:  d => `${d.id},${d.name},${d.gender},${d.age},${d.job},${d.step},${d.status},${d.date},"${d.tags.join("/")}",${d.stars}`,
+      hr:    d => `${d.id},${d.name},${d.gender},${d.age},${d.step},${d.status},"${d.tags.join("/")}"`,
+      report:d => `${d.job},${d.id},${d.name},${d.step},${d.status},${d.date},${d.stars}`
+    };
+    const csv = [fmt.cols, ...rows.map(maps[selCsvFmt])].join("\n");
+    const a = document.createElement("a");
+    a.href = "data:text/csv;charset=utf-8,\uFEFF" + encodeURIComponent(csv);
+    a.download = `applicants_${selCsvFmt}.csv`; a.click();
+    showToast(`${rows.length}件をダウンロードしました`); closeMod("mod-csv");
+  });
+  G("mail-search").addEventListener("input", renderMailModal);
+  G("csv-search").addEventListener("input", renderCsvModal);
+  document.querySelectorAll(".overlay").forEach(ov => {
+    ov.addEventListener("click", e => { if (e.target === ov) ov.classList.remove("open"); });
+  });
+}
+
+// Patch openDetail to wire eval events after render
+function openDetail(id) {
+  curDetId = id;
+  showDet = false; editingInfo = false;
+  openAccs.clear();
+  const d = ALL_DATA.find(x => x.id === id);
+  if (!d) return;
+  STEPS.forEach(s => { if (d.evals[s] && d.evals[s].ivs && d.evals[s].ivs.length) openAccs.add(s); });
+  if (openAccs.size === 0) openAccs.add(d.step);
+  G("pg-list").style.display = "none";
+  G("pg-detail").style.display = "block";
+  G("d-name").textContent = d.name;
+  G("d-id").textContent = d.id;
+  G("d-av").innerHTML = `<svg width="24" height="24" viewBox="0 0 32 32" fill="none"><circle cx="16" cy="12" r="6" stroke="#aaa" stroke-width="1.5"/><path d="M4 28c0-6.627 5.373-12 12-12s12 5.373 12 12" stroke="#aaa" stroke-width="1.5" stroke-linecap="round"/></svg>`;
+  G("d-memo").value = d.memo || "";
+  renderBasicInfo(d);
+  G("detail-info").style.display = "none";
+  G("detail-info").innerHTML = "";
+  G("dtog").textContent = "▶ 詳細情報を表示";
+  G("info-edit-btn").style.display = "";
+  G("info-save-btn").style.display = "none";
+  document.querySelectorAll("#det-tabs .tab").forEach(t => t.className = "tab" + (t.dataset.tab === "history" ? " active" : ""));
+  document.querySelectorAll(".dpane").forEach(p => p.className = "dpane" + (p.id === "dpane-history" ? " active" : ""));
+  renderHistory(d);
+  renderEval(d);
+  wireAllEvalEvents(d);
+  renderDocs(d);
+  renderMailsPane(d);
+  renderITL(d);
+  renderStepFlow(d);
+}
+
+}); // end DOMContentLoaded
 </script>
 </body>
 </html>

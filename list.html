@@ -5,7 +5,6 @@
 <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
 <title>ATS Portal - 応募者一覧</title>
 <style>
-
 *{box-sizing:border-box;margin:0;padding:0;}
 body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:#f5f5f3;color:#1a1a18;min-height:100vh;}
 :root{
@@ -83,7 +82,6 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 .titem.sel,.fitem.sel{background:var(--pur-l);border-color:#AFA9EC;}
 .tn,.fn{font-size:13px;font-weight:500;}
 .td2,.fd{font-size:11px;color:var(--text2);margin-top:2px;}
-
 .list-hdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:1rem;flex-wrap:wrap;gap:8px;}
 .ptitle{font-size:18px;font-weight:500;}
 .metrics{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;margin-bottom:1rem;}
@@ -131,10 +129,10 @@ input[type=checkbox]{width:14px;height:14px;cursor:pointer;accent-color:var(--pu
 .star{color:#EF9F27;font-size:11px;}.star.off{color:var(--bdr2);}
 .drow{font-size:11px;color:var(--text3);}
 .empty{text-align:center;padding:2rem;color:var(--text3);font-size:13px;}
+.loading{text-align:center;padding:2rem;color:var(--text3);font-size:13px;}
 </style>
 </head>
 <body>
-
 <nav class="navbar">
   <div class="nmark"><svg width="16" height="16" viewBox="0 0 20 20" fill="none"><path d="M10 2L3 6v8l7 4 7-4V6L10 2z" stroke="#fff" stroke-width="1.5" stroke-linejoin="round"/><path d="M10 2v12M3 6l7 4 7-4" stroke="#fff" stroke-width="1.5" stroke-linejoin="round"/></svg></div>
   <span class="ntitle">ATS Portal</span>
@@ -142,7 +140,6 @@ input[type=checkbox]{width:14px;height:14px;cursor:pointer;accent-color:var(--pu
   <span class="nusr" id="nav-user"></span>
   <button class="nbtn" id="logout-btn">ログアウト</button>
 </nav>
-
 <div class="abody">
   <div class="list-hdr">
     <div class="ptitle">応募者管理</div>
@@ -193,11 +190,10 @@ input[type=checkbox]{width:14px;height:14px;cursor:pointer;accent-color:var(--pu
         <th>タグ</th>
         <th class="sth" data-k="stars">評価 / 応募日 <span class="si" id="si-stars"><svg viewBox="0 0 8 5"><path d="M4 0L8 5H0z" fill="currentColor"/></svg><svg viewBox="0 0 8 5"><path d="M4 5L0 0h8z" fill="currentColor"/></svg></span></th>
       </tr></thead>
-      <tbody id="tbody"></tbody>
+      <tbody id="tbody"><tr><td colspan="9" class="loading">読み込み中...</td></tr></tbody>
     </table>
   </div>
 </div>
-
 <!-- MODALS -->
 <div class="overlay" id="mod-bulk"><div class="mbox">
   <h3>一括変更</h3>
@@ -219,80 +215,241 @@ input[type=checkbox]{width:14px;height:14px;cursor:pointer;accent-color:var(--pu
 </div></div>
 <div class="toast" id="toast"></div>
 
+<script src="lib/api.js"></script>
 <script>
-
-const USERS = { "admin": "demo1234", "hr": "hr2024" };
+// ===== 定数 =====
 const STEPS = ["書類選考","筆記試験","1次面接","2次面接","最終面接","内定"];
 const STEP_CLS = {"書類選考":"step-doc","筆記試験":"step-written","1次面接":"step-1st","2次面接":"step-2nd","最終面接":"step-final","内定":"step-offer"};
 const STATUSES = ["未対応","通過","不合格","保留","辞退"];
 const ST_CLS = {"通過":"st-pass","不合格":"st-fail","保留":"st-hold","未対応":"st-new","辞退":"st-wd"};
 const STEP_ORD = {"書類選考":1,"筆記試験":2,"1次面接":3,"2次面接":4,"最終面接":5,"内定":6};
-const ST_ORD = {"未対応":1,"通過":2,"保留":3,"不合格":4,"辞退":5};
 const ALL_TAGS = ["エンジニア","HR","HOT","KEEP"];
 const TAG_CLS = {"エンジニア":"t-eng","HR":"t-hr","HOT":"t-hot","KEEP":"t-keep"};
-
-const ALL_DATA = [
-  {id:"AP-0001",name:"田中 涼子",gender:"女",age:28,job:"フロントエンドエンジニア",step:"1次面接",status:"通過",date:"2025-04-08",stars:4,tags:["エンジニア","HOT"],
-   basic:[{k:"現年収",f:"cur_sal",v:"450万円"},{k:"希望年収",f:"des_sal",v:"600万円"}],
-   detail:[{k:"生年月日",f:"dob",v:"1997-01-15"},{k:"メール",f:"email",v:"tanaka.r@example.com"},{k:"電話",f:"tel",v:"090-1234-5678"},{k:"住所",f:"addr",v:"東京都渋谷区"},{k:"最終学歴",f:"edu",v:"〇〇大学 工学部"},{k:"現職",f:"job_now",v:"株式会社△△ FEエンジニア"},{k:"経験年数",f:"exp",v:"5年"},{k:"応募日",f:"app_date",v:"2025-04-08"}],
-   memo:"コミュニケーション能力高い。次回最終面接を調整中。",
-   evals:{"書類選考":{adminComment:"書類は申し分なし。",ivs:[{name:"佐藤 花子",ini:"佐",role:"人事リード",date:"2025-04-09",overall:4,crit:{書類品質:4,印象:4,意欲:4},comment:"職務経歴書の記述が具体的で好印象。"}]},"1次面接":{adminComment:"最終面接へ進める。",ivs:[{name:"鈴木 一郎",ini:"鈴",role:"EMgr",date:"2025-04-13",overall:4,crit:{技術力:4,コミュ力:5,カルチャー:3},comment:"技術力は申し分ない。"},{name:"佐藤 花子",ini:"佐",role:"人事リード",date:"2025-04-14",overall:4,crit:{技術力:4,コミュ力:5,カルチャー:3},comment:"入社意欲が高い。"}]}},
-   history:[{c:"tg",date:"2025-04-08",title:"応募受付",body:"フロントエンドエンジニア職に応募。"},{c:"tg",date:"2025-04-09",title:"書類選考 通過",body:"書類審査通過。"},{c:"tp",date:"2025-04-12",title:"1次面接 実施",body:"オンライン60分。鈴木・佐藤が担当。"},{c:"ta",date:"2025-04-15",title:"最終面接 調整中",body:"日程調整メール送付済み。"}],
-   mails:[{dir:"out",subj:"【書類選考通過のご連絡】",from:"佐藤花子 <hr@co.jp>",to:"田中涼子 <tanaka.r@example.com>",date:"2025-04-09 14:32",body:"田中 涼子 様\n\n書類選考の結果、次の選考にお進みいただけることとなりました。\n\n採用担当 佐藤花子"},{dir:"in",subj:"Re: 【書類選考通過のご連絡】",from:"田中涼子 <tanaka.r@example.com>",to:"佐藤花子 <hr@co.jp>",date:"2025-04-09 18:15",body:"佐藤様\n\n4月12日 13:00にてよろしくお願いいたします。\n\n田中 涼子"}],
-   docs:[{name:"履歴書.pdf",type:"PDF",date:"2025-04-08",size:"1.2MB"},{name:"職務経歴書.pdf",type:"PDF",date:"2025-04-08",size:"0.8MB"},{name:"ポートフォリオ.zip",type:"ZIP",date:"2025-04-09",size:"12.4MB"}],
-   itl:[{who:"佐藤 花子",ini:"佐",type:"discuss",text:"1次面接の総評：全員通過票。最終面接の日程調整をお願いします。",time:"2025-04-14 15:20"}]},
-  {id:"AP-0002",name:"山本 健二",gender:"男",age:35,job:"バックエンドエンジニア",step:"書類選考",status:"保留",date:"2025-04-10",stars:3,tags:["エンジニア"],basic:[{k:"現年収",f:"cur_sal",v:"550万円"},{k:"希望年収",f:"des_sal",v:"700万円"}],detail:[{k:"生年月日",f:"dob",v:"1990-03-22"},{k:"メール",f:"email",v:"yamamoto.k@example.com"},{k:"電話",f:"tel",v:"080-2345-6789"},{k:"住所",f:"addr",v:"神奈川県横浜市"},{k:"最終学歴",f:"edu",v:"△△大学 情報学部"},{k:"現職",f:"job_now",v:"株式会社□□ バックエンドEng"},{k:"経験年数",f:"exp",v:"10年"},{k:"応募日",f:"app_date",v:"2025-04-10"}],memo:"経験豊富だが年収要望が高め。",evals:{},history:[{c:"tg",date:"2025-04-10",title:"応募受付",body:"バックエンドエンジニア職に応募。"}],mails:[],docs:[{name:"履歴書.pdf",type:"PDF",date:"2025-04-10",size:"0.9MB"}],itl:[]},
-  {id:"AP-0003",name:"佐々木 美咲",gender:"女",age:31,job:"人事マネージャー",step:"内定",status:"通過",date:"2025-03-28",stars:5,tags:["HR","HOT"],basic:[{k:"現年収",f:"cur_sal",v:"480万円"},{k:"希望年収",f:"des_sal",v:"550万円"}],detail:[{k:"生年月日",f:"dob",v:"1994-07-05"},{k:"メール",f:"email",v:"sasaki.m@example.com"},{k:"電話",f:"tel",v:"070-3456-7890"},{k:"住所",f:"addr",v:"東京都港区"},{k:"最終学歴",f:"edu",v:"○○大学 経営学部"},{k:"現職",f:"job_now",v:"株式会社★★ 人事"},{k:"経験年数",f:"exp",v:"7年"},{k:"応募日",f:"app_date",v:"2025-03-28"}],memo:"即戦力。入社日調整中。",evals:{},history:[{c:"tg",date:"2025-03-28",title:"応募受付",body:""},{c:"tg",date:"2025-04-01",title:"書類選考 通過",body:""},{c:"tp",date:"2025-04-10",title:"内定通知",body:"内定通知書送付済み。"}],mails:[],docs:[{name:"履歴書.pdf",type:"PDF",date:"2025-03-28",size:"1.0MB"}],itl:[]},
-  {id:"AP-0004",name:"中村 大輔",gender:"男",age:26,job:"フロントエンドエンジニア",step:"書類選考",status:"未対応",date:"2025-04-12",stars:0,tags:[],basic:[{k:"現年収",f:"cur_sal",v:"320万円"},{k:"希望年収",f:"des_sal",v:"420万円"}],detail:[{k:"生年月日",f:"dob",v:"1999-11-30"},{k:"メール",f:"email",v:"nakamura.d@example.com"},{k:"電話",f:"tel",v:"090-4567-8901"},{k:"住所",f:"addr",v:"大阪府大阪市"},{k:"最終学歴",f:"edu",v:"□□工業大学 情報工学部"},{k:"現職",f:"job_now",v:"フリーランス"},{k:"経験年数",f:"exp",v:"2年"},{k:"応募日",f:"app_date",v:"2025-04-12"}],memo:"",evals:{},history:[{c:"tg",date:"2025-04-12",title:"応募受付",body:""}],mails:[],docs:[{name:"履歴書.pdf",type:"PDF",date:"2025-04-12",size:"0.7MB"}],itl:[]},
-  {id:"AP-0005",name:"小林 彩",gender:"女",age:29,job:"プロダクトマネージャー",step:"最終面接",status:"通過",date:"2025-03-15",stars:5,tags:["KEEP"],basic:[{k:"現年収",f:"cur_sal",v:"520万円"},{k:"希望年収",f:"des_sal",v:"650万円"}],detail:[{k:"生年月日",f:"dob",v:"1996-04-18"},{k:"メール",f:"email",v:"kobayashi.a@example.com"},{k:"電話",f:"tel",v:"080-5678-9012"},{k:"住所",f:"addr",v:"東京都新宿区"},{k:"最終学歴",f:"edu",v:"△△大学 経済学部"},{k:"現職",f:"job_now",v:"株式会社◎◎ PM"},{k:"経験年数",f:"exp",v:"5年"},{k:"応募日",f:"app_date",v:"2025-03-15"}],memo:"",evals:{},history:[{c:"tg",date:"2025-03-15",title:"応募受付",body:""},{c:"tg",date:"2025-03-20",title:"書類選考 通過",body:""},{c:"tp",date:"2025-04-02",title:"最終面接 実施",body:""}],mails:[],docs:[],itl:[]},
-  {id:"AP-0006",name:"伊藤 拓也",gender:"男",age:42,job:"バックエンドエンジニア",step:"2次面接",status:"不合格",date:"2025-04-01",stars:2,tags:[],basic:[{k:"現年収",f:"cur_sal",v:"700万円"},{k:"希望年収",f:"des_sal",v:"800万円"}],detail:[{k:"生年月日",f:"dob",v:"1983-08-14"},{k:"メール",f:"email",v:"ito.t@example.com"},{k:"電話",f:"tel",v:"070-6789-0123"},{k:"住所",f:"addr",v:"埼玉県さいたま市"},{k:"最終学歴",f:"edu",v:"○○大学 理工学部"},{k:"現職",f:"job_now",v:"株式会社▲▲ シニアEng"},{k:"経験年数",f:"exp",v:"17年"},{k:"応募日",f:"app_date",v:"2025-04-01"}],memo:"カルチャーフィット懸念。",evals:{},history:[{c:"tg",date:"2025-04-01",title:"応募受付",body:""},{c:"tr2",date:"2025-04-10",title:"2次面接 不合格",body:""}],mails:[],docs:[],itl:[]},
-  {id:"AP-0007",name:"渡辺 さくら",gender:"女",age:24,job:"人事マネージャー",step:"書類選考",status:"通過",date:"2025-04-11",stars:3,tags:["HR"],basic:[{k:"現年収",f:"cur_sal",v:"300万円"},{k:"希望年収",f:"des_sal",v:"380万円"}],detail:[{k:"生年月日",f:"dob",v:"2001-02-28"},{k:"メール",f:"email",v:"watanabe.s@example.com"},{k:"電話",f:"tel",v:"090-7890-1234"},{k:"住所",f:"addr",v:"東京都世田谷区"},{k:"最終学歴",f:"edu",v:"□□大学 文学部"},{k:"現職",f:"job_now",v:"株式会社●● 人事補佐"},{k:"経験年数",f:"exp",v:"2年"},{k:"応募日",f:"app_date",v:"2025-04-11"}],memo:"",evals:{},history:[{c:"tg",date:"2025-04-11",title:"応募受付",body:""}],mails:[],docs:[],itl:[]},
-  {id:"AP-0008",name:"加藤 誠",gender:"男",age:38,job:"プロダクトマネージャー",step:"2次面接",status:"保留",date:"2025-04-07",stars:4,tags:["HOT","KEEP"],basic:[{k:"現年収",f:"cur_sal",v:"600万円"},{k:"希望年収",f:"des_sal",v:"720万円"}],detail:[{k:"生年月日",f:"dob",v:"1987-06-10"},{k:"メール",f:"email",v:"kato.m@example.com"},{k:"電話",f:"tel",v:"080-8901-2345"},{k:"住所",f:"addr",v:"東京都品川区"},{k:"最終学歴",f:"edu",v:"△△大学 工学部"},{k:"現職",f:"job_now",v:"株式会社■■ PM"},{k:"経験年数",f:"exp",v:"12年"},{k:"応募日",f:"app_date",v:"2025-04-07"}],memo:"",evals:{},history:[{c:"tg",date:"2025-04-07",title:"応募受付",body:""}],mails:[],docs:[],itl:[]}
+const CSV_FORMATS = [
+  {id:"basic", name:"基本フォーマット",  cols:"ID,氏名,性別,年齢,応募求人,ステップ,ステータス,応募日"},
+  {id:"full",  name:"詳細フォーマット",  cols:"ID,氏名,性別,年齢,応募求人,ステップ,ステータス,応募日,評価"},
+  {id:"hr",    name:"HR連携フォーマット",cols:"ID,氏名,性別,年齢,ステップ,ステータス"},
+  {id:"report",name:"レポートフォーマット",cols:"応募求人,ID,氏名,ステップ,ステータス,応募日,評価"}
 ];
 
-
-const user = sessionStorage.getItem("ats_user");
-if (!user) { window.location.href = "index.html"; }
-document.getElementById("nav-user").textContent = user;
-document.getElementById("logout-btn").addEventListener("click", () => {
-  sessionStorage.removeItem("ats_user");
+// ===== 認証チェック =====
+requireAuth();
+const _user = getCurrentUser();
+if (_user) {
+  document.getElementById("nav-user").textContent = _user.name || _user.email || "";
+}
+document.getElementById("logout-btn").addEventListener("click", async () => {
+  await atsApi.logout();
   window.location.href = "index.html";
 });
 
-
-const CSV_FORMATS = [
-  {id:"basic",name:"基本フォーマット",cols:"ID,氏名,性別,年齢,応募求人,ステップ,ステータス,応募日"},
-  {id:"full",name:"詳細フォーマット",cols:"ID,氏名,性別,年齢,応募求人,ステップ,ステータス,応募日,タグ,評価"},
-  {id:"hr",name:"HR連携フォーマット",cols:"ID,氏名,性別,年齢,ステップ,ステータス,タグ"},
-  {id:"report",name:"レポートフォーマット",cols:"応募求人,ID,氏名,ステップ,ステータス,応募日,評価"}
-];
-const MAIL_TPLS = [
-  {id:"pass_doc",name:"書類選考通過",desc:"書類選考通過のご連絡と次ステップ案内"},
-  {id:"interview",name:"面接日程調整",desc:"面接日程の確認・調整依頼"},
-  {id:"offer",name:"内定通知",desc:"内定のご連絡と条件提示"},
-  {id:"reject",name:"不合格通知",desc:"選考終了のご連絡"},
-  {id:"remind",name:"書類提出リマインド",desc:"未提出者へのリマインド"}
-];
-
+// ===== 状態 =====
 const G = id => document.getElementById(id);
 const showToast = msg => { const t=G("toast"); t.textContent=msg; t.className="toast show"; setTimeout(()=>t.className="toast",2500); };
-const openMod = id => G(id).classList.add("open");
+const openMod  = id => G(id).classList.add("open");
 const closeMod = id => G(id).classList.remove("open");
 
-let dispData = [...ALL_DATA];
-let selected = new Set();
-let sortKey = null, sortDir = 1;
+let ALL_DATA   = [];   // Supabaseから取得したデータ
+let MAIL_TPLS  = [];   // Supabaseから取得したテンプレート
+let dispData   = [];
+let selected   = new Set();
+let sortKey    = null, sortDir = 1;
 let activeTags = new Set();
-let advOpen = false;
-let bulkTab = "step", selBulkVal = null, selTagsOp = new Set();
-let selCsvFmt = null, selMailTpl = null;
+let advOpen    = false;
+let bulkTab    = "step", selBulkVal = null, selTagsOp = new Set();
+let selCsvFmt  = null, selMailTpl = null;
 
-// init
-populateFilters();
-renderTagPills();
-renderMetrics();
-renderTable();
+// ===== 初期化（Supabaseからデータ取得） =====
+async function init() {
+  try {
+    // 応募者・メールテンプレート・求人を並行取得
+    const [applicants, templates, jobs, tags] = await Promise.all([
+      atsApi.getApplicants(),
+      atsApi.getMailTemplates(),
+      atsApi.getJobs(),
+      atsApi.getTags()
+    ]);
 
+    ALL_DATA  = Array.isArray(applicants) ? applicants : [];
+    MAIL_TPLS = Array.isArray(templates)  ? templates  : [];
+    dispData  = [...ALL_DATA];
+
+    // タグをDBから取得してALL_TAGSを上書き
+    if (Array.isArray(tags) && tags.length > 0) {
+      // タグは定数のまま使用（DB取得タグと合わせる場合は後で拡張）
+    }
+
+    // 求人フィルターをDBデータで構築
+    const jobSel = G("f-job");
+    (Array.isArray(jobs) ? jobs : []).forEach(j => {
+      const o = document.createElement("option");
+      o.value = j.title; o.textContent = j.title;
+      jobSel.appendChild(o);
+    });
+
+    populateFilters();
+    renderTagPills();
+    renderMetrics();
+    renderTable();
+  } catch (e) {
+    console.error(e);
+    G("tbody").innerHTML = `<tr><td colspan="9" class="empty">データの読み込みに失敗しました。再読み込みしてください。</td></tr>`;
+  }
+}
+
+// ===== フィルター構築 =====
+function populateFilters() {
+  STEPS.forEach(s => { const o=document.createElement("option"); o.value=s; o.textContent=s; G("f-step").appendChild(o); });
+  STATUSES.forEach(s => { const o=document.createElement("option"); o.value=s; o.textContent=s; G("f-status").appendChild(o); });
+}
+
+function renderTagPills() {
+  G("tpills").innerHTML = ALL_TAGS.map(t =>
+    `<span class="tpill${activeTags.has(t)?" active":""}" data-tag="${t}">${t}</span>`
+  ).join("");
+  G("tpills").querySelectorAll(".tpill").forEach(el => {
+    el.addEventListener("click", () => {
+      activeTags.has(el.dataset.tag) ? activeTags.delete(el.dataset.tag) : activeTags.add(el.dataset.tag);
+      renderTagPills();
+    });
+  });
+}
+
+function renderMetrics() {
+  const t = ALL_DATA.length;
+  const a = ALL_DATA.filter(d => !["不合格","辞退"].includes(d.status)).length;
+  const i = ALL_DATA.filter(d => d.step && d.step.includes("面接")).length;
+  const p = ALL_DATA.filter(d => d.status === "通過").length;
+  G("metrics").innerHTML = `
+    <div class="metric"><div class="mlabel">総応募数</div><div class="mval">${t}</div><div class="msub">今月</div></div>
+    <div class="metric"><div class="mlabel">選考中</div><div class="mval">${a}</div><div class="msub">アクティブ</div></div>
+    <div class="metric"><div class="mlabel">面接中</div><div class="mval">${i}</div><div class="msub">今週</div></div>
+    <div class="metric"><div class="mlabel">通過者</div><div class="mval">${p}</div><div class="msub">累計</div></div>`;
+}
+
+// ===== フィルター適用 =====
+function applyFilter() {
+  const kw  = G("f-kw").value.toLowerCase().trim();
+  const fs  = G("f-step").value;
+  const fst = G("f-status").value;
+  const fj  = G("f-job").value;
+  const fg  = G("f-gender").value;
+  const fd1 = G("f-d1").value;
+  const fd2 = G("f-d2").value;
+
+  dispData = ALL_DATA.filter(d => {
+    const jobTitle = d.job_title || d.job || "";
+    if (kw && !d.name.toLowerCase().includes(kw) && !jobTitle.toLowerCase().includes(kw) && !d.id.toLowerCase().includes(kw)) return false;
+    if (fs  && d.step   !== fs)  return false;
+    if (fst && d.status !== fst) return false;
+    if (fj  && jobTitle !== fj)  return false;
+    if (fg  && d.gender !== fg)  return false;
+    if (fd1 && d.applied_at < fd1) return false;
+    if (fd2 && d.applied_at > fd2) return false;
+    return true;
+  });
+
+  if (sortKey) applySortToDisp();
+  renderTable();
+  showToast(dispData.length + "件ヒット");
+}
+
+function resetFilter() {
+  G("f-kw").value = "";
+  ["f-step","f-status","f-job","f-gender"].forEach(id => G(id).value = "");
+  G("f-d1").value = ""; G("f-d2").value = "";
+  activeTags.clear(); renderTagPills();
+  dispData = [...ALL_DATA]; renderTable();
+}
+
+// ===== ソート =====
+function sortBy(key) {
+  sortKey === key ? sortDir *= -1 : (sortKey = key, sortDir = 1);
+  updateSortIcons(); applySortToDisp(); renderTable();
+}
+
+function applySortToDisp() {
+  dispData.sort((a, b) => {
+    let va = a[sortKey], vb = b[sortKey];
+    if (sortKey === "step") { va = STEP_ORD[va]||99; vb = STEP_ORD[vb]||99; }
+    else if (sortKey === "status") {
+      const o = {"未対応":1,"通過":2,"保留":3,"不合格":4,"辞退":5};
+      va = o[va]||99; vb = o[vb]||99;
+    }
+    if (typeof va === "string" && typeof vb === "string") return va.localeCompare(vb, "ja") * sortDir;
+    return ((va||0) - (vb||0)) * sortDir;
+  });
+}
+
+function updateSortIcons() {
+  ["name","gender","age","job","step","status","stars"].forEach(k => {
+    const el = G("si-" + k); if (!el) return;
+    el.className = "si" + (k === sortKey ? (sortDir === 1 ? " asc" : " desc") : "");
+    el.closest("th").className = k === sortKey ? "sth son" : "sth";
+  });
+}
+
+// ===== テーブル描画 =====
+function updateBulkBar() {
+  const n = selected.size;
+  G("bulk-cnt").textContent = n + "件選択中";
+  G("bulk-bar").className = "bulk-bar" + (n > 0 ? " active" : "");
+}
+
+function renderTable() {
+  G("rinfo").textContent = dispData.length === ALL_DATA.length
+    ? `全${ALL_DATA.length}件`
+    : `${dispData.length} / ${ALL_DATA.length}件`;
+
+  const tbody = G("tbody");
+  if (!dispData.length) {
+    tbody.innerHTML = `<tr><td colspan="9" class="empty">該当する応募者が見つかりません</td></tr>`;
+    return;
+  }
+
+  tbody.innerHTML = dispData.map(d => {
+    // DBのフィールド名に合わせて取得
+    const jobTitle  = d.job_title || d.job || "―";
+    const appliedAt = d.applied_at ? d.applied_at.slice(0, 10) : "―";
+    const stars = [1,2,3,4,5].map(i =>
+      `<span class="star${i <= (d.stars||0) ? "" : " off"}">★</span>`
+    ).join("");
+    // タグはapplicant_tagsテーブルから取得する（現時点では空）
+    const tags = `<span style="color:var(--text3)">―</span>`;
+
+    return `<tr class="${selected.has(d.id) ? "sel" : ""}" data-id="${d.id}">
+      <td><input type="checkbox" class="rchk" data-id="${d.id}" ${selected.has(d.id) ? "checked" : ""}></td>
+      <td class="ell" style="font-weight:500">${d.name}</td>
+      <td><span class="${d.gender === "男" ? "gm" : "gf"}">${d.gender || "―"}</span></td>
+      <td style="white-space:nowrap;color:var(--text2)">${d.age ? d.age + "歳" : "―"}</td>
+      <td class="ell" style="color:var(--text2)">${jobTitle}</td>
+      <td style="white-space:nowrap"><span class="stepb ${STEP_CLS[d.step] || ""}">${d.step || "―"}</span></td>
+      <td style="white-space:nowrap"><span class="badge ${ST_CLS[d.status] || ""}">${d.status || "―"}</span></td>
+      <td>${tags}</td>
+      <td><div style="display:flex;flex-direction:column;gap:1px"><div>${stars}</div><div class="drow">${appliedAt}</div></div></td>
+    </tr>`;
+  }).join("");
+
+  tbody.querySelectorAll("tr[data-id]").forEach(tr => {
+    tr.addEventListener("click", e => {
+      if (e.target.type === "checkbox") return;
+      window.open(`detail.html?id=${tr.dataset.id}`, "_blank");
+    });
+  });
+
+  tbody.querySelectorAll(".rchk").forEach(cb => {
+    cb.addEventListener("click", e => e.stopPropagation());
+    cb.addEventListener("change", () => {
+      cb.checked ? selected.add(cb.dataset.id) : selected.delete(cb.dataset.id);
+      cb.closest("tr").className = cb.checked ? "sel" : "";
+      G("chk-all").checked = dispData.length > 0 && dispData.every(d => selected.has(d.id));
+      updateBulkBar();
+    });
+  });
+  G("chk-all").checked = dispData.length > 0 && dispData.every(d => selected.has(d.id));
+}
+
+// ===== イベント設定 =====
 G("adv-btn").addEventListener("click", () => {
   advOpen = !advOpen;
   G("adv-panel").className = "adv-panel" + (advOpen ? " open" : "");
@@ -313,193 +470,121 @@ G("bmail-btn").addEventListener("click", openMailModal);
 G("bcsv-btn").addEventListener("click", openCsvModal);
 document.querySelectorAll("th.sth").forEach(th => th.addEventListener("click", () => sortBy(th.dataset.k)));
 G("bulk-mcancel").addEventListener("click", () => closeMod("mod-bulk"));
-G("mail-cancel").addEventListener("click", () => closeMod("mod-mail"));
-G("csv-cancel").addEventListener("click", () => closeMod("mod-csv"));
+G("mail-cancel").addEventListener("click",  () => closeMod("mod-mail"));
+G("csv-cancel").addEventListener("click",   () => closeMod("mod-csv"));
 G("mail-search").addEventListener("input", renderMailModal);
-G("csv-search").addEventListener("input", renderCsvModal);
-document.querySelectorAll(".overlay").forEach(ov => ov.addEventListener("click", e => { if(e.target===ov) ov.classList.remove("open"); }));
+G("csv-search").addEventListener("input",  renderCsvModal);
+document.querySelectorAll(".overlay").forEach(ov =>
+  ov.addEventListener("click", e => { if (e.target === ov) ov.classList.remove("open"); })
+);
 
-G("bulk-mok").addEventListener("click", () => {
+// ===== 一括変更 =====
+G("bulk-mok").addEventListener("click", async () => {
   if (bulkTab === "tag-add" || bulkTab === "tag-remove") {
     if (!selTagsOp.size) { showToast("タグを選択してください"); return; }
-    selected.forEach(id => {
-      const d = ALL_DATA.find(x => x.id === id); if (!d) return;
-      if (bulkTab === "tag-add") selTagsOp.forEach(t => { if (!d.tags.includes(t)) d.tags.push(t); });
-      else selTagsOp.forEach(t => { d.tags = d.tags.filter(x => x !== t); });
-    });
-    showToast(`${selected.size}件のタグを${bulkTab==="tag-add"?"付与":"削除"}しました`);
+    showToast(`${selected.size}件のタグを${bulkTab === "tag-add" ? "付与" : "削除"}しました（DB連携は次フェーズ）`);
   } else {
     if (!selBulkVal) { showToast("変更先を選択してください"); return; }
-    const field = {step:"step",status:"status",job:"job"}[bulkTab];
-    const label = {step:"ステップ",status:"ステータス",job:"求人"}[bulkTab];
-    selected.forEach(id => { const d = ALL_DATA.find(x => x.id === id); if (d) d[field] = selBulkVal; });
+    const field = {step:"step", status:"status"}[bulkTab];
+    const label = {step:"ステップ", status:"ステータス", job:"求人"}[bulkTab];
+    // Supabaseに一括更新
+    await atsApi.bulkUpdate([...selected], { [field]: selBulkVal });
+    selected.forEach(id => {
+      const d = ALL_DATA.find(x => x.id === id);
+      if (d) d[field] = selBulkVal;
+    });
     showToast(`${selected.size}件の${label}を「${selBulkVal}」に変更しました`);
   }
   renderMetrics(); renderTable(); closeMod("mod-bulk");
 });
+
+// ===== メール =====
 G("mail-ok").addEventListener("click", () => {
   if (!selMailTpl) { showToast("テンプレートを選択してください"); return; }
-  showToast(`「${MAIL_TPLS.find(t=>t.id===selMailTpl).name}」を送付しました`);
+  const tpl = MAIL_TPLS.find(t => t.id === selMailTpl);
+  showToast(`「${tpl ? tpl.name : ""}」を送付しました`);
   closeMod("mod-mail");
 });
+
+// ===== CSV =====
 G("csv-ok").addEventListener("click", () => {
   if (!selCsvFmt) { showToast("フォーマットを選択してください"); return; }
   const rows = ALL_DATA.filter(d => selected.has(d.id));
-  const fmt = CSV_FORMATS.find(f => f.id === selCsvFmt);
+  const fmt  = CSV_FORMATS.find(f => f.id === selCsvFmt);
   const maps = {
-    basic: d => `${d.id},${d.name},${d.gender},${d.age},${d.job},${d.step},${d.status},${d.date}`,
-    full:  d => `${d.id},${d.name},${d.gender},${d.age},${d.job},${d.step},${d.status},${d.date},"${d.tags.join("/")}",${d.stars}`,
-    hr:    d => `${d.id},${d.name},${d.gender},${d.age},${d.step},${d.status},"${d.tags.join("/")}"`  ,
-    report:d => `${d.job},${d.id},${d.name},${d.step},${d.status},${d.date},${d.stars}`
+    basic:  d => `${d.id},${d.name},${d.gender||""},${d.age||""},${d.job||""},${d.step||""},${d.status||""},${(d.applied_at||"").slice(0,10)}`,
+    full:   d => `${d.id},${d.name},${d.gender||""},${d.age||""},${d.job||""},${d.step||""},${d.status||""},${(d.applied_at||"").slice(0,10)},${d.stars||0}`,
+    hr:     d => `${d.id},${d.name},${d.gender||""},${d.age||""},${d.step||""},${d.status||""}`,
+    report: d => `${d.job||""},${d.id},${d.name},${d.step||""},${d.status||""},${(d.applied_at||"").slice(0,10)},${d.stars||0}`
   };
   const csv = [fmt.cols, ...rows.map(maps[selCsvFmt])].join("\n");
   const a = document.createElement("a");
   a.href = "data:text/csv;charset=utf-8,\uFEFF" + encodeURIComponent(csv);
-  a.download = `applicants_${selCsvFmt}.csv`; a.click();
-  showToast(`${rows.length}件をダウンロードしました`); closeMod("mod-csv");
+  a.download = `applicants_${selCsvFmt}.csv`;
+  a.click();
+  showToast(`${rows.length}件をダウンロードしました`);
+  closeMod("mod-csv");
 });
 
-function populateFilters() {
-  STEPS.forEach(s => { const o=document.createElement("option"); o.value=s; o.textContent=s; G("f-step").appendChild(o); });
-  STATUSES.forEach(s => { const o=document.createElement("option"); o.value=s; o.textContent=s; G("f-status").appendChild(o); });
-  [...new Set(ALL_DATA.map(d=>d.job))].forEach(j => { const o=document.createElement("option"); o.value=j; o.textContent=j; G("f-job").appendChild(o); });
-}
-function renderTagPills() {
-  G("tpills").innerHTML = ALL_TAGS.map(t => `<span class="tpill${activeTags.has(t)?" active":""}" data-tag="${t}">${t}</span>`).join("");
-  G("tpills").querySelectorAll(".tpill").forEach(el => {
-    el.addEventListener("click", () => { activeTags.has(el.dataset.tag)?activeTags.delete(el.dataset.tag):activeTags.add(el.dataset.tag); renderTagPills(); });
-  });
-}
-function renderMetrics() {
-  const t=ALL_DATA.length, a=ALL_DATA.filter(d=>!["不合格","辞退"].includes(d.status)).length,
-        i=ALL_DATA.filter(d=>d.step.includes("面接")).length, p=ALL_DATA.filter(d=>d.status==="通過").length;
-  G("metrics").innerHTML = `
-    <div class="metric"><div class="mlabel">総応募数</div><div class="mval">${t}</div><div class="msub">今月</div></div>
-    <div class="metric"><div class="mlabel">選考中</div><div class="mval">${a}</div><div class="msub">アクティブ</div></div>
-    <div class="metric"><div class="mlabel">面接中</div><div class="mval">${i}</div><div class="msub">今週</div></div>
-    <div class="metric"><div class="mlabel">通過者</div><div class="mval">${p}</div><div class="msub">累計</div></div>`;
-}
-function applyFilter() {
-  const kw=G("f-kw").value.toLowerCase().trim(), fs=G("f-step").value, fst=G("f-status").value,
-        fj=G("f-job").value, fg=G("f-gender").value, fd1=G("f-d1").value, fd2=G("f-d2").value;
-  dispData = ALL_DATA.filter(d => {
-    if(kw && !d.name.includes(kw) && !d.job.toLowerCase().includes(kw) && !d.id.toLowerCase().includes(kw)) return false;
-    if(fs && d.step!==fs) return false; if(fst && d.status!==fst) return false;
-    if(fj && d.job!==fj) return false; if(fg && d.gender!==fg) return false;
-    if(fd1 && d.date<fd1) return false; if(fd2 && d.date>fd2) return false;
-    if(activeTags.size>0 && ![...activeTags].every(t=>d.tags.includes(t))) return false;
-    return true;
-  });
-  if(sortKey) applySortToDisp();
-  renderTable(); showToast(dispData.length+"件ヒット");
-}
-function resetFilter() {
-  G("f-kw").value=""; ["f-step","f-status","f-job","f-gender"].forEach(id=>G(id).value="");
-  G("f-d1").value=""; G("f-d2").value=""; activeTags.clear(); renderTagPills();
-  dispData=[...ALL_DATA]; renderTable();
-}
-function sortBy(key) {
-  sortKey===key ? sortDir*=-1 : (sortKey=key, sortDir=1);
-  updateSortIcons(); applySortToDisp(); renderTable();
-}
-function applySortToDisp() {
-  dispData.sort((a,b) => {
-    let va=a[sortKey], vb=b[sortKey];
-    if(sortKey==="step"){va=STEP_ORD[va]||99;vb=STEP_ORD[vb]||99;}
-    else if(sortKey==="status"){va=({"未対応":1,"通過":2,"保留":3,"不合格":4,"辞退":5})[va]||99;vb=({"未対応":1,"通過":2,"保留":3,"不合格":4,"辞退":5})[vb]||99;}
-    if(typeof va==="string"&&typeof vb==="string") return va.localeCompare(vb,"ja")*sortDir;
-    return (va-vb)*sortDir;
-  });
-}
-function updateSortIcons() {
-  ["name","gender","age","job","step","status","stars"].forEach(k => {
-    const el=G("si-"+k); if(!el) return;
-    el.className="si"+(k===sortKey?(sortDir===1?" asc":" desc"):"");
-    el.closest("th").className=k===sortKey?"sth son":"sth";
-  });
-}
-function updateBulkBar() {
-  const n=selected.size; G("bulk-cnt").textContent=n+"件選択中";
-  G("bulk-bar").className="bulk-bar"+(n>0?" active":"");
-}
-function renderTable() {
-  G("rinfo").textContent = dispData.length===ALL_DATA.length?`全${ALL_DATA.length}件`:`${dispData.length} / ${ALL_DATA.length}件`;
-  const tbody=G("tbody");
-  if(!dispData.length){tbody.innerHTML=`<tr><td colspan="9" class="empty">該当する応募者が見つかりません</td></tr>`;return;}
-  tbody.innerHTML = dispData.map(d => {
-    const stars=[1,2,3,4,5].map(i=>`<span class="star${i<=d.stars?"":" off"}">★</span>`).join("");
-    const tags=d.tags.length?d.tags.map(t=>`<span class="tag ${TAG_CLS[t]||""}">${t}</span>`).join(""):`<span style="color:var(--text3)">―</span>`;
-    return `<tr class="${selected.has(d.id)?"sel":""}" data-id="${d.id}">
-      <td><input type="checkbox" class="rchk" data-id="${d.id}" ${selected.has(d.id)?"checked":""}></td>
-      <td class="ell" style="font-weight:500">${d.name}</td>
-      <td><span class="${d.gender==="男"?"gm":"gf"}">${d.gender}</span></td>
-      <td style="white-space:nowrap;color:var(--text2)">${d.age}歳</td>
-      <td class="ell" style="color:var(--text2)">${d.job}</td>
-      <td style="white-space:nowrap"><span class="stepb ${STEP_CLS[d.step]||""}">${d.step}</span></td>
-      <td style="white-space:nowrap"><span class="badge ${ST_CLS[d.status]||""}">${d.status}</span></td>
-      <td>${tags}</td>
-      <td><div style="display:flex;flex-direction:column;gap:1px"><div>${stars}</div><div class="drow">${d.date}</div></div></td>
-    </tr>`;
-  }).join("");
-  tbody.querySelectorAll("tr[data-id]").forEach(tr => {
-    tr.addEventListener("click", e => {
-      if(e.target.type==="checkbox") return;
-      window.open(`detail.html?id=${tr.dataset.id}`, "_blank");
-    });
-  });
-  tbody.querySelectorAll(".rchk").forEach(cb => {
-    cb.addEventListener("click", e => e.stopPropagation());
-    cb.addEventListener("change", () => {
-      cb.checked?selected.add(cb.dataset.id):selected.delete(cb.dataset.id);
-      cb.closest("tr").className=cb.checked?"sel":"";
-      G("chk-all").checked=dispData.length>0&&dispData.every(d=>selected.has(d.id));
-      updateBulkBar();
-    });
-  });
-  G("chk-all").checked=dispData.length>0&&dispData.every(d=>selected.has(d.id));
-}
-function openBulkModal() { selBulkVal=null; selTagsOp.clear(); bulkTab="step"; renderBulkModal(); openMod("mod-bulk"); }
+// ===== モーダル描画 =====
+function openBulkModal()  { selBulkVal=null; selTagsOp.clear(); bulkTab="step"; renderBulkModal(); openMod("mod-bulk"); }
 function renderBulkModal() {
-  G("bulk-mtabs").innerHTML=["step","status","job","tag-add","tag-remove"].map((t,i)=>
-    `<button class="mtab${bulkTab===t?" active":""}" data-bt="${t}">${["ステップ","ステータス","求人","タグ付与","タグ削除"][i]}</button>`
+  G("bulk-mtabs").innerHTML = ["step","status","tag-add","tag-remove"].map((t, i) =>
+    `<button class="mtab${bulkTab===t?" active":""}" data-bt="${t}">${["ステップ","ステータス","タグ付与","タグ削除"][i]}</button>`
   ).join("");
-  G("bulk-mtabs").querySelectorAll(".mtab").forEach(b=>b.addEventListener("click",()=>{bulkTab=b.dataset.bt;selBulkVal=null;selTagsOp.clear();renderBulkModal();}));
-  if(bulkTab==="tag-add"||bulkTab==="tag-remove"){
-    const isAdd=bulkTab==="tag-add";
-    G("bulk-mbody").innerHTML=`<div style="font-size:11px;color:var(--text3);margin-bottom:8px">${isAdd?"付与するタグを選択":"削除するタグを選択"}</div>
+  G("bulk-mtabs").querySelectorAll(".mtab").forEach(b =>
+    b.addEventListener("click", () => { bulkTab=b.dataset.bt; selBulkVal=null; selTagsOp.clear(); renderBulkModal(); })
+  );
+  if (bulkTab === "tag-add" || bulkTab === "tag-remove") {
+    const isAdd = bulkTab === "tag-add";
+    G("bulk-mbody").innerHTML = `<div style="font-size:11px;color:var(--text3);margin-bottom:8px">${isAdd?"付与するタグを選択":"削除するタグを選択"}</div>
       <div class="taggrid">${ALL_TAGS.map(t=>`<div class="tagopt${selTagsOp.has(t)?(isAdd?" tadd":" tremove"):""}" data-tag="${t}">${t}</div>`).join("")}</div>`;
-    G("bulk-mbody").querySelectorAll(".tagopt").forEach(el=>el.addEventListener("click",()=>{selTagsOp.has(el.dataset.tag)?selTagsOp.delete(el.dataset.tag):selTagsOp.add(el.dataset.tag);renderBulkModal();}));
+    G("bulk-mbody").querySelectorAll(".tagopt").forEach(el =>
+      el.addEventListener("click", () => { selTagsOp.has(el.dataset.tag)?selTagsOp.delete(el.dataset.tag):selTagsOp.add(el.dataset.tag); renderBulkModal(); })
+    );
   } else {
-    const items=bulkTab==="step"?STEPS:bulkTab==="status"?STATUSES:[...new Set(ALL_DATA.map(d=>d.job))];
-    G("bulk-mbody").innerHTML=`<input class="msearch" id="bsearch" placeholder="検索..."/><div class="olist" id="blist"></div>`;
-    const fill=()=>{
-      const q=G("bsearch").value.toLowerCase();
-      G("blist").innerHTML=items.filter(v=>v.toLowerCase().includes(q)).map(v=>{
-        const cls=bulkTab==="step"?(STEP_CLS[v]||""):bulkTab==="status"?(ST_CLS[v]||""):"";
-        const bt=bulkTab==="step"?"stepb":"badge";
+    const items = bulkTab === "step" ? STEPS : STATUSES;
+    G("bulk-mbody").innerHTML = `<input class="msearch" id="bsearch" placeholder="検索..."/><div class="olist" id="blist"></div>`;
+    const fill = () => {
+      const q = G("bsearch").value.toLowerCase();
+      G("blist").innerHTML = items.filter(v => v.toLowerCase().includes(q)).map(v => {
+        const cls = bulkTab==="step" ? (STEP_CLS[v]||"") : (ST_CLS[v]||"");
+        const bt  = bulkTab==="step" ? "stepb" : "badge";
         return `<div class="oitem${selBulkVal===v?" sel":""}" data-bv="${v}"><input type="radio" ${selBulkVal===v?"checked":""} readonly/><span class="${bt} ${cls}">${v}</span></div>`;
       }).join("");
-      G("blist").querySelectorAll(".oitem").forEach(el=>el.addEventListener("click",()=>{selBulkVal=el.dataset.bv;fill();}));
+      G("blist").querySelectorAll(".oitem").forEach(el =>
+        el.addEventListener("click", () => { selBulkVal=el.dataset.bv; fill(); })
+      );
     };
-    fill(); G("bsearch").addEventListener("input",fill);
+    fill();
+    G("bsearch").addEventListener("input", fill);
   }
 }
-function openMailModal() { selMailTpl=null; G("mail-search").value=""; renderMailModal(); openMod("mod-mail"); }
+
+function openMailModal()  { selMailTpl=null; G("mail-search").value=""; renderMailModal(); openMod("mod-mail"); }
 function renderMailModal() {
-  const q=G("mail-search").value.toLowerCase();
-  G("mail-list").innerHTML=MAIL_TPLS.filter(t=>t.name.includes(q)||t.desc.includes(q)).map(t=>
-    `<div class="titem${selMailTpl===t.id?" sel":""}" data-tid="${t.id}"><div class="tn">${t.name}</div><div class="td2">${t.desc}</div></div>`
-  ).join("");
-  G("mail-list").querySelectorAll(".titem").forEach(el=>el.addEventListener("click",()=>{selMailTpl=el.dataset.tid;renderMailModal();}));
+  const q = G("mail-search").value.toLowerCase();
+  G("mail-list").innerHTML = MAIL_TPLS.filter(t => t.name.includes(q) || (t.body||"").includes(q)).map(t =>
+    `<div class="titem${selMailTpl===t.id?" sel":""}" data-tid="${t.id}"><div class="tn">${t.name}</div><div class="td2">${t.subject||""}</div></div>`
+  ).join("") || `<div style="font-size:13px;color:var(--text3);padding:8px">テンプレートがありません</div>`;
+  G("mail-list").querySelectorAll(".titem").forEach(el =>
+    el.addEventListener("click", () => { selMailTpl=el.dataset.tid; renderMailModal(); })
+  );
 }
-function openCsvModal() { selCsvFmt=null; G("csv-search").value=""; renderCsvModal(); openMod("mod-csv"); }
+
+function openCsvModal()  { selCsvFmt=null; G("csv-search").value=""; renderCsvModal(); openMod("mod-csv"); }
 function renderCsvModal() {
-  const q=G("csv-search").value.toLowerCase();
-  G("csv-list").innerHTML=CSV_FORMATS.filter(f=>f.name.toLowerCase().includes(q)||f.cols.toLowerCase().includes(q)).map(f=>
+  const q = G("csv-search").value.toLowerCase();
+  G("csv-list").innerHTML = CSV_FORMATS.filter(f => f.name.toLowerCase().includes(q)).map(f =>
     `<div class="fitem${selCsvFmt===f.id?" sel":""}" data-fid="${f.id}"><div class="fn">${f.name}</div><div class="fd">${f.cols}</div></div>`
   ).join("");
-  G("csv-list").querySelectorAll(".fitem").forEach(el=>el.addEventListener("click",()=>{selCsvFmt=el.dataset.fid;renderCsvModal();}));
+  G("csv-list").querySelectorAll(".fitem").forEach(el =>
+    el.addEventListener("click", () => { selCsvFmt=el.dataset.fid; renderCsvModal(); })
+  );
 }
+
+// ===== 起動 =====
+init();
 </script>
 </body>
 </html>

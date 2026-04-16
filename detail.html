@@ -5,7 +5,6 @@
 <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
 <title>ATS Portal - 候補者詳細</title>
 <style>
-
 *{box-sizing:border-box;margin:0;padding:0;}
 body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:#f5f5f3;color:#1a1a18;min-height:100vh;}
 :root{
@@ -43,12 +42,6 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 .st-hold{background:var(--gry-l);color:var(--gry);}
 .st-new{background:var(--blu-l);color:var(--blu);}
 .st-wd{background:#FBEAF0;color:#72243E;}
-.tag{display:inline-block;font-size:11px;padding:2px 6px;border-radius:99px;margin:1px;}
-.t-eng{background:var(--pur-l);color:var(--pur-d);}
-.t-hr{background:var(--grn-l);color:var(--grn);}
-.t-hot{background:#FAECE7;color:#712B13;}
-.t-keep{background:var(--amb-l);color:var(--amb);}
-.gm{color:#185FA5;font-weight:500;}.gf{color:#993556;font-weight:500;}
 .navbar{height:52px;background:var(--bg);border-bottom:0.5px solid var(--bdr);display:flex;align-items:center;padding:0 1.25rem;gap:12px;position:sticky;top:0;z-index:50;}
 .nmark{width:28px;height:28px;background:var(--pur);border-radius:6px;display:flex;align-items:center;justify-content:center;}
 .ntitle{font-size:15px;font-weight:500;color:var(--text);}
@@ -56,40 +49,33 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 .nusr{font-size:13px;color:var(--text2);}
 .nbtn{height:30px;padding:0 12px;font-size:12px;border:0.5px solid var(--bdr2);border-radius:var(--r-md);background:transparent;color:var(--text2);cursor:pointer;}
 .nbtn:hover{background:var(--bg2);}
-.abody{padding:1.25rem;max-width:1200px;margin:0 auto;}
 .toast{display:none;position:fixed;bottom:1.5rem;left:50%;transform:translateX(-50%);background:#2C2C2A;color:#F1EFE8;font-size:12px;padding:9px 18px;border-radius:var(--r-md);white-space:nowrap;z-index:9999;}
 .toast.show{display:block;}
 .overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.4);z-index:200;align-items:flex-start;justify-content:center;padding:40px 16px;}
 .overlay.open{display:flex;}
 .mbox{background:var(--bg);border:0.5px solid var(--bdr);border-radius:var(--r-lg);padding:1.25rem;width:100%;max-width:440px;max-height:calc(100vh - 80px);overflow-y:auto;}
 .mbox h3{font-size:15px;font-weight:500;margin-bottom:1rem;}
-.mtabs{display:grid;gap:4px;margin-bottom:1rem;}
-.mtab{height:30px;font-size:12px;border:0.5px solid var(--bdr2);border-radius:var(--r-md);background:var(--bg);color:var(--text2);cursor:pointer;padding:0 4px;}
-.mtab.active{background:var(--pur);color:#fff;border-color:var(--pur);}
-.msearch{width:100%;height:32px;padding:0 10px;font-size:13px;border:0.5px solid var(--bdr2);border-radius:var(--r-md);background:var(--bg2);color:var(--text);outline:none;margin-bottom:8px;}
-.msearch:focus{border-color:var(--pur);}
-.olist{display:flex;flex-direction:column;gap:3px;max-height:180px;overflow-y:auto;}
+.olist{display:flex;flex-direction:column;gap:3px;max-height:220px;overflow-y:auto;}
 .oitem{display:flex;align-items:center;gap:8px;padding:6px 10px;border:0.5px solid var(--bdr);border-radius:var(--r-md);cursor:pointer;font-size:13px;}
 .oitem:hover{background:var(--bg2);}
 .oitem.sel{background:var(--pur-l);border-color:#AFA9EC;}
 .oitem input[type=radio]{width:13px;height:13px;accent-color:var(--pur);flex-shrink:0;}
-.taggrid{display:flex;flex-wrap:wrap;gap:8px;padding:4px 0;}
-.tagopt{padding:6px 12px;border:0.5px solid var(--bdr2);border-radius:99px;cursor:pointer;font-size:13px;color:var(--text2);}
-.tagopt.tadd{background:var(--pur);color:#fff;border-color:var(--pur);}
-.tagopt.tremove{background:var(--red-l);color:#A32D2D;border-color:#F09595;}
 .macts{display:flex;gap:8px;margin-top:1rem;justify-content:flex-end;}
-.titem,.fitem{padding:8px 10px;border:0.5px solid var(--bdr);border-radius:var(--r-md);cursor:pointer;margin-bottom:4px;}
-.titem:hover,.fitem:hover{background:var(--bg2);}
-.titem.sel,.fitem.sel{background:var(--pur-l);border-color:#AFA9EC;}
-.tn,.fn{font-size:13px;font-weight:500;}
-.td2,.fd{font-size:11px;color:var(--text2);margin-top:2px;}
-
-.det-hdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:1rem;gap:8px;flex-wrap:wrap;padding:1.25rem 1.25rem 0;}
+.msearch{width:100%;height:32px;padding:0 10px;font-size:13px;border:0.5px solid var(--bdr2);border-radius:var(--r-md);background:var(--bg2);color:var(--text);outline:none;margin-bottom:8px;}
+.msearch:focus{border-color:var(--pur);}
+.titem{padding:8px 10px;border:0.5px solid var(--bdr);border-radius:var(--r-md);cursor:pointer;margin-bottom:4px;}
+.titem:hover{background:var(--bg2);}
+.titem.sel{background:var(--pur-l);border-color:#AFA9EC;}
+.tn{font-size:13px;font-weight:500;}
+.td2{font-size:11px;color:var(--text2);margin-top:2px;}
+/* LAYOUT */
+.det-hdr{display:flex;align-items:center;justify-content:space-between;padding:1.25rem 1.25rem 0;gap:8px;flex-wrap:wrap;margin-bottom:1rem;}
 .dlayout{display:grid;grid-template-columns:230px 1fr;gap:14px;align-items:start;padding:0 1.25rem 1.25rem;}
 @media(max-width:640px){.dlayout{grid-template-columns:1fr;}}
 .dside{display:flex;flex-direction:column;gap:10px;}
 .card{background:var(--bg);border:0.5px solid var(--bdr);border-radius:var(--r-lg);padding:13px 15px;}
 .card-t{font-size:11px;font-weight:500;color:var(--text2);margin-bottom:8px;}
+/* PROFILE */
 .ph{display:flex;flex-direction:column;align-items:center;text-align:center;padding-bottom:10px;border-bottom:0.5px solid var(--bdr);margin-bottom:10px;}
 .av{width:56px;height:56px;border-radius:50%;overflow:hidden;background:var(--bg2);border:0.5px solid var(--bdr);display:flex;align-items:center;justify-content:center;margin-bottom:5px;cursor:pointer;}
 .av img{width:100%;height:100%;object-fit:cover;}
@@ -98,11 +84,12 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 .pid{font-size:10px;color:var(--text3);font-family:monospace;}
 .irow{display:flex;align-items:flex-start;padding:3px 0;border-bottom:0.5px solid var(--bdr);}
 .irow:last-child{border-bottom:none;}
-.ikey{font-size:11px;color:var(--text2);width:64px;flex-shrink:0;padding-top:2px;}
+.ikey{font-size:11px;color:var(--text2);width:72px;flex-shrink:0;padding-top:2px;}
 .ival{font-size:12px;flex:1;word-break:break-all;}
 .iinput{font-size:12px;width:100%;border:0.5px solid var(--bdr2);border-radius:4px;padding:2px 6px;background:var(--bg);color:var(--text);outline:none;}
 .iinput:focus{border-color:var(--pur);}
 .dtog{font-size:11px;color:var(--pur);cursor:pointer;margin-top:6px;display:block;}
+/* STEP FLOW */
 .sflow{display:flex;flex-direction:column;gap:4px;}
 .snode{display:flex;align-items:center;gap:6px;padding:5px 8px;border-radius:var(--r-md);border:0.5px solid var(--bdr);font-size:11px;}
 .snode.cur{border-color:var(--pur);background:var(--pur-l);}
@@ -111,14 +98,17 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 .sdot{width:6px;height:6px;border-radius:50%;flex-shrink:0;}
 .sd-done{background:#1D9E75;}.sd-cur{background:var(--pur);}.sd-fut{background:var(--bdr2);}
 .sname{flex:1;font-weight:500;}
+/* MEMO */
 .memo-wrap{border-top:0.5px solid var(--bdr);padding-top:8px;margin-top:8px;}
 .memo-lbl{font-size:11px;color:var(--text2);margin-bottom:4px;}
 .mta{width:100%;min-height:52px;padding:6px 8px;font-size:12px;border:0.5px solid var(--bdr2);border-radius:var(--r-md);background:var(--bg);color:var(--text);outline:none;resize:vertical;line-height:1.5;}
 .mta:focus{border-color:var(--pur);}
+/* TABS */
 .tabs{display:flex;border-bottom:0.5px solid var(--bdr);margin-bottom:1rem;overflow-x:auto;}
 .tab{height:36px;padding:0 12px;font-size:13px;border:none;background:transparent;color:var(--text2);cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-0.5px;white-space:nowrap;}
 .tab.active{color:var(--pur);border-bottom-color:var(--pur);font-weight:500;}
 .dpane{display:none;}.dpane.active{display:block;}
+/* HISTORY TIMELINE */
 .tl{display:flex;flex-direction:column;}
 .tli{display:flex;gap:10px;padding-bottom:14px;}
 .tli:last-child{padding-bottom:0;}
@@ -129,6 +119,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 .tdate{font-size:11px;color:var(--text3);}
 .ttitle{font-size:13px;font-weight:500;}
 .tbody3{font-size:12px;color:var(--text2);margin-top:2px;line-height:1.6;}
+/* EVAL */
 .acc{border:0.5px solid var(--bdr);border-radius:var(--r-lg);margin-bottom:8px;overflow:hidden;}
 .acc-hd{display:flex;align-items:center;gap:8px;padding:10px 13px;cursor:pointer;background:var(--bg2);user-select:none;}
 .acc-hd:hover{background:var(--bg3);}
@@ -163,6 +154,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 .rbtns{display:flex;gap:5px;margin-top:5px;justify-content:flex-end;}
 .asect{margin-top:10px;border-top:0.5px solid var(--bdr);padding-top:10px;}
 .asect-lbl{font-size:11px;font-weight:500;color:var(--text2);margin-bottom:5px;}
+/* MAIL */
 .mitem{border:0.5px solid var(--bdr);border-radius:var(--r-md);margin-bottom:7px;overflow:hidden;}
 .mhd{display:flex;align-items:center;gap:8px;padding:9px 12px;cursor:pointer;}
 .mhd:hover{background:var(--bg2);}
@@ -174,12 +166,14 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 .mbody{display:none;padding:10px 12px;border-top:0.5px solid var(--bdr);background:var(--bg2);}
 .mmeta{font-size:11px;color:var(--text2);margin-bottom:7px;line-height:1.7;}
 .mtext{font-size:12px;line-height:1.7;white-space:pre-wrap;}
+/* DOCS */
 .ditem{display:flex;align-items:center;gap:9px;padding:8px 0;border-bottom:0.5px solid var(--bdr);}
 .ditem:last-child{border-bottom:none;}
 .dicon{width:28px;height:28px;border-radius:var(--r-md);background:var(--blu-l);display:flex;align-items:center;justify-content:center;flex-shrink:0;}
 .dname{font-size:12px;font-weight:500;}
 .dmeta{font-size:11px;color:var(--text3);}
 .ddl{margin-left:auto;height:24px;padding:0 9px;font-size:11px;border:0.5px solid var(--bdr2);border-radius:var(--r-md);background:transparent;color:var(--text2);cursor:pointer;}
+/* ITL */
 .itl-compose{background:var(--bg2);border-radius:var(--r-md);padding:10px 12px;margin-bottom:12px;}
 .itl-ta{width:100%;min-height:52px;padding:7px 9px;font-size:13px;border:0.5px solid var(--bdr2);border-radius:var(--r-md);background:var(--bg);color:var(--text);outline:none;resize:none;line-height:1.5;margin-bottom:6px;}
 .itl-ta:focus{border-color:var(--pur);}
@@ -192,12 +186,15 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 .iwho{font-size:12px;font-weight:500;}
 .iwhen{font-size:11px;color:var(--text3);margin-left:auto;}
 .itbadge{font-size:10px;padding:1px 6px;border-radius:99px;}
-.itn{background:var(--blu-l);color:var(--blu);}.ita{background:var(--pur-l);color:var(--pur-d);}.itu{background:var(--red-l);color:var(--red);}
+.itn{background:var(--blu-l);color:var(--blu);}
+.ita{background:var(--pur-l);color:var(--pur-d);}
+.itu{background:var(--red-l);color:var(--red);}
 .itext{font-size:12px;color:var(--text2);line-height:1.6;}
+.empty{text-align:center;padding:2rem;color:var(--text3);font-size:13px;}
+.loading{text-align:center;padding:2rem;color:var(--text3);font-size:13px;}
 </style>
 </head>
 <body>
-
 <nav class="navbar">
   <div class="nmark"><svg width="16" height="16" viewBox="0 0 20 20" fill="none"><path d="M10 2L3 6v8l7 4 7-4V6L10 2z" stroke="#fff" stroke-width="1.5" stroke-linejoin="round"/><path d="M10 2v12M3 6l7 4 7-4" stroke="#fff" stroke-width="1.5" stroke-linejoin="round"/></svg></div>
   <span class="ntitle">ATS Portal</span>
@@ -214,14 +211,18 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
     <button class="btn pri" id="d-save-btn">保存</button>
   </div>
 </div>
+
 <div class="dlayout">
+  <!-- サイドバー -->
   <div class="dside">
     <div class="card">
       <div class="ph">
-        <div class="av" id="d-av"><svg width="24" height="24" viewBox="0 0 32 32" fill="none"><circle cx="16" cy="12" r="6" stroke="#aaa" stroke-width="1.5"/><path d="M4 28c0-6.627 5.373-12 12-12s12 5.373 12 12" stroke="#aaa" stroke-width="1.5" stroke-linecap="round"/></svg></div>
+        <div class="av" id="d-av">
+          <svg width="24" height="24" viewBox="0 0 32 32" fill="none"><circle cx="16" cy="12" r="6" stroke="#aaa" stroke-width="1.5"/><path d="M4 28c0-6.627 5.373-12 12-12s12 5.373 12 12" stroke="#aaa" stroke-width="1.5" stroke-linecap="round"/></svg>
+        </div>
         <input type="file" id="ph-file" accept="image/*" style="display:none"/>
         <div class="ph-hint" id="ph-hint">写真をアップロード</div>
-        <div class="pname" id="d-name"></div>
+        <div class="pname" id="d-name">読み込み中...</div>
         <div class="pid" id="d-id"></div>
       </div>
       <div id="basic-info"></div>
@@ -234,14 +235,18 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
       <div class="memo-wrap">
         <div class="memo-lbl">メモ</div>
         <textarea class="mta" id="d-memo"></textarea>
-        <div style="display:flex;justify-content:flex-end"><button class="btn sm pri" id="memo-save" style="margin-top:4px">保存</button></div>
+        <div style="display:flex;justify-content:flex-end">
+          <button class="btn sm pri" id="memo-save" style="margin-top:4px">保存</button>
+        </div>
       </div>
     </div>
     <div class="card">
       <div class="card-t">選考ステップ</div>
-      <div class="sflow" id="d-sflow"></div>
+      <div class="sflow" id="d-sflow"><div class="loading">読み込み中...</div></div>
     </div>
   </div>
+
+  <!-- メインコンテンツ -->
   <div>
     <div class="tabs" id="det-tabs">
       <button class="tab active" data-tab="history">選考履歴</button>
@@ -250,248 +255,331 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
       <button class="tab" data-tab="mail">メール履歴</button>
       <button class="tab" data-tab="itl">社内連絡</button>
     </div>
-    <div class="dpane active" id="dpane-history"></div>
-    <div class="dpane" id="dpane-eval"></div>
-    <div class="dpane" id="dpane-docs"></div>
-    <div class="dpane" id="dpane-mail"></div>
-    <div class="dpane" id="dpane-itl"></div>
+    <div class="dpane active" id="dpane-history"><div class="loading">読み込み中...</div></div>
+    <div class="dpane" id="dpane-eval"><div class="loading">読み込み中...</div></div>
+    <div class="dpane" id="dpane-docs"><div class="loading">読み込み中...</div></div>
+    <div class="dpane" id="dpane-mail"><div class="loading">読み込み中...</div></div>
+    <div class="dpane" id="dpane-itl"><div class="loading">読み込み中...</div></div>
   </div>
 </div>
 
-<!-- step modal -->
+<!-- ステップ更新モーダル -->
 <div class="overlay" id="mod-step"><div class="mbox">
   <h3>ステップ・ステータス更新</h3>
-  <div style="margin-bottom:10px"><div style="font-size:11px;font-weight:500;color:var(--text2);margin-bottom:5px">選考ステップ</div><div class="olist" id="sm-steps"></div></div>
-  <div><div style="font-size:11px;font-weight:500;color:var(--text2);margin-bottom:5px">ステータス</div><div class="olist" id="sm-statuses"></div></div>
-  <div class="macts"><button class="btn" id="sm-cancel">キャンセル</button><button class="btn pri" id="sm-ok">更新する</button></div>
+  <div style="margin-bottom:10px">
+    <div style="font-size:11px;font-weight:500;color:var(--text2);margin-bottom:5px">選考ステップ</div>
+    <div class="olist" id="sm-steps"></div>
+  </div>
+  <div>
+    <div style="font-size:11px;font-weight:500;color:var(--text2);margin-bottom:5px">ステータス</div>
+    <div class="olist" id="sm-statuses"></div>
+  </div>
+  <div class="macts">
+    <button class="btn" id="sm-cancel">キャンセル</button>
+    <button class="btn pri" id="sm-ok">更新する</button>
+  </div>
 </div></div>
-<!-- mail modal -->
+
+<!-- メール送付モーダル -->
 <div class="overlay" id="mod-mail"><div class="mbox">
   <h3>メールテンプレート選択</h3>
   <input class="msearch" id="mail-search" placeholder="テンプレートを検索..."/>
   <div id="mail-list"></div>
-  <div class="macts"><button class="btn" id="mail-cancel">キャンセル</button><button class="btn pri" id="mail-ok">送付する</button></div>
+  <div class="macts">
+    <button class="btn" id="mail-cancel">キャンセル</button>
+    <button class="btn pri" id="mail-ok">送付する</button>
+  </div>
 </div></div>
+
 <div class="toast" id="toast"></div>
 
+<script src="lib/api.js"></script>
 <script>
-
-const USERS = { "admin": "demo1234", "hr": "hr2024" };
-const STEPS = ["書類選考","筆記試験","1次面接","2次面接","最終面接","内定"];
+// ===== 定数 =====
+const STEPS   = ["書類選考","筆記試験","1次面接","2次面接","最終面接","内定"];
 const STEP_CLS = {"書類選考":"step-doc","筆記試験":"step-written","1次面接":"step-1st","2次面接":"step-2nd","最終面接":"step-final","内定":"step-offer"};
 const STATUSES = ["未対応","通過","不合格","保留","辞退"];
-const ST_CLS = {"通過":"st-pass","不合格":"st-fail","保留":"st-hold","未対応":"st-new","辞退":"st-wd"};
+const ST_CLS   = {"通過":"st-pass","不合格":"st-fail","保留":"st-hold","未対応":"st-new","辞退":"st-wd"};
 const STEP_ORD = {"書類選考":1,"筆記試験":2,"1次面接":3,"2次面接":4,"最終面接":5,"内定":6};
-const ST_ORD = {"未対応":1,"通過":2,"保留":3,"不合格":4,"辞退":5};
-const ALL_TAGS = ["エンジニア","HR","HOT","KEEP"];
-const TAG_CLS = {"エンジニア":"t-eng","HR":"t-hr","HOT":"t-hot","KEEP":"t-keep"};
+const AVAIL_IV = ["鈴木 一郎（EMgr）","佐藤 花子（人事）","高橋 健（CTO）","中島 彩（PM）"];
+const ITL_TYPE = {
+  notify:  {label:"連絡",  cls:"itn"},
+  discuss: {label:"相談",  cls:"ita"},
+  urgent:  {label:"至急",  cls:"itu"}
+};
 
-const ALL_DATA = [
-  {id:"AP-0001",name:"田中 涼子",gender:"女",age:28,job:"フロントエンドエンジニア",step:"1次面接",status:"通過",date:"2025-04-08",stars:4,tags:["エンジニア","HOT"],
-   basic:[{k:"現年収",f:"cur_sal",v:"450万円"},{k:"希望年収",f:"des_sal",v:"600万円"}],
-   detail:[{k:"生年月日",f:"dob",v:"1997-01-15"},{k:"メール",f:"email",v:"tanaka.r@example.com"},{k:"電話",f:"tel",v:"090-1234-5678"},{k:"住所",f:"addr",v:"東京都渋谷区"},{k:"最終学歴",f:"edu",v:"〇〇大学 工学部"},{k:"現職",f:"job_now",v:"株式会社△△ FEエンジニア"},{k:"経験年数",f:"exp",v:"5年"},{k:"応募日",f:"app_date",v:"2025-04-08"}],
-   memo:"コミュニケーション能力高い。次回最終面接を調整中。",
-   evals:{"書類選考":{adminComment:"書類は申し分なし。",ivs:[{name:"佐藤 花子",ini:"佐",role:"人事リード",date:"2025-04-09",overall:4,crit:{書類品質:4,印象:4,意欲:4},comment:"職務経歴書の記述が具体的で好印象。"}]},"1次面接":{adminComment:"最終面接へ進める。",ivs:[{name:"鈴木 一郎",ini:"鈴",role:"EMgr",date:"2025-04-13",overall:4,crit:{技術力:4,コミュ力:5,カルチャー:3},comment:"技術力は申し分ない。"},{name:"佐藤 花子",ini:"佐",role:"人事リード",date:"2025-04-14",overall:4,crit:{技術力:4,コミュ力:5,カルチャー:3},comment:"入社意欲が高い。"}]}},
-   history:[{c:"tg",date:"2025-04-08",title:"応募受付",body:"フロントエンドエンジニア職に応募。"},{c:"tg",date:"2025-04-09",title:"書類選考 通過",body:"書類審査通過。"},{c:"tp",date:"2025-04-12",title:"1次面接 実施",body:"オンライン60分。鈴木・佐藤が担当。"},{c:"ta",date:"2025-04-15",title:"最終面接 調整中",body:"日程調整メール送付済み。"}],
-   mails:[{dir:"out",subj:"【書類選考通過のご連絡】",from:"佐藤花子 <hr@co.jp>",to:"田中涼子 <tanaka.r@example.com>",date:"2025-04-09 14:32",body:"田中 涼子 様\n\n書類選考の結果、次の選考にお進みいただけることとなりました。\n\n採用担当 佐藤花子"},{dir:"in",subj:"Re: 【書類選考通過のご連絡】",from:"田中涼子 <tanaka.r@example.com>",to:"佐藤花子 <hr@co.jp>",date:"2025-04-09 18:15",body:"佐藤様\n\n4月12日 13:00にてよろしくお願いいたします。\n\n田中 涼子"}],
-   docs:[{name:"履歴書.pdf",type:"PDF",date:"2025-04-08",size:"1.2MB"},{name:"職務経歴書.pdf",type:"PDF",date:"2025-04-08",size:"0.8MB"},{name:"ポートフォリオ.zip",type:"ZIP",date:"2025-04-09",size:"12.4MB"}],
-   itl:[{who:"佐藤 花子",ini:"佐",type:"discuss",text:"1次面接の総評：全員通過票。最終面接の日程調整をお願いします。",time:"2025-04-14 15:20"}]},
-  {id:"AP-0002",name:"山本 健二",gender:"男",age:35,job:"バックエンドエンジニア",step:"書類選考",status:"保留",date:"2025-04-10",stars:3,tags:["エンジニア"],basic:[{k:"現年収",f:"cur_sal",v:"550万円"},{k:"希望年収",f:"des_sal",v:"700万円"}],detail:[{k:"生年月日",f:"dob",v:"1990-03-22"},{k:"メール",f:"email",v:"yamamoto.k@example.com"},{k:"電話",f:"tel",v:"080-2345-6789"},{k:"住所",f:"addr",v:"神奈川県横浜市"},{k:"最終学歴",f:"edu",v:"△△大学 情報学部"},{k:"現職",f:"job_now",v:"株式会社□□ バックエンドEng"},{k:"経験年数",f:"exp",v:"10年"},{k:"応募日",f:"app_date",v:"2025-04-10"}],memo:"経験豊富だが年収要望が高め。",evals:{},history:[{c:"tg",date:"2025-04-10",title:"応募受付",body:"バックエンドエンジニア職に応募。"}],mails:[],docs:[{name:"履歴書.pdf",type:"PDF",date:"2025-04-10",size:"0.9MB"}],itl:[]},
-  {id:"AP-0003",name:"佐々木 美咲",gender:"女",age:31,job:"人事マネージャー",step:"内定",status:"通過",date:"2025-03-28",stars:5,tags:["HR","HOT"],basic:[{k:"現年収",f:"cur_sal",v:"480万円"},{k:"希望年収",f:"des_sal",v:"550万円"}],detail:[{k:"生年月日",f:"dob",v:"1994-07-05"},{k:"メール",f:"email",v:"sasaki.m@example.com"},{k:"電話",f:"tel",v:"070-3456-7890"},{k:"住所",f:"addr",v:"東京都港区"},{k:"最終学歴",f:"edu",v:"○○大学 経営学部"},{k:"現職",f:"job_now",v:"株式会社★★ 人事"},{k:"経験年数",f:"exp",v:"7年"},{k:"応募日",f:"app_date",v:"2025-03-28"}],memo:"即戦力。入社日調整中。",evals:{},history:[{c:"tg",date:"2025-03-28",title:"応募受付",body:""},{c:"tg",date:"2025-04-01",title:"書類選考 通過",body:""},{c:"tp",date:"2025-04-10",title:"内定通知",body:"内定通知書送付済み。"}],mails:[],docs:[{name:"履歴書.pdf",type:"PDF",date:"2025-03-28",size:"1.0MB"}],itl:[]},
-  {id:"AP-0004",name:"中村 大輔",gender:"男",age:26,job:"フロントエンドエンジニア",step:"書類選考",status:"未対応",date:"2025-04-12",stars:0,tags:[],basic:[{k:"現年収",f:"cur_sal",v:"320万円"},{k:"希望年収",f:"des_sal",v:"420万円"}],detail:[{k:"生年月日",f:"dob",v:"1999-11-30"},{k:"メール",f:"email",v:"nakamura.d@example.com"},{k:"電話",f:"tel",v:"090-4567-8901"},{k:"住所",f:"addr",v:"大阪府大阪市"},{k:"最終学歴",f:"edu",v:"□□工業大学 情報工学部"},{k:"現職",f:"job_now",v:"フリーランス"},{k:"経験年数",f:"exp",v:"2年"},{k:"応募日",f:"app_date",v:"2025-04-12"}],memo:"",evals:{},history:[{c:"tg",date:"2025-04-12",title:"応募受付",body:""}],mails:[],docs:[{name:"履歴書.pdf",type:"PDF",date:"2025-04-12",size:"0.7MB"}],itl:[]},
-  {id:"AP-0005",name:"小林 彩",gender:"女",age:29,job:"プロダクトマネージャー",step:"最終面接",status:"通過",date:"2025-03-15",stars:5,tags:["KEEP"],basic:[{k:"現年収",f:"cur_sal",v:"520万円"},{k:"希望年収",f:"des_sal",v:"650万円"}],detail:[{k:"生年月日",f:"dob",v:"1996-04-18"},{k:"メール",f:"email",v:"kobayashi.a@example.com"},{k:"電話",f:"tel",v:"080-5678-9012"},{k:"住所",f:"addr",v:"東京都新宿区"},{k:"最終学歴",f:"edu",v:"△△大学 経済学部"},{k:"現職",f:"job_now",v:"株式会社◎◎ PM"},{k:"経験年数",f:"exp",v:"5年"},{k:"応募日",f:"app_date",v:"2025-03-15"}],memo:"",evals:{},history:[{c:"tg",date:"2025-03-15",title:"応募受付",body:""},{c:"tg",date:"2025-03-20",title:"書類選考 通過",body:""},{c:"tp",date:"2025-04-02",title:"最終面接 実施",body:""}],mails:[],docs:[],itl:[]},
-  {id:"AP-0006",name:"伊藤 拓也",gender:"男",age:42,job:"バックエンドエンジニア",step:"2次面接",status:"不合格",date:"2025-04-01",stars:2,tags:[],basic:[{k:"現年収",f:"cur_sal",v:"700万円"},{k:"希望年収",f:"des_sal",v:"800万円"}],detail:[{k:"生年月日",f:"dob",v:"1983-08-14"},{k:"メール",f:"email",v:"ito.t@example.com"},{k:"電話",f:"tel",v:"070-6789-0123"},{k:"住所",f:"addr",v:"埼玉県さいたま市"},{k:"最終学歴",f:"edu",v:"○○大学 理工学部"},{k:"現職",f:"job_now",v:"株式会社▲▲ シニアEng"},{k:"経験年数",f:"exp",v:"17年"},{k:"応募日",f:"app_date",v:"2025-04-01"}],memo:"カルチャーフィット懸念。",evals:{},history:[{c:"tg",date:"2025-04-01",title:"応募受付",body:""},{c:"tr2",date:"2025-04-10",title:"2次面接 不合格",body:""}],mails:[],docs:[],itl:[]},
-  {id:"AP-0007",name:"渡辺 さくら",gender:"女",age:24,job:"人事マネージャー",step:"書類選考",status:"通過",date:"2025-04-11",stars:3,tags:["HR"],basic:[{k:"現年収",f:"cur_sal",v:"300万円"},{k:"希望年収",f:"des_sal",v:"380万円"}],detail:[{k:"生年月日",f:"dob",v:"2001-02-28"},{k:"メール",f:"email",v:"watanabe.s@example.com"},{k:"電話",f:"tel",v:"090-7890-1234"},{k:"住所",f:"addr",v:"東京都世田谷区"},{k:"最終学歴",f:"edu",v:"□□大学 文学部"},{k:"現職",f:"job_now",v:"株式会社●● 人事補佐"},{k:"経験年数",f:"exp",v:"2年"},{k:"応募日",f:"app_date",v:"2025-04-11"}],memo:"",evals:{},history:[{c:"tg",date:"2025-04-11",title:"応募受付",body:""}],mails:[],docs:[],itl:[]},
-  {id:"AP-0008",name:"加藤 誠",gender:"男",age:38,job:"プロダクトマネージャー",step:"2次面接",status:"保留",date:"2025-04-07",stars:4,tags:["HOT","KEEP"],basic:[{k:"現年収",f:"cur_sal",v:"600万円"},{k:"希望年収",f:"des_sal",v:"720万円"}],detail:[{k:"生年月日",f:"dob",v:"1987-06-10"},{k:"メール",f:"email",v:"kato.m@example.com"},{k:"電話",f:"tel",v:"080-8901-2345"},{k:"住所",f:"addr",v:"東京都品川区"},{k:"最終学歴",f:"edu",v:"△△大学 工学部"},{k:"現職",f:"job_now",v:"株式会社■■ PM"},{k:"経験年数",f:"exp",v:"12年"},{k:"応募日",f:"app_date",v:"2025-04-07"}],memo:"",evals:{},history:[{c:"tg",date:"2025-04-07",title:"応募受付",body:""}],mails:[],docs:[],itl:[]}
-];
-
-
-const user = sessionStorage.getItem("ats_user");
-if (!user) { window.location.href = "index.html"; }
-document.getElementById("nav-user").textContent = user;
-document.getElementById("logout-btn").addEventListener("click", () => {
-  sessionStorage.removeItem("ats_user");
+// ===== 認証チェック =====
+requireAuth();
+const _user = getCurrentUser();
+if (_user) document.getElementById("nav-user").textContent = _user.name || _user.email || "";
+document.getElementById("logout-btn").addEventListener("click", async () => {
+  await atsApi.logout();
   window.location.href = "index.html";
 });
 
+// ===== URLからID取得 =====
+const params = new URLSearchParams(location.search);
+const curId  = params.get("id");
+if (!curId) {
+  document.body.innerHTML = "<p style='padding:2rem;font-size:14px'>候補者IDが指定されていません。<a href='list.html'>一覧に戻る</a></p>";
+  throw new Error("no id");
+}
 
-const AVAIL_IV = ["鈴木 一郎（EMgr）","佐藤 花子（人事）","高橋 健（CTO）","中島 彩（PM）"];
-const ITL_TYPE = {notify:{label:"連絡",cls:"itn"},discuss:{label:"相談",cls:"ita"},urgent:{label:"至急",cls:"itu"}};
-const MAIL_TPLS = [
-  {id:"pass_doc",name:"書類選考通過",desc:"書類選考通過のご連絡と次ステップ案内"},
-  {id:"interview",name:"面接日程調整",desc:"面接日程の確認・調整依頼"},
-  {id:"offer",name:"内定通知",desc:"内定のご連絡と条件提示"},
-  {id:"reject",name:"不合格通知",desc:"選考終了のご連絡"},
-  {id:"remind",name:"書類提出リマインド",desc:"未提出者へのリマインド"}
-];
-
+// ===== ユーティリティ =====
 const G = id => document.getElementById(id);
 const showToast = msg => { const t=G("toast"); t.textContent=msg; t.className="toast show"; setTimeout(()=>t.className="toast",2500); };
-const openMod = id => G(id).classList.add("open");
+const openMod  = id => G(id).classList.add("open");
 const closeMod = id => G(id).classList.remove("open");
 
-// Get applicant ID from URL
-const params = new URLSearchParams(location.search);
-const curId = params.get("id");
-const d = ALL_DATA.find(x => x.id === curId);
-if (!d) { document.body.innerHTML = "<p style='padding:2rem'>候補者が見つかりません</p>"; throw new Error("not found"); }
-
-let showDet = false, editingInfo = false;
-let openAccs = new Set();
-let selStep2 = d.step, selStatus2 = d.status;
+// ===== 状態 =====
+let d = null;          // 応募者データ
+let MAIL_TPLS = [];
+let showDet   = false;
+let editingInfo = false;
+let openAccs  = new Set();
+let selStep2  = null, selStatus2 = null;
 let selMailTpl = null;
+// 評価はメモリ上で管理（将来DB保存に移行）
+let evalData  = {};
 
-// Page title
-document.title = `ATS Portal - ${d.name}`;
+// ===== 初期化 =====
+async function init() {
+  try {
+    const [applicant, templates, history, timeline, files, mailHistory] = await Promise.all([
+      atsApi.getApplicant(curId),
+      atsApi.getMailTemplates(),
+      atsApi.getStepHistory(curId),
+      atsApi.getTimeline(curId),
+      atsApi.getFiles(curId),
+      atsApi.getMailHistory(curId)
+    ]);
 
-// Init
-STEPS.forEach(s => { if(d.evals[s]&&d.evals[s].ivs&&d.evals[s].ivs.length) openAccs.add(s); });
-if(openAccs.size===0) openAccs.add(d.step);
+    if (!applicant) {
+      document.body.innerHTML = "<p style='padding:2rem;font-size:14px'>候補者が見つかりません。<a href='list.html'>一覧に戻る</a></p>";
+      return;
+    }
 
-G("d-name").textContent = d.name;
-G("d-id").textContent = d.id;
-G("d-memo").value = d.memo || "";
-renderBasicInfo();
-renderStepFlow();
-renderHistory();
-renderEval();
-renderDocs();
-renderMailsPane();
-renderITL();
+    d = applicant;
+    MAIL_TPLS = Array.isArray(templates) ? templates : [];
+    selStep2   = d.step;
+    selStatus2 = d.status;
 
-// Tab switching
+    document.title = `ATS Portal - ${d.name}`;
+    G("d-name").textContent = d.name;
+    G("d-id").textContent   = d.id;
+    G("d-memo").value       = d.memo || "";
+
+    renderBasicInfo();
+    renderStepFlow();
+    renderHistory(Array.isArray(history) ? history : []);
+    renderEval();
+    renderDocs(Array.isArray(files) ? files : []);
+    renderMailsPane(Array.isArray(mailHistory) ? mailHistory : []);
+    renderITL(Array.isArray(timeline) ? timeline : []);
+
+  } catch (e) {
+    console.error(e);
+    showToast("データの読み込みに失敗しました");
+  }
+}
+
+// ===== タブ切替 =====
 document.querySelectorAll("#det-tabs .tab").forEach(tab => {
   tab.addEventListener("click", () => {
-    document.querySelectorAll("#det-tabs .tab").forEach(t => t.className="tab");
-    document.querySelectorAll(".dpane").forEach(p => p.className="dpane");
+    document.querySelectorAll("#det-tabs .tab").forEach(t => t.className = "tab");
+    document.querySelectorAll(".dpane").forEach(p => p.className = "dpane");
     tab.className = "tab active";
-    G("dpane-"+tab.dataset.tab).className = "dpane active";
+    G("dpane-" + tab.dataset.tab).className = "dpane active";
   });
 });
 
-G("back-btn").addEventListener("click", () => { window.close(); });
-G("d-save-btn").addEventListener("click", () => showToast("保存しました"));
-G("d-mail-btn").addEventListener("click", openMailModal);
+// ===== ヘッダーボタン =====
+G("back-btn").addEventListener("click", () => window.close());
+G("d-save-btn").addEventListener("click", async () => {
+  if (!d) return;
+  await atsApi.updateApplicant(d.id, { memo: G("d-memo").value, step: d.step, status: d.status, stars: d.stars });
+  showToast("保存しました");
+});
 G("d-step-btn").addEventListener("click", openStepModal);
-G("memo-save").addEventListener("click", () => { d.memo=G("d-memo").value; showToast("メモを保存しました"); });
-G("ph-hint").addEventListener("click", ()=>G("ph-file").click());
-G("d-av").addEventListener("click", ()=>G("ph-file").click());
+G("d-mail-btn").addEventListener("click", openMailModal);
+G("memo-save").addEventListener("click", async () => {
+  if (!d) return;
+  await atsApi.updateApplicant(d.id, { memo: G("d-memo").value });
+  d.memo = G("d-memo").value;
+  showToast("メモを保存しました");
+});
+
+// ===== 写真アップロード =====
+G("ph-hint").addEventListener("click", () => G("ph-file").click());
+G("d-av").addEventListener("click",   () => G("ph-file").click());
 G("ph-file").addEventListener("change", function() {
-  if(!this.files||!this.files[0]) return;
-  const r=new FileReader(); r.onload=e=>{G("d-av").innerHTML=`<img src="${e.target.result}"/>`;}; r.readAsDataURL(this.files[0]);
+  if (!this.files || !this.files[0]) return;
+  const r = new FileReader();
+  r.onload = e => { G("d-av").innerHTML = `<img src="${e.target.result}"/>`; };
+  r.readAsDataURL(this.files[0]);
 });
+
+// ===== 詳細情報トグル =====
 G("dtog").addEventListener("click", () => {
-  showDet=!showDet;
-  G("detail-info").style.display=showDet?"block":"none";
-  G("dtog").textContent=showDet?"▼ 詳細情報を非表示":"▶ 詳細情報を表示";
-  if(showDet) renderDetailInfo();
+  showDet = !showDet;
+  G("detail-info").style.display = showDet ? "block" : "none";
+  G("dtog").textContent = showDet ? "▼ 詳細情報を非表示" : "▶ 詳細情報を表示";
+  if (showDet) renderDetailInfo();
 });
+
+// ===== 情報編集 =====
 G("info-edit-btn").addEventListener("click", () => {
-  editingInfo=true; renderBasicInfo(); if(showDet) renderDetailInfo();
-  G("info-edit-btn").style.display="none"; G("info-save-btn").style.display="";
+  editingInfo = true;
+  renderBasicInfo();
+  if (showDet) renderDetailInfo();
+  G("info-edit-btn").style.display  = "none";
+  G("info-save-btn").style.display  = "";
 });
-G("info-save-btn").addEventListener("click", () => {
-  [...d.basic,...d.detail].forEach(r=>{ const el=G("iinput-"+r.f); if(el) r.v=el.value; });
-  editingInfo=false; renderBasicInfo(); if(showDet) renderDetailInfo();
-  G("info-edit-btn").style.display=""; G("info-save-btn").style.display="none";
+G("info-save-btn").addEventListener("click", async () => {
+  if (!d) return;
+  // 入力値を取得してDBに保存
+  const updates = {
+    name:             G("iinput-name")     ? G("iinput-name").value     : d.name,
+    age:              G("iinput-age")      ? parseInt(G("iinput-age").value) : d.age,
+    current_salary:   G("iinput-cur_sal")  ? parseInt(G("iinput-cur_sal").value)  : d.current_salary,
+    desired_salary:   G("iinput-des_sal")  ? parseInt(G("iinput-des_sal").value)  : d.desired_salary,
+    email:            G("iinput-email")    ? G("iinput-email").value    : d.email,
+    phone:            G("iinput-phone")    ? G("iinput-phone").value    : d.phone,
+    address:          G("iinput-address")  ? G("iinput-address").value  : d.address,
+    education:        G("iinput-edu")      ? G("iinput-edu").value      : d.education,
+    current_job:      G("iinput-job_now")  ? G("iinput-job_now").value  : d.current_job,
+    experience_years: G("iinput-exp")      ? parseInt(G("iinput-exp").value) : d.experience_years,
+  };
+  await atsApi.updateApplicant(d.id, updates);
+  Object.assign(d, updates);
+  editingInfo = false;
+  renderBasicInfo();
+  if (showDet) renderDetailInfo();
+  G("info-edit-btn").style.display = "";
+  G("info-save-btn").style.display = "none";
   showToast("候補者情報を保存しました");
 });
-G("sm-cancel").addEventListener("click", ()=>closeMod("mod-step"));
-G("sm-ok").addEventListener("click", () => {
-  d.step=selStep2; d.status=selStatus2; renderStepFlow(); closeMod("mod-step");
-  showToast("ステップ・ステータスを更新しました");
-});
-G("mail-cancel").addEventListener("click", ()=>closeMod("mod-mail"));
-G("mail-ok").addEventListener("click", () => {
-  if(!selMailTpl){showToast("テンプレートを選択してください");return;}
-  showToast(`「${MAIL_TPLS.find(t=>t.id===selMailTpl).name}」を送付しました`); closeMod("mod-mail");
-});
-G("mail-search").addEventListener("input", renderMailModal);
-document.querySelectorAll(".overlay").forEach(ov=>ov.addEventListener("click",e=>{if(e.target===ov)ov.classList.remove("open");}));
 
-function renderInfoRows(arr) {
-  return arr.map(r => {
-    if(editingInfo) return `<div class="irow"><span class="ikey">${r.k}</span><input class="iinput" id="iinput-${r.f}" value="${(r.rawV!==undefined?r.rawV:r.v).toString().replace(/"/g,'&quot;')}"/></div>`;
-    return `<div class="irow"><span class="ikey">${r.k}</span><span class="ival">${r.v}</span></div>`;
-  }).join("");
-}
+// ===== 基本情報描画 =====
 function renderBasicInfo() {
-  const rows=[
-    {k:"性別",f:"gender",v:`<span class="${d.gender==="男"?"gm":"gf"}">${d.gender}</span>`,rawV:d.gender},
-    {k:"年齢",f:"age",v:d.age+"歳",rawV:d.age},
-    {k:"応募求人",f:"job",v:d.job,rawV:d.job},
-    ...d.basic,
-    {k:"タグ",f:"tags",v:d.tags.length?d.tags.map(t=>`<span class="tag ${TAG_CLS[t]||""}">${t}</span>`).join(""):"―",rawV:d.tags.join("/")}
+  if (!d) return;
+  const rows = [
+    {k:"性別",    f:"gender",   v: d.gender === "男"
+      ? `<span style="color:#185FA5;font-weight:500">男</span>`
+      : `<span style="color:#993556;font-weight:500">${d.gender||"―"}</span>`,
+      raw: d.gender || ""},
+    {k:"年齢",    f:"age",      v: d.age ? d.age + "歳" : "―",          raw: d.age || ""},
+    {k:"現年収",  f:"cur_sal",  v: d.current_salary  ? d.current_salary + "万円" : "―",  raw: d.current_salary || ""},
+    {k:"希望年収",f:"des_sal",  v: d.desired_salary  ? d.desired_salary + "万円" : "―",  raw: d.desired_salary || ""},
   ];
-  G("basic-info").innerHTML=renderInfoRows(rows);
+  G("basic-info").innerHTML = rows.map(r => editingInfo
+    ? `<div class="irow"><span class="ikey">${r.k}</span><input class="iinput" id="iinput-${r.f}" value="${r.raw}"/></div>`
+    : `<div class="irow"><span class="ikey">${r.k}</span><span class="ival">${r.v}</span></div>`
+  ).join("");
 }
-function renderDetailInfo() { G("detail-info").innerHTML=renderInfoRows(d.detail); }
+
+function renderDetailInfo() {
+  if (!d) return;
+  const rows = [
+    {k:"メール",    f:"email",    v: d.email         || "―", raw: d.email         || ""},
+    {k:"電話",      f:"phone",    v: d.phone         || "―", raw: d.phone         || ""},
+    {k:"住所",      f:"address",  v: d.address       || "―", raw: d.address       || ""},
+    {k:"最終学歴",  f:"edu",      v: d.education     || "―", raw: d.education     || ""},
+    {k:"現職",      f:"job_now",  v: d.current_job   || "―", raw: d.current_job   || ""},
+    {k:"経験年数",  f:"exp",      v: d.experience_years ? d.experience_years + "年" : "―", raw: d.experience_years || ""},
+    {k:"応募日",    f:"applied",  v: d.applied_at    ? d.applied_at.slice(0,10) : "―", raw: ""},
+  ];
+  G("detail-info").innerHTML = rows.map(r => (editingInfo && r.f !== "applied")
+    ? `<div class="irow"><span class="ikey">${r.k}</span><input class="iinput" id="iinput-${r.f}" value="${r.raw}"/></div>`
+    : `<div class="irow"><span class="ikey">${r.k}</span><span class="ival">${r.v}</span></div>`
+  ).join("");
+}
+
+// ===== ステップフロー描画 =====
 function renderStepFlow() {
-  const idx=STEP_ORD[d.step]||0;
-  G("d-sflow").innerHTML=STEPS.map((s,i)=>{
-    const ord=i+1,isCur=d.step===s,isDone=idx>ord;
-    const cls=isCur?"snode cur":isDone?"snode done":"snode fut";
-    const dot=isCur?"sd-cur":isDone?"sd-done":"sd-fut";
-    const badge=isCur?`<span class="badge ${ST_CLS[d.status]||""}" style="font-size:10px">${d.status}</span>`:"";
+  if (!d) return;
+  const idx = STEP_ORD[d.step] || 0;
+  G("d-sflow").innerHTML = STEPS.map((s, i) => {
+    const ord = i + 1, isCur = d.step === s, isDone = idx > ord;
+    const cls  = isCur ? "snode cur" : isDone ? "snode done" : "snode fut";
+    const dot  = isCur ? "sd-cur"    : isDone ? "sd-done"    : "sd-fut";
+    const badge = isCur
+      ? `<span class="badge ${ST_CLS[d.status]||""}" style="font-size:10px">${d.status}</span>`
+      : "";
     return `<div class="${cls}"><div class="sdot ${dot}"></div><div class="sname">${s}</div>${badge}</div>`;
   }).join("");
 }
-function renderHistory() {
-  G("dpane-history").innerHTML=`<div class="tl">${
-    d.history.map((h,i)=>`<div class="tli">
-      <div class="tll"><div class="tdot ${h.c}"></div>${i<d.history.length-1?'<div class="tline"></div>':""}</div>
-      <div><div class="tdate">${h.date}</div><div class="ttitle">${h.title}</div>${h.body?`<div class="tbody3">${h.body}</div>`:""}</div>
-    </div>`).join("")
+
+// ===== 選考履歴 =====
+function renderHistory(history) {
+  if (!history.length) {
+    G("dpane-history").innerHTML = `<div class="empty">履歴がありません</div>`;
+    return;
+  }
+  G("dpane-history").innerHTML = `<div class="tl">${
+    history.map((h, i) => {
+      const dot = h.step ? (
+        h.status === "通過" ? "tg" :
+        h.status === "不合格" ? "tr2" :
+        h.status === "保留" ? "ta" : "tp"
+      ) : "tgr";
+      return `<div class="tli">
+        <div class="tll">
+          <div class="tdot ${dot}"></div>
+          ${i < history.length - 1 ? '<div class="tline"></div>' : ""}
+        </div>
+        <div>
+          <div class="tdate">${h.created_at ? h.created_at.slice(0,10) : ""}</div>
+          <div class="ttitle">${h.step} ${h.status ? "→ " + h.status : ""}</div>
+          ${h.note ? `<div class="tbody3">${h.note}</div>` : ""}
+        </div>
+      </div>`;
+    }).join("")
   }</div>`;
 }
-function calcStepScore(step) {
-  const e=d.evals[step]; if(!e||!e.ivs||!e.ivs.length) return null;
-  return (e.ivs.reduce((a,iv)=>a+iv.overall,0)/e.ivs.length).toFixed(1);
-}
-function calcCritAvg(step) {
-  const e=d.evals[step]; if(!e||!e.ivs||!e.ivs.length) return {};
-  const m={};
-  e.ivs.forEach(iv=>Object.entries(iv.crit).forEach(([k,v])=>{if(!m[k])m[k]={s:0,n:0};m[k].s+=v;m[k].n++;}));
-  const out={};Object.entries(m).forEach(([k,{s,n}])=>out[k]=(s/n).toFixed(1));return out;
-}
+
+// ===== 評価（メモリ管理） =====
 function renderEval() {
-  G("dpane-eval").innerHTML=STEPS.map((s,si)=>{
-    if(!d.evals[s]) d.evals[s]={ivs:[],adminComment:""};
-    const e=d.evals[s], isOpen=openAccs.has(s), score=calcStepScore(s);
+  G("dpane-eval").innerHTML = STEPS.map((s, si) => {
+    if (!evalData[s]) evalData[s] = {ivs: [], adminComment: ""};
+    const e = evalData[s];
+    const isOpen = openAccs.has(s);
+    const score  = e.ivs.length
+      ? (e.ivs.reduce((a, iv) => a + iv.overall, 0) / e.ivs.length).toFixed(1)
+      : null;
     return `<div class="acc" id="acc-${si}">
       <div class="acc-hd" id="acchd-${si}">
         <span class="stepb ${STEP_CLS[s]||""}">${s}</span>
-        <span style="font-size:11px;color:var(--text3);margin-left:4px">${score?"avg "+score:"未評価"}</span>
+        <span style="font-size:11px;color:var(--text3);margin-left:4px">${score ? "avg " + score : "未評価"}</span>
         <span style="flex:1"></span>
         <span style="font-size:11px;color:var(--text3)">${e.ivs.length}名</span>
         <span class="acc-chev${isOpen?" open":""}" id="chev-${si}">▼</span>
       </div>
       <div class="acc-bd" id="accbd-${si}" style="display:${isOpen?"block":"none"}">
-        ${renderAccBody(s,si)}
+        ${renderAccBody(s, si)}
       </div>
     </div>`;
   }).join("");
-  STEPS.forEach((s,si)=>{
-    G("acchd-"+si).addEventListener("click",()=>{
-      const bd=G("accbd-"+si),chev=G("chev-"+si);
-      if(bd.style.display==="block"){bd.style.display="none";chev.classList.remove("open");openAccs.delete(s);}
-      else{bd.style.display="block";chev.classList.add("open");openAccs.add(s);}
+  STEPS.forEach((s, si) => {
+    G("acchd-" + si).addEventListener("click", () => {
+      const bd = G("accbd-" + si), chev = G("chev-" + si);
+      if (bd.style.display === "block") { bd.style.display = "none"; chev.classList.remove("open"); openAccs.delete(s); }
+      else { bd.style.display = "block"; chev.classList.add("open"); openAccs.add(s); }
     });
-    wireAccEvents(s,si);
+    wireAccEvents(s, si);
   });
 }
-function renderAccBody(s,si) {
-  if(!d.evals[s]) d.evals[s]={ivs:[],adminComment:""};
-  const e=d.evals[s], avg=calcCritAvg(s);
-  const bars=Object.keys(avg).length?`<div style="margin-bottom:10px">${Object.entries(avg).map(([k,v])=>`<div class="sbar2"><div class="sbar2-hd"><span>${k}</span><span>${v}</span></div><div class="sbar2-tr"><div class="sbar2-fl" style="width:${parseFloat(v)/5*100}%"></div></div></div>`).join("")}</div>`:"";
-  const ivHtml=e.ivs.length?e.ivs.map((iv,ii)=>renderIVCard(s,si,iv,ii)).join(""):
-    `<div style="font-size:12px;color:var(--text3);margin-bottom:8px">評価がありません</div>`;
-  return `${bars}
-  <div class="asrow">
+
+function renderAccBody(s, si) {
+  const e = evalData[s] || {ivs:[], adminComment:""};
+  const ivHtml = e.ivs.length
+    ? e.ivs.map((iv, ii) => renderIVCard(s, si, iv, ii)).join("")
+    : `<div style="font-size:12px;color:var(--text3);margin-bottom:8px">評価がありません</div>`;
+  return `<div class="asrow">
     <span style="font-size:12px;color:var(--text2);white-space:nowrap">面接官を追加</span>
     <select class="asel" id="asel-${si}">
       <option value="">選択してください</option>
-      ${AVAIL_IV.map(n=>`<option value="${n}">${n}</option>`).join("")}
+      ${AVAIL_IV.map(n => `<option value="${n}">${n}</option>`).join("")}
     </select>
     <button class="btn sm pri" id="assign-${si}">追加</button>
   </div>
@@ -502,22 +590,27 @@ function renderAccBody(s,si) {
     <div class="rbtns"><button class="btn sm pri" id="adcmtsave-${si}">保存</button></div>
   </div>`;
 }
-function renderIVCard(s,si,iv,ii) {
-  const ov=iv.overall||0;
-  const stars=Array.from({length:5},(_,i)=>`<span class="osi${i<ov?" on":""}" id="osi-${s}-${ii}-${i+1}">★</span>`).join("");
-  const crits=Object.entries(iv.crit).map(([k,v])=>{
-    const v2=v||0;
-    const cs=Array.from({length:5},(_,i)=>`<span class="csi${i<v2?" on":""}" id="csi-${s}-${ii}-${k}-${i+1}">★</span>`).join("");
+
+function renderIVCard(s, si, iv, ii) {
+  const ov = iv.overall || 0;
+  const stars = Array.from({length:5}, (_, i) =>
+    `<span class="osi${i < ov ? " on" : ""}" id="osi-${s}-${ii}-${i+1}">★</span>`
+  ).join("");
+  const crits = Object.entries(iv.crit || {}).map(([k, v]) => {
+    const v2 = v || 0;
+    const cs = Array.from({length:5}, (_, i) =>
+      `<span class="csi${i < v2 ? " on" : ""}" id="csi-${s}-${ii}-${k}-${i+1}">★</span>`
+    ).join("");
     return `<div class="citem"><div class="clabel">${k}</div><div class="cstars">${cs}</div></div>`;
   }).join("");
   return `<div class="ecard">
     <div class="ehd">
-      <div class="iav">${iv.ini}</div>
-      <div><div class="iname">${iv.name}<span class="ebadge">編集可</span></div><div class="irole">${iv.role}</div></div>
-      <div class="idate">${iv.date}</div>
+      <div class="iav">${iv.ini||iv.name.slice(0,1)}</div>
+      <div><div class="iname">${iv.name}<span class="ebadge">編集可</span></div><div class="irole">${iv.role||""}</div></div>
+      <div class="idate">${iv.date||""}</div>
     </div>
-    <div class="starrow">${stars}<span style="font-size:12px;font-weight:500;margin-left:5px" id="oscore-${s}-${ii}">${ov}.0</span></div>
-    <div class="cgrid">${crits}</div>
+    <div class="starrow">${stars}<span style="font-size:12px;font-weight:500;margin-left:5px">${ov}.0</span></div>
+    ${crits ? `<div class="cgrid">${crits}</div>` : ""}
     <textarea class="cmtta" id="cmt-${s}-${ii}">${iv.comment||""}</textarea>
     <div class="rbtns">
       <button class="btn sm pri" id="cmtsave-${s}-${ii}">保存</button>
@@ -525,124 +618,234 @@ function renderIVCard(s,si,iv,ii) {
     </div>
   </div>`;
 }
-function wireAccEvents(s,si) {
-  const assignBtn=G("assign-"+si);
-  if(assignBtn) assignBtn.addEventListener("click",()=>assignIV(s,si));
-  const adBtn=G("adcmtsave-"+si);
-  if(adBtn) adBtn.addEventListener("click",()=>{const el=G("adcmt-"+si);if(el)d.evals[s].adminComment=el.value;showToast("保存しました");});
-  if(!d.evals[s]) return;
-  d.evals[s].ivs.forEach((iv,ii)=>{
-    for(let v=1;v<=5;v++){const el=G(`osi-${s}-${ii}-${v}`);if(el)el.addEventListener("click",()=>{d.evals[s].ivs[ii].overall=v;refreshAcc(s,si);});}
-    Object.keys(iv.crit).forEach(k=>{for(let v=1;v<=5;v++){const el=G(`csi-${s}-${ii}-${k}-${v}`);if(el)el.addEventListener("click",()=>{d.evals[s].ivs[ii].crit[k]=v;refreshAcc(s,si);});}});
-    const csave=G(`cmtsave-${s}-${ii}`);if(csave)csave.addEventListener("click",()=>{const el=G(`cmt-${s}-${ii}`);if(el)d.evals[s].ivs[ii].comment=el.value;showToast("保存しました");});
-    const del=G(`ivdel-${s}-${si}-${ii}`);if(del)del.addEventListener("click",()=>{d.evals[s].ivs.splice(ii,1);showToast("削除しました");refreshAcc(s,si);});
+
+function wireAccEvents(s, si) {
+  const assignBtn = G("assign-" + si);
+  if (assignBtn) assignBtn.addEventListener("click", () => assignIV(s, si));
+  const adBtn = G("adcmtsave-" + si);
+  if (adBtn) adBtn.addEventListener("click", () => {
+    const el = G("adcmt-" + si);
+    if (el) evalData[s].adminComment = el.value;
+    showToast("管理者コメントを保存しました");
   });
-}
-function assignIV(s,si) {
-  const sel=G("asel-"+si),full=sel.value;if(!full){showToast("面接官を選択してください");return;}
-  const name=full.split("（")[0],role=(full.match(/（(.+?)）/)||[])[1]||"";
-  if(!d.evals[s]) d.evals[s]={ivs:[],adminComment:""};
-  if(d.evals[s].ivs.find(iv=>iv.name===name)){showToast("すでにアサイン済みです");return;}
-  d.evals[s].ivs.push({name,ini:name.slice(0,1),role,date:new Date().toISOString().slice(0,10),overall:0,crit:{技術力:0,コミュ力:0,カルチャー:0},comment:""});
-  sel.value=""; showToast(name+" をアサインしました"); refreshAcc(s,si);
-}
-function refreshAcc(s,si) {
-  const bd=G("accbd-"+si);if(!bd)return;
-  if(!d.evals[s]) d.evals[s]={ivs:[],adminComment:""};
-  const e=d.evals[s],avg=calcCritAvg(s);
-  const bars=Object.keys(avg).length?`<div style="margin-bottom:10px">${Object.entries(avg).map(([k,v])=>`<div class="sbar2"><div class="sbar2-hd"><span>${k}</span><span>${v}</span></div><div class="sbar2-tr"><div class="sbar2-fl" style="width:${parseFloat(v)/5*100}%"></div></div></div>`).join("")}</div>`:"";
-  const ivHtml=e.ivs.length?e.ivs.map((iv,ii)=>renderIVCard(s,si,iv,ii)).join(""):
-    `<div style="font-size:12px;color:var(--text3);margin-bottom:8px">評価がありません</div>`;
-  bd.innerHTML=`${bars}<div class="asrow"><span style="font-size:12px;color:var(--text2);white-space:nowrap">面接官を追加</span><select class="asel" id="asel-${si}"><option value="">選択してください</option>${AVAIL_IV.map(n=>`<option value="${n}">${n}</option>`).join("")}</select><button class="btn sm pri" id="assign-${si}">追加</button></div><div id="ivlist-${si}">${ivHtml}</div><div class="asect"><div class="asect-lbl">管理者コメント</div><textarea class="cmtta" id="adcmt-${si}">${e.adminComment||""}</textarea><div class="rbtns"><button class="btn sm pri" id="adcmtsave-${si}">保存</button></div></div>`;
-  wireAccEvents(s,si);
-  const sc=calcStepScore(s);
-  const hd=document.querySelector(`#acc-${si} .acc-hd span:nth-child(2)`);if(hd)hd.textContent=sc?"avg "+sc:"未評価";
-  const cnt=document.querySelector(`#acc-${si} .acc-hd span:nth-child(4)`);if(cnt)cnt.textContent=e.ivs.length+"名";
-}
-function renderDocs() {
-  G("dpane-docs").innerHTML=d.docs.length?d.docs.map(doc=>`
-    <div class="ditem">
-      <div class="dicon"><svg width="14" height="14" viewBox="0 0 16 16" fill="none"><rect x="2" y="1" width="9" height="13" rx="1" stroke="currentColor" stroke-width="1.2"/><path d="M5 5h5M5 8h5M5 11h3" stroke="currentColor" stroke-width="1" stroke-linecap="round"/></svg></div>
-      <div><div class="dname">${doc.name}</div><div class="dmeta">${doc.type} · ${doc.size} · ${doc.date}</div></div>
-      <button class="ddl" data-name="${doc.name}">DL</button>
-    </div>`).join(""):`<div style="font-size:13px;color:var(--text3)">書類がありません</div>`;
-  G("dpane-docs").querySelectorAll(".ddl").forEach(btn=>btn.addEventListener("click",()=>showToast(btn.dataset.name+"をダウンロードしました")));
-}
-function renderMailsPane() {
-  if(!d.mails.length){G("dpane-mail").innerHTML=`<div style="font-size:13px;color:var(--text3)">メール履歴がありません</div>`;return;}
-  G("dpane-mail").innerHTML=d.mails.map((m,i)=>`
-    <div class="mitem">
-      <div class="mhd" data-mi="${i}">
-        <div class="mdir ${m.dir==="out"?"mo":"mi"}">
-          <svg width="12" height="12" viewBox="0 0 16 16" fill="none">
-            ${m.dir==="out"?'<path d="M3 13L13 3M13 3H7M13 3v6" stroke="#3C3489" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>':'<path d="M13 3L3 13M3 13h6M3 13V7" stroke="#085041" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>'}
-          </svg>
-        </div>
-        <div class="msubj">${m.subj}</div><div class="mdt">${m.date}</div>
-        <div class="mchev" id="mchev-${i}">▼</div>
-      </div>
-      <div class="mbody" id="mbody-${i}">
-        <div class="mmeta">差出人: ${m.from}<br>宛先: ${m.to}</div>
-        <div class="mtext">${m.body}</div>
-      </div>
-    </div>`).join("");
-  G("dpane-mail").querySelectorAll(".mhd[data-mi]").forEach(el=>{
-    el.addEventListener("click",()=>{
-      const b=G("mbody-"+el.dataset.mi),c=G("mchev-"+el.dataset.mi);
-      const open=b.style.display==="block"; b.style.display=open?"none":"block"; c.style.transform=open?"":"rotate(180deg)";
+  (evalData[s]?.ivs || []).forEach((iv, ii) => {
+    for (let v = 1; v <= 5; v++) {
+      const el = G(`osi-${s}-${ii}-${v}`);
+      if (el) el.addEventListener("click", () => { evalData[s].ivs[ii].overall = v; refreshAcc(s, si); });
+    }
+    Object.keys(iv.crit || {}).forEach(k => {
+      for (let v = 1; v <= 5; v++) {
+        const el = G(`csi-${s}-${ii}-${k}-${v}`);
+        if (el) el.addEventListener("click", () => { evalData[s].ivs[ii].crit[k] = v; refreshAcc(s, si); });
+      }
+    });
+    const csave = G(`cmtsave-${s}-${ii}`);
+    if (csave) csave.addEventListener("click", () => {
+      const el = G(`cmt-${s}-${ii}`);
+      if (el) evalData[s].ivs[ii].comment = el.value;
+      showToast("コメントを保存しました");
+    });
+    const del = G(`ivdel-${s}-${si}-${ii}`);
+    if (del) del.addEventListener("click", () => {
+      evalData[s].ivs.splice(ii, 1);
+      showToast("削除しました");
+      refreshAcc(s, si);
     });
   });
 }
-function renderITL() {
-  G("dpane-itl").innerHTML=`
+
+function assignIV(s, si) {
+  const sel = G("asel-" + si), full = sel.value;
+  if (!full) { showToast("面接官を選択してください"); return; }
+  const name = full.split("（")[0];
+  const role = (full.match(/（(.+?)）/) || [])[1] || "";
+  if (!evalData[s]) evalData[s] = {ivs:[], adminComment:""};
+  if (evalData[s].ivs.find(iv => iv.name === name)) { showToast("すでにアサイン済みです"); return; }
+  evalData[s].ivs.push({
+    name, ini: name.slice(0,1), role,
+    date: new Date().toISOString().slice(0,10),
+    overall: 0, crit: {技術力:0, コミュ力:0, カルチャー:0}, comment: ""
+  });
+  sel.value = "";
+  showToast(name + " をアサインしました");
+  refreshAcc(s, si);
+}
+
+function refreshAcc(s, si) {
+  const bd = G("accbd-" + si); if (!bd) return;
+  bd.innerHTML = renderAccBody(s, si);
+  wireAccEvents(s, si);
+  const e = evalData[s] || {ivs:[]};
+  const score = e.ivs.length ? (e.ivs.reduce((a,iv)=>a+iv.overall,0)/e.ivs.length).toFixed(1) : null;
+  const hd = document.querySelector(`#acc-${si} .acc-hd span:nth-child(2)`);
+  if (hd) hd.textContent = score ? "avg " + score : "未評価";
+  const cnt = document.querySelector(`#acc-${si} .acc-hd span:nth-child(4)`);
+  if (cnt) cnt.textContent = e.ivs.length + "名";
+}
+
+// ===== 書類 =====
+function renderDocs(files) {
+  if (!files.length) { G("dpane-docs").innerHTML = `<div class="empty">書類がありません</div>`; return; }
+  G("dpane-docs").innerHTML = files.map(f => `
+    <div class="ditem">
+      <div class="dicon"><svg width="14" height="14" viewBox="0 0 16 16" fill="none"><rect x="2" y="1" width="9" height="13" rx="1" stroke="currentColor" stroke-width="1.2"/><path d="M5 5h5M5 8h5M5 11h3" stroke="currentColor" stroke-width="1" stroke-linecap="round"/></svg></div>
+      <div><div class="dname">${f.name}</div><div class="dmeta">${f.file_type||""} · ${f.size_bytes ? Math.round(f.size_bytes/1024)+"KB" : ""} · ${f.created_at?f.created_at.slice(0,10):""}</div></div>
+      <button class="ddl" data-path="${f.storage_path}" data-name="${f.name}">DL</button>
+    </div>`).join("");
+  G("dpane-docs").querySelectorAll(".ddl").forEach(btn => {
+    btn.addEventListener("click", async () => {
+      const url = await atsApi.getFileUrl(btn.dataset.path);
+      if (url) { const a = document.createElement("a"); a.href = url; a.download = btn.dataset.name; a.click(); }
+      else showToast("ダウンロードURLの取得に失敗しました");
+    });
+  });
+}
+
+// ===== メール履歴 =====
+function renderMailsPane(mails) {
+  if (!mails.length) { G("dpane-mail").innerHTML = `<div class="empty">メール履歴がありません</div>`; return; }
+  G("dpane-mail").innerHTML = mails.map((m, i) => `
+    <div class="mitem">
+      <div class="mhd" data-mi="${i}">
+        <div class="mdir mo">
+          <svg width="12" height="12" viewBox="0 0 16 16" fill="none">
+            <path d="M3 13L13 3M13 3H7M13 3v6" stroke="#3C3489" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </div>
+        <div class="msubj">${m.subject}</div>
+        <div class="mdt">${m.sent_at ? m.sent_at.slice(0,16).replace("T"," ") : ""}</div>
+        <div class="mchev" id="mchev-${i}">▼</div>
+      </div>
+      <div class="mbody" id="mbody-${i}">
+        <div class="mmeta">宛先: ${m.sent_to}<br>送信者: ${m.profiles?.name || ""}</div>
+      </div>
+    </div>`).join("");
+  G("dpane-mail").querySelectorAll(".mhd[data-mi]").forEach(el => {
+    el.addEventListener("click", () => {
+      const b = G("mbody-" + el.dataset.mi), c = G("mchev-" + el.dataset.mi);
+      const open = b.style.display === "block";
+      b.style.display = open ? "none" : "block";
+      c.style.transform = open ? "" : "rotate(180deg)";
+    });
+  });
+}
+
+// ===== 社内連絡 =====
+function renderITL(items) {
+  G("dpane-itl").innerHTML = `
     <div class="itl-compose">
       <textarea class="itl-ta" id="itl-ta" placeholder="社内連絡・申し送り・相談事項を入力..."></textarea>
       <div class="itl-foot">
-        <select class="itl-sel" id="itl-sel"><option value="notify">連絡</option><option value="discuss">相談</option><option value="urgent">至急</option></select>
+        <select class="itl-sel" id="itl-sel">
+          <option value="notify">連絡</option>
+          <option value="discuss">相談</option>
+          <option value="urgent">至急</option>
+        </select>
         <button class="itl-post" id="itl-post">投稿</button>
       </div>
     </div>
-    <div id="itl-posts">${renderITLPosts()}</div>`;
-  G("itl-post").addEventListener("click",()=>{
-    const ta=G("itl-ta"),txt=ta.value.trim();if(!txt){showToast("内容を入力してください");return;}
-    const now=new Date(),ts=now.toISOString().slice(0,10)+" "+now.toTimeString().slice(0,5);
-    d.itl.unshift({who:"管理者",ini:"管",type:G("itl-sel").value,text:txt,time:ts});
-    ta.value=""; G("itl-posts").innerHTML=renderITLPosts(); wireITLDel();
+    <div id="itl-posts">${renderITLPosts(items)}</div>`;
+
+  G("itl-post").addEventListener("click", async () => {
+    const ta  = G("itl-ta"), txt = ta.value.trim();
+    if (!txt) { showToast("内容を入力してください"); return; }
+    await atsApi.postTimeline(curId, G("itl-sel").value, txt);
+    ta.value = "";
+    const updated = await atsApi.getTimeline(curId);
+    G("itl-posts").innerHTML = renderITLPosts(Array.isArray(updated) ? updated : []);
     showToast("投稿しました");
   });
-  wireITLDel();
 }
-function renderITLPosts() {
-  return d.itl.map((p,i)=>`
-    <div class="icard"><div class="icard-hd">
-      <div class="iav2">${p.ini}</div><span class="iwho">${p.who}</span>
-      <span class="itbadge ${ITL_TYPE[p.type]?.cls||"itn"}">${ITL_TYPE[p.type]?.label||p.type}</span>
-      <span class="iwhen">${p.time}</span>
-      <button class="btn sm danger itl-del" data-i="${i}">削除</button>
-    </div><div class="itext">${p.text}</div></div>`).join("")||`<div style="font-size:13px;color:var(--text3)">投稿がありません</div>`;
+
+function renderITLPosts(items) {
+  if (!items.length) return `<div class="empty">投稿がありません</div>`;
+  return items.map(p => `
+    <div class="icard">
+      <div class="icard-hd">
+        <div class="iav2">${(p.user_name||"管").slice(0,1)}</div>
+        <span class="iwho">${p.user_name || "管理者"}</span>
+        <span class="itbadge ${ITL_TYPE[p.type]?.cls||"itn"}">${ITL_TYPE[p.type]?.label||p.type}</span>
+        <span class="iwhen">${p.created_at ? p.created_at.slice(0,16).replace("T"," ") : ""}</span>
+      </div>
+      <div class="itext">${p.text}</div>
+    </div>`).join("");
 }
-function wireITLDel() {
-  document.querySelectorAll(".itl-del").forEach(btn=>btn.addEventListener("click",()=>{
-    d.itl.splice(parseInt(btn.dataset.i),1); G("itl-posts").innerHTML=renderITLPosts(); wireITLDel(); showToast("削除しました");
-  }));
-}
+
+// ===== ステップ更新モーダル =====
 function openStepModal() {
-  selStep2=d.step; selStatus2=d.status; renderStepModal(); openMod("mod-step");
+  selStep2 = d?.step; selStatus2 = d?.status;
+  renderStepModal(); openMod("mod-step");
 }
 function renderStepModal() {
-  G("sm-steps").innerHTML=STEPS.map(s=>`<div class="oitem${selStep2===s?" sel":""}" data-sv="${s}"><input type="radio" ${selStep2===s?"checked":""} readonly/><span class="stepb ${STEP_CLS[s]||""}">${s}</span></div>`).join("");
-  G("sm-statuses").innerHTML=STATUSES.map(s=>`<div class="oitem${selStatus2===s?" sel":""}" data-sv="${s}"><input type="radio" ${selStatus2===s?"checked":""} readonly/><span class="badge ${ST_CLS[s]||""}">${s}</span></div>`).join("");
-  G("sm-steps").querySelectorAll(".oitem").forEach(el=>el.addEventListener("click",()=>{selStep2=el.dataset.sv;renderStepModal();}));
-  G("sm-statuses").querySelectorAll(".oitem").forEach(el=>el.addEventListener("click",()=>{selStatus2=el.dataset.sv;renderStepModal();}));
-}
-function openMailModal() { selMailTpl=null; G("mail-search").value=""; renderMailModal(); openMod("mod-mail"); }
-function renderMailModal() {
-  const q=G("mail-search").value.toLowerCase();
-  G("mail-list").innerHTML=MAIL_TPLS.filter(t=>t.name.includes(q)||t.desc.includes(q)).map(t=>
-    `<div class="titem${selMailTpl===t.id?" sel":""}" data-tid="${t.id}"><div class="tn">${t.name}</div><div class="td2">${t.desc}</div></div>`
+  G("sm-steps").innerHTML = STEPS.map(s =>
+    `<div class="oitem${selStep2===s?" sel":""}" data-sv="${s}">
+      <input type="radio" ${selStep2===s?"checked":""} readonly/>
+      <span class="stepb ${STEP_CLS[s]||""}">${s}</span>
+    </div>`
   ).join("");
-  G("mail-list").querySelectorAll(".titem").forEach(el=>el.addEventListener("click",()=>{selMailTpl=el.dataset.tid;renderMailModal();}));
+  G("sm-statuses").innerHTML = STATUSES.map(s =>
+    `<div class="oitem${selStatus2===s?" sel":""}" data-sv="${s}">
+      <input type="radio" ${selStatus2===s?"checked":""} readonly/>
+      <span class="badge ${ST_CLS[s]||""}">${s}</span>
+    </div>`
+  ).join("");
+  G("sm-steps").querySelectorAll(".oitem").forEach(el =>
+    el.addEventListener("click", () => { selStep2 = el.dataset.sv; renderStepModal(); })
+  );
+  G("sm-statuses").querySelectorAll(".oitem").forEach(el =>
+    el.addEventListener("click", () => { selStatus2 = el.dataset.sv; renderStepModal(); })
+  );
 }
+G("sm-cancel").addEventListener("click", () => closeMod("mod-step"));
+G("sm-ok").addEventListener("click", async () => {
+  if (!d) return;
+  const prevStep   = d.step;
+  const prevStatus = d.status;
+  // DBに更新
+  await atsApi.updateApplicant(d.id, {step: selStep2, status: selStatus2});
+  // 変更があった場合は選考履歴に記録
+  if (prevStep !== selStep2 || prevStatus !== selStatus2) {
+    await atsApi.addStepHistory(d.id, selStep2, selStatus2,
+      `${prevStep}(${prevStatus}) → ${selStep2}(${selStatus2})`);
+  }
+  d.step = selStep2; d.status = selStatus2;
+  renderStepFlow();
+  closeMod("mod-step");
+  showToast("ステップ・ステータスを更新しました");
+});
+
+// ===== メール送付モーダル =====
+function openMailModal()  { selMailTpl=null; G("mail-search").value=""; renderMailModal(); openMod("mod-mail"); }
+function renderMailModal() {
+  const q = G("mail-search").value.toLowerCase();
+  G("mail-list").innerHTML = MAIL_TPLS.filter(t => t.name.includes(q)||(t.subject||"").includes(q)).map(t =>
+    `<div class="titem${selMailTpl===t.id?" sel":""}" data-tid="${t.id}">
+      <div class="tn">${t.name}</div>
+      <div class="td2">${t.subject||""}</div>
+    </div>`
+  ).join("") || `<div style="font-size:13px;color:var(--text3);padding:8px">テンプレートがありません</div>`;
+  G("mail-list").querySelectorAll(".titem").forEach(el =>
+    el.addEventListener("click", () => { selMailTpl=el.dataset.tid; renderMailModal(); })
+  );
+}
+G("mail-cancel").addEventListener("click", () => closeMod("mod-mail"));
+G("mail-ok").addEventListener("click", async () => {
+  if (!selMailTpl) { showToast("テンプレートを選択してください"); return; }
+  const tpl = MAIL_TPLS.find(t => t.id === selMailTpl);
+  if (tpl && d) {
+    await atsApi.logMail(d.id, tpl.id, tpl.subject, d.email || "");
+    showToast(`「${tpl.name}」を送付しました`);
+  }
+  closeMod("mod-mail");
+});
+
+// オーバーレイ背景クリックで閉じる
+document.querySelectorAll(".overlay").forEach(ov =>
+  ov.addEventListener("click", e => { if (e.target === ov) ov.classList.remove("open"); })
+);
+
+// ===== 起動 =====
+init();
 </script>
 </body>
 </html>

@@ -5,7 +5,6 @@
 <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
 <title>ATS Portal - ログイン</title>
 <style>
-
 *{box-sizing:border-box;margin:0;padding:0;}
 body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:#f5f5f3;color:#1a1a18;min-height:100vh;}
 :root{
@@ -83,7 +82,6 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 .titem.sel,.fitem.sel{background:var(--pur-l);border-color:#AFA9EC;}
 .tn,.fn{font-size:13px;font-weight:500;}
 .td2,.fd{font-size:11px;color:var(--text2);margin-top:2px;}
-
 body{display:flex;align-items:center;justify-content:center;min-height:100vh;background:var(--bg2);}
 .lcard{background:var(--bg);border:0.5px solid var(--bdr);border-radius:var(--r-lg);padding:2rem 2.5rem;width:100%;max-width:380px;}
 .logo{display:flex;align-items:center;gap:10px;margin-bottom:2rem;}
@@ -99,6 +97,7 @@ body{display:flex;align-items:center;justify-content:center;min-height:100vh;bac
 .lerr{display:none;font-size:12px;color:#A32D2D;background:var(--red-l);border:0.5px solid #F09595;border-radius:var(--r-md);padding:8px 12px;margin-bottom:1rem;}
 .lbtn{width:100%;height:40px;background:var(--pur);color:#fff;border:none;border-radius:var(--r-md);font-size:14px;font-weight:500;cursor:pointer;}
 .lbtn:hover{background:var(--pur-d);}
+.lbtn:disabled{opacity:0.6;cursor:not-allowed;}
 </style>
 </head>
 <body>
@@ -109,58 +108,62 @@ body{display:flex;align-items:center;justify-content:center;min-height:100vh;bac
   </div>
   <h2>ログイン</h2>
   <p>アカウント情報を入力してください</p>
-  <div id="lerr" class="lerr">ユーザー名またはパスワードが正しくありません</div>
-  <div class="field"><label>ユーザー名</label><input type="text" id="l-user" placeholder="ユーザー名" autocomplete="username"/></div>
+  <div id="lerr" class="lerr">メールアドレスまたはパスワードが正しくありません</div>
+  <div class="field"><label>メールアドレス</label><input type="email" id="l-user" placeholder="admin@ats-test.com" autocomplete="email"/></div>
   <div class="field"><label>パスワード</label><input type="password" id="l-pass" placeholder="••••••••" autocomplete="current-password"/></div>
   <button class="lbtn" id="l-btn">ログイン</button>
 </div>
+
+<!-- lib/api.js を先に読み込む -->
+<script src="lib/api.js"></script>
 <script>
-
-const USERS = { "admin": "demo1234", "hr": "hr2024" };
-const STEPS = ["書類選考","筆記試験","1次面接","2次面接","最終面接","内定"];
-const STEP_CLS = {"書類選考":"step-doc","筆記試験":"step-written","1次面接":"step-1st","2次面接":"step-2nd","最終面接":"step-final","内定":"step-offer"};
-const STATUSES = ["未対応","通過","不合格","保留","辞退"];
-const ST_CLS = {"通過":"st-pass","不合格":"st-fail","保留":"st-hold","未対応":"st-new","辞退":"st-wd"};
-const STEP_ORD = {"書類選考":1,"筆記試験":2,"1次面接":3,"2次面接":4,"最終面接":5,"内定":6};
-const ST_ORD = {"未対応":1,"通過":2,"保留":3,"不合格":4,"辞退":5};
-const ALL_TAGS = ["エンジニア","HR","HOT","KEEP"];
-const TAG_CLS = {"エンジニア":"t-eng","HR":"t-hr","HOT":"t-hot","KEEP":"t-keep"};
-
-const ALL_DATA = [
-  {id:"AP-0001",name:"田中 涼子",gender:"女",age:28,job:"フロントエンドエンジニア",step:"1次面接",status:"通過",date:"2025-04-08",stars:4,tags:["エンジニア","HOT"],
-   basic:[{k:"現年収",f:"cur_sal",v:"450万円"},{k:"希望年収",f:"des_sal",v:"600万円"}],
-   detail:[{k:"生年月日",f:"dob",v:"1997-01-15"},{k:"メール",f:"email",v:"tanaka.r@example.com"},{k:"電話",f:"tel",v:"090-1234-5678"},{k:"住所",f:"addr",v:"東京都渋谷区"},{k:"最終学歴",f:"edu",v:"〇〇大学 工学部"},{k:"現職",f:"job_now",v:"株式会社△△ FEエンジニア"},{k:"経験年数",f:"exp",v:"5年"},{k:"応募日",f:"app_date",v:"2025-04-08"}],
-   memo:"コミュニケーション能力高い。次回最終面接を調整中。",
-   evals:{"書類選考":{adminComment:"書類は申し分なし。",ivs:[{name:"佐藤 花子",ini:"佐",role:"人事リード",date:"2025-04-09",overall:4,crit:{書類品質:4,印象:4,意欲:4},comment:"職務経歴書の記述が具体的で好印象。"}]},"1次面接":{adminComment:"最終面接へ進める。",ivs:[{name:"鈴木 一郎",ini:"鈴",role:"EMgr",date:"2025-04-13",overall:4,crit:{技術力:4,コミュ力:5,カルチャー:3},comment:"技術力は申し分ない。"},{name:"佐藤 花子",ini:"佐",role:"人事リード",date:"2025-04-14",overall:4,crit:{技術力:4,コミュ力:5,カルチャー:3},comment:"入社意欲が高い。"}]}},
-   history:[{c:"tg",date:"2025-04-08",title:"応募受付",body:"フロントエンドエンジニア職に応募。"},{c:"tg",date:"2025-04-09",title:"書類選考 通過",body:"書類審査通過。"},{c:"tp",date:"2025-04-12",title:"1次面接 実施",body:"オンライン60分。鈴木・佐藤が担当。"},{c:"ta",date:"2025-04-15",title:"最終面接 調整中",body:"日程調整メール送付済み。"}],
-   mails:[{dir:"out",subj:"【書類選考通過のご連絡】",from:"佐藤花子 <hr@co.jp>",to:"田中涼子 <tanaka.r@example.com>",date:"2025-04-09 14:32",body:"田中 涼子 様\n\n書類選考の結果、次の選考にお進みいただけることとなりました。\n\n採用担当 佐藤花子"},{dir:"in",subj:"Re: 【書類選考通過のご連絡】",from:"田中涼子 <tanaka.r@example.com>",to:"佐藤花子 <hr@co.jp>",date:"2025-04-09 18:15",body:"佐藤様\n\n4月12日 13:00にてよろしくお願いいたします。\n\n田中 涼子"}],
-   docs:[{name:"履歴書.pdf",type:"PDF",date:"2025-04-08",size:"1.2MB"},{name:"職務経歴書.pdf",type:"PDF",date:"2025-04-08",size:"0.8MB"},{name:"ポートフォリオ.zip",type:"ZIP",date:"2025-04-09",size:"12.4MB"}],
-   itl:[{who:"佐藤 花子",ini:"佐",type:"discuss",text:"1次面接の総評：全員通過票。最終面接の日程調整をお願いします。",time:"2025-04-14 15:20"}]},
-  {id:"AP-0002",name:"山本 健二",gender:"男",age:35,job:"バックエンドエンジニア",step:"書類選考",status:"保留",date:"2025-04-10",stars:3,tags:["エンジニア"],basic:[{k:"現年収",f:"cur_sal",v:"550万円"},{k:"希望年収",f:"des_sal",v:"700万円"}],detail:[{k:"生年月日",f:"dob",v:"1990-03-22"},{k:"メール",f:"email",v:"yamamoto.k@example.com"},{k:"電話",f:"tel",v:"080-2345-6789"},{k:"住所",f:"addr",v:"神奈川県横浜市"},{k:"最終学歴",f:"edu",v:"△△大学 情報学部"},{k:"現職",f:"job_now",v:"株式会社□□ バックエンドEng"},{k:"経験年数",f:"exp",v:"10年"},{k:"応募日",f:"app_date",v:"2025-04-10"}],memo:"経験豊富だが年収要望が高め。",evals:{},history:[{c:"tg",date:"2025-04-10",title:"応募受付",body:"バックエンドエンジニア職に応募。"}],mails:[],docs:[{name:"履歴書.pdf",type:"PDF",date:"2025-04-10",size:"0.9MB"}],itl:[]},
-  {id:"AP-0003",name:"佐々木 美咲",gender:"女",age:31,job:"人事マネージャー",step:"内定",status:"通過",date:"2025-03-28",stars:5,tags:["HR","HOT"],basic:[{k:"現年収",f:"cur_sal",v:"480万円"},{k:"希望年収",f:"des_sal",v:"550万円"}],detail:[{k:"生年月日",f:"dob",v:"1994-07-05"},{k:"メール",f:"email",v:"sasaki.m@example.com"},{k:"電話",f:"tel",v:"070-3456-7890"},{k:"住所",f:"addr",v:"東京都港区"},{k:"最終学歴",f:"edu",v:"○○大学 経営学部"},{k:"現職",f:"job_now",v:"株式会社★★ 人事"},{k:"経験年数",f:"exp",v:"7年"},{k:"応募日",f:"app_date",v:"2025-03-28"}],memo:"即戦力。入社日調整中。",evals:{},history:[{c:"tg",date:"2025-03-28",title:"応募受付",body:""},{c:"tg",date:"2025-04-01",title:"書類選考 通過",body:""},{c:"tp",date:"2025-04-10",title:"内定通知",body:"内定通知書送付済み。"}],mails:[],docs:[{name:"履歴書.pdf",type:"PDF",date:"2025-03-28",size:"1.0MB"}],itl:[]},
-  {id:"AP-0004",name:"中村 大輔",gender:"男",age:26,job:"フロントエンドエンジニア",step:"書類選考",status:"未対応",date:"2025-04-12",stars:0,tags:[],basic:[{k:"現年収",f:"cur_sal",v:"320万円"},{k:"希望年収",f:"des_sal",v:"420万円"}],detail:[{k:"生年月日",f:"dob",v:"1999-11-30"},{k:"メール",f:"email",v:"nakamura.d@example.com"},{k:"電話",f:"tel",v:"090-4567-8901"},{k:"住所",f:"addr",v:"大阪府大阪市"},{k:"最終学歴",f:"edu",v:"□□工業大学 情報工学部"},{k:"現職",f:"job_now",v:"フリーランス"},{k:"経験年数",f:"exp",v:"2年"},{k:"応募日",f:"app_date",v:"2025-04-12"}],memo:"",evals:{},history:[{c:"tg",date:"2025-04-12",title:"応募受付",body:""}],mails:[],docs:[{name:"履歴書.pdf",type:"PDF",date:"2025-04-12",size:"0.7MB"}],itl:[]},
-  {id:"AP-0005",name:"小林 彩",gender:"女",age:29,job:"プロダクトマネージャー",step:"最終面接",status:"通過",date:"2025-03-15",stars:5,tags:["KEEP"],basic:[{k:"現年収",f:"cur_sal",v:"520万円"},{k:"希望年収",f:"des_sal",v:"650万円"}],detail:[{k:"生年月日",f:"dob",v:"1996-04-18"},{k:"メール",f:"email",v:"kobayashi.a@example.com"},{k:"電話",f:"tel",v:"080-5678-9012"},{k:"住所",f:"addr",v:"東京都新宿区"},{k:"最終学歴",f:"edu",v:"△△大学 経済学部"},{k:"現職",f:"job_now",v:"株式会社◎◎ PM"},{k:"経験年数",f:"exp",v:"5年"},{k:"応募日",f:"app_date",v:"2025-03-15"}],memo:"",evals:{},history:[{c:"tg",date:"2025-03-15",title:"応募受付",body:""},{c:"tg",date:"2025-03-20",title:"書類選考 通過",body:""},{c:"tp",date:"2025-04-02",title:"最終面接 実施",body:""}],mails:[],docs:[],itl:[]},
-  {id:"AP-0006",name:"伊藤 拓也",gender:"男",age:42,job:"バックエンドエンジニア",step:"2次面接",status:"不合格",date:"2025-04-01",stars:2,tags:[],basic:[{k:"現年収",f:"cur_sal",v:"700万円"},{k:"希望年収",f:"des_sal",v:"800万円"}],detail:[{k:"生年月日",f:"dob",v:"1983-08-14"},{k:"メール",f:"email",v:"ito.t@example.com"},{k:"電話",f:"tel",v:"070-6789-0123"},{k:"住所",f:"addr",v:"埼玉県さいたま市"},{k:"最終学歴",f:"edu",v:"○○大学 理工学部"},{k:"現職",f:"job_now",v:"株式会社▲▲ シニアEng"},{k:"経験年数",f:"exp",v:"17年"},{k:"応募日",f:"app_date",v:"2025-04-01"}],memo:"カルチャーフィット懸念。",evals:{},history:[{c:"tg",date:"2025-04-01",title:"応募受付",body:""},{c:"tr2",date:"2025-04-10",title:"2次面接 不合格",body:""}],mails:[],docs:[],itl:[]},
-  {id:"AP-0007",name:"渡辺 さくら",gender:"女",age:24,job:"人事マネージャー",step:"書類選考",status:"通過",date:"2025-04-11",stars:3,tags:["HR"],basic:[{k:"現年収",f:"cur_sal",v:"300万円"},{k:"希望年収",f:"des_sal",v:"380万円"}],detail:[{k:"生年月日",f:"dob",v:"2001-02-28"},{k:"メール",f:"email",v:"watanabe.s@example.com"},{k:"電話",f:"tel",v:"090-7890-1234"},{k:"住所",f:"addr",v:"東京都世田谷区"},{k:"最終学歴",f:"edu",v:"□□大学 文学部"},{k:"現職",f:"job_now",v:"株式会社●● 人事補佐"},{k:"経験年数",f:"exp",v:"2年"},{k:"応募日",f:"app_date",v:"2025-04-11"}],memo:"",evals:{},history:[{c:"tg",date:"2025-04-11",title:"応募受付",body:""}],mails:[],docs:[],itl:[]},
-  {id:"AP-0008",name:"加藤 誠",gender:"男",age:38,job:"プロダクトマネージャー",step:"2次面接",status:"保留",date:"2025-04-07",stars:4,tags:["HOT","KEEP"],basic:[{k:"現年収",f:"cur_sal",v:"600万円"},{k:"希望年収",f:"des_sal",v:"720万円"}],detail:[{k:"生年月日",f:"dob",v:"1987-06-10"},{k:"メール",f:"email",v:"kato.m@example.com"},{k:"電話",f:"tel",v:"080-8901-2345"},{k:"住所",f:"addr",v:"東京都品川区"},{k:"最終学歴",f:"edu",v:"△△大学 工学部"},{k:"現職",f:"job_now",v:"株式会社■■ PM"},{k:"経験年数",f:"exp",v:"12年"},{k:"応募日",f:"app_date",v:"2025-04-07"}],memo:"",evals:{},history:[{c:"tg",date:"2025-04-07",title:"応募受付",body:""}],mails:[],docs:[],itl:[]}
-];
-
-// Already logged in → skip login
-if (sessionStorage.getItem("ats_user")) {
+// すでにログイン済みなら一覧へ飛ばす
+if (getToken()) {
   window.location.href = "list.html";
 }
+
 document.getElementById("l-btn").addEventListener("click", doLogin);
-document.getElementById("l-pass").addEventListener("keydown", e => { if (e.key === "Enter") doLogin(); });
-function doLogin() {
-  const u = document.getElementById("l-user").value.trim();
-  const p = document.getElementById("l-pass").value;
-  if (USERS[u] && USERS[u] === p) {
-    sessionStorage.setItem("ats_user", u);
-    window.location.href = "list.html";
-  } else {
-    document.getElementById("lerr").style.display = "block";
-    document.getElementById("l-pass").value = "";
-    document.getElementById("l-pass").focus();
+document.getElementById("l-pass").addEventListener("keydown", function(e) {
+  if (e.key === "Enter") doLogin();
+});
+
+async function doLogin() {
+  const email    = document.getElementById("l-user").value.trim();
+  const password = document.getElementById("l-pass").value;
+  const btn      = document.getElementById("l-btn");
+  const errEl    = document.getElementById("lerr");
+
+  // 入力チェック
+  if (!email || !password) {
+    errEl.textContent = "メールアドレスとパスワードを入力してください";
+    errEl.style.display = "block";
+    return;
+  }
+
+  // ボタンをローディング状態に
+  btn.disabled = true;
+  btn.textContent = "ログイン中...";
+  errEl.style.display = "none";
+
+  try {
+    const result = await atsApi.login(email, password);
+
+    if (result.success) {
+      // ログイン成功 → 一覧ページへ
+      window.location.href = "list.html";
+    } else {
+      // ログイン失敗
+      errEl.textContent = result.error || "メールアドレスまたはパスワードが正しくありません";
+      errEl.style.display = "block";
+      document.getElementById("l-pass").value = "";
+      document.getElementById("l-pass").focus();
+    }
+  } catch (e) {
+    errEl.textContent = "通信エラーが発生しました。しばらくしてから再試行してください。";
+    errEl.style.display = "block";
+  } finally {
+    btn.disabled = false;
+    btn.textContent = "ログイン";
   }
 }
 </script>

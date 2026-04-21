@@ -89,6 +89,20 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 .iinput{font-size:12px;width:100%;border:0.5px solid var(--bdr2);border-radius:4px;padding:2px 6px;background:var(--bg);color:var(--text);outline:none;}
 .iinput:focus{border-color:var(--pur);}
 .dtog{font-size:11px;color:var(--pur);cursor:pointer;margin-top:6px;display:block;}
+/* TAG SECTION */
+.tag-section{border-top:0.5px solid var(--bdr);padding-top:8px;margin-top:8px;}
+.tag-section-lbl{font-size:11px;color:var(--text2);margin-bottom:6px;display:flex;align-items:center;justify-content:space-between;}
+.tag-area{display:flex;flex-wrap:wrap;gap:4px;min-height:24px;align-items:center;}
+.tag-badge{display:inline-flex;align-items:center;gap:3px;font-size:11px;padding:2px 7px;border-radius:99px;}
+.tag-badge .tag-x{cursor:pointer;font-size:10px;opacity:0.7;margin-left:1px;}
+.tag-badge .tag-x:hover{opacity:1;}
+.tag-add-btn{font-size:11px;color:var(--pur);cursor:pointer;background:none;border:0.5px dashed var(--pur);border-radius:99px;padding:2px 8px;white-space:nowrap;}
+.tag-add-btn:hover{background:var(--pur-l);}
+.tag-picker{display:none;flex-wrap:wrap;gap:6px;margin-top:6px;padding:8px;background:var(--bg2);border-radius:var(--r-md);border:0.5px solid var(--bdr);}
+.tag-picker.open{display:flex;}
+.tpopt{font-size:12px;padding:4px 12px;border-radius:99px;border:0.5px solid var(--bdr2);background:var(--bg);color:var(--text2);cursor:pointer;}
+.tpopt:hover{background:var(--bg2);}
+.tpopt.active{background:var(--pur);color:#fff;border-color:var(--pur);}
 /* STEP FLOW */
 .sflow{display:flex;flex-direction:column;gap:4px;}
 .snode{display:flex;align-items:center;gap:6px;padding:5px 8px;border-radius:var(--r-md);border:0.5px solid var(--bdr);font-size:11px;}
@@ -232,6 +246,14 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
         <button class="btn sm" id="info-edit-btn">編集</button>
         <button class="btn sm pri" id="info-save-btn" style="display:none">保存</button>
       </div>
+      <div class="tag-section">
+        <div class="tag-section-lbl">
+          <span>タグ</span>
+          <button class="tag-add-btn" id="tag-add-btn">＋ タグを追加</button>
+        </div>
+        <div class="tag-area" id="tag-area"></div>
+        <div class="tag-picker" id="tag-picker"></div>
+      </div>
       <div class="memo-wrap">
         <div class="memo-lbl">メモ</div>
         <textarea class="mta" id="d-memo"></textarea>
@@ -333,6 +355,8 @@ const closeMod = id => G(id).classList.remove("open");
 
 // ===== 状態 =====
 let d = null;          // 応募者データ
+let APPLICANT_TAGS = [];  // 応募者に付与済みのタグ [{tag_id, tags:{id,name,color}}]
+let ALL_TAGS_DB = [];     // 全タグマスタ [{id,name,color}]
 let MAIL_TPLS = [];
 let showDet   = false;
 let editingInfo = false;
@@ -345,13 +369,15 @@ let evalData  = {};
 // ===== 初期化 =====
 async function init() {
   try {
-    const [applicant, templates, history, timeline, files, mailHistory] = await Promise.all([
+    const [applicant, templates, history, timeline, files, mailHistory, appTags, allTags] = await Promise.all([
       atsApi.getApplicant(curId),
       atsApi.getMailTemplates(),
       atsApi.getStepHistory(curId),
       atsApi.getTimeline(curId),
       atsApi.getFiles(curId),
-      atsApi.getMailHistory(curId)
+      atsApi.getMailHistory(curId),
+      atsApi.getApplicantTags(curId),
+      atsApi.getTags()
     ]);
 
     if (!applicant) {
@@ -360,6 +386,8 @@ async function init() {
     }
 
     d = applicant;
+    APPLICANT_TAGS = Array.isArray(appTags) ? appTags : [];
+    ALL_TAGS_DB    = Array.isArray(allTags) ? allTags : [];
     MAIL_TPLS = Array.isArray(templates) ? templates : [];
     selStep2   = d.step;
     selStatus2 = d.status;
@@ -370,6 +398,7 @@ async function init() {
     G("d-memo").value       = d.memo || "";
 
     renderBasicInfo();
+    renderTags();
     renderStepFlow();
     renderHistory(Array.isArray(history) ? history : []);
     renderEval();
@@ -461,6 +490,80 @@ G("info-save-btn").addEventListener("click", async () => {
 });
 
 // ===== 基本情報描画 =====
+// ===== タグ =====
+const TAG_COLOR_MAP = {
+  "エンジニア": {bg:"var(--pur-l)", color:"var(--pur-d)"},
+  "HR":         {bg:"var(--grn-l)", color:"var(--grn)"},
+  "HOT":        {bg:"#FAECE7",      color:"#712B13"},
+  "KEEP":       {bg:"var(--amb-l)", color:"var(--amb)"},
+};
+
+function getTagStyle(name) {
+  const c = TAG_COLOR_MAP[name];
+  return c ? `background:${c.bg};color:${c.color}` : "background:var(--pur-l);color:var(--pur-d)";
+}
+
+function renderTags() {
+  const area = G("tag-area");
+  const picker = G("tag-picker");
+  if (!area) return;
+
+  // 付与済みタグを表示
+  const assignedIds = APPLICANT_TAGS.map(t => t.tag_id);
+  area.innerHTML = APPLICANT_TAGS.map(t => {
+    const name = t.tags?.name || "";
+    const style = getTagStyle(name);
+    return `<span class="tag-badge" style="${style}" data-tid="${t.tag_id}">
+      ${name}<span class="tag-x" data-tid="${t.tag_id}">✕</span>
+    </span>`;
+  }).join("") || `<span style="font-size:11px;color:var(--text3)">なし</span>`;
+
+  // タグ削除イベント
+  area.querySelectorAll(".tag-x").forEach(el => {
+    el.addEventListener("click", async (e) => {
+      e.stopPropagation();
+      const tid = el.dataset.tid;
+      await atsApi.removeTag(curId, tid);
+      APPLICANT_TAGS = APPLICANT_TAGS.filter(t => t.tag_id !== tid);
+      renderTags();
+      showToast("タグを削除しました");
+    });
+  });
+
+  // タグピッカー（未付与のタグのみ表示）
+  const unassigned = ALL_TAGS_DB.filter(t => !assignedIds.includes(t.id));
+  if (unassigned.length === 0) {
+    picker.innerHTML = `<span style="font-size:12px;color:var(--text3)">追加できるタグがありません</span>`;
+  } else {
+    picker.innerHTML = unassigned.map(t =>
+      `<span class="tpopt" data-tid="${t.id}" data-name="${t.name}">${t.name}</span>`
+    ).join("");
+    picker.querySelectorAll(".tpopt").forEach(el => {
+      el.addEventListener("click", async () => {
+        await atsApi.addTag(curId, el.dataset.tid);
+        // 付与済みリストに追加
+        const tag = ALL_TAGS_DB.find(t => t.id === el.dataset.tid);
+        if (tag) APPLICANT_TAGS.push({tag_id: tag.id, tags: tag});
+        picker.classList.remove("open");
+        renderTags();
+        showToast(`「${el.dataset.name}」を付与しました`);
+      });
+    });
+  }
+}
+
+// タグ追加ボタン
+document.addEventListener("click", e => {
+  const btn = G("tag-add-btn");
+  const picker = G("tag-picker");
+  if (!btn || !picker) return;
+  if (e.target === btn || btn.contains(e.target)) {
+    picker.classList.toggle("open");
+  } else if (!picker.contains(e.target)) {
+    picker.classList.remove("open");
+  }
+});
+
 function renderBasicInfo() {
   if (!d) return;
   const rows = [

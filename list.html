@@ -29,6 +29,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 .btn.sm{height:28px;font-size:12px;padding:0 10px;}
 .btn.danger{color:#A32D2D;border-color:#F09595;}
 .btn.danger:hover{background:var(--red-l);}
+.btn:disabled{opacity:0.5;cursor:not-allowed;}
 .badge{display:inline-block;font-size:11px;padding:2px 7px;border-radius:99px;white-space:nowrap;}
 .stepb{display:inline-block;font-size:11px;padding:2px 7px;border-radius:4px;white-space:nowrap;}
 .step-doc{background:var(--blu-l);color:var(--blu);}
@@ -58,10 +59,11 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 .abody{padding:1.25rem;max-width:1200px;margin:0 auto;}
 .toast{display:none;position:fixed;bottom:1.5rem;left:50%;transform:translateX(-50%);background:#2C2C2A;color:#F1EFE8;font-size:12px;padding:9px 18px;border-radius:var(--r-md);white-space:nowrap;z-index:9999;}
 .toast.show{display:block;}
-.overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.4);z-index:200;align-items:flex-start;justify-content:center;padding:40px 16px;}
+.overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.4);z-index:200;align-items:flex-start;justify-content:center;padding:40px 16px;overflow-y:auto;}
 .overlay.open{display:flex;}
 .mbox{background:var(--bg);border:0.5px solid var(--bdr);border-radius:var(--r-lg);padding:1.25rem;width:100%;max-width:440px;max-height:calc(100vh - 80px);overflow-y:auto;}
 .mbox h3{font-size:15px;font-weight:500;margin-bottom:1rem;}
+.mbox-lg{max-width:600px;}
 .mtabs{display:grid;gap:4px;margin-bottom:1rem;}
 .mtab{height:30px;font-size:12px;border:0.5px solid var(--bdr2);border-radius:var(--r-md);background:var(--bg);color:var(--text2);cursor:pointer;padding:0 4px;}
 .mtab.active{background:var(--pur);color:#fff;border-color:var(--pur);}
@@ -82,6 +84,23 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 .titem.sel,.fitem.sel{background:var(--pur-l);border-color:#AFA9EC;}
 .tn,.fn{font-size:13px;font-weight:500;}
 .td2,.fd{font-size:11px;color:var(--text2);margin-top:2px;}
+/* NEW APPLICANT FORM */
+.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+@media(max-width:480px){.form-grid{grid-template-columns:1fr;}}
+.form-grid .span2{grid-column:span 2;}
+@media(max-width:480px){.form-grid .span2{grid-column:span 1;}}
+.fld{display:flex;flex-direction:column;gap:4px;}
+.fld label{font-size:12px;color:var(--text2);font-weight:500;}
+.fld label .req{color:#A32D2D;margin-left:2px;}
+.fld input,.fld select,.fld textarea{height:36px;padding:0 10px;font-size:13px;border:0.5px solid var(--bdr2);border-radius:var(--r-md);background:var(--bg);color:var(--text);outline:none;width:100%;}
+.fld textarea{height:72px;padding:8px 10px;resize:vertical;}
+.fld input:focus,.fld select:focus,.fld textarea:focus{border-color:var(--pur);box-shadow:0 0 0 3px rgba(83,74,183,0.08);}
+.fld input.err,.fld select.err{border-color:#E24B4A;}
+.ferr{font-size:11px;color:#A32D2D;display:none;}
+.ferr.show{display:block;}
+.fsect{font-size:11px;font-weight:600;color:var(--text2);margin:12px 0 8px;padding-bottom:4px;border-bottom:0.5px solid var(--bdr);grid-column:span 2;}
+@media(max-width:480px){.fsect{grid-column:span 1;}}
+/* LIST */
 .list-hdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:1rem;flex-wrap:wrap;gap:8px;}
 .ptitle{font-size:18px;font-weight:500;}
 .metrics{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;margin-bottom:1rem;}
@@ -114,8 +133,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 .twrap{background:var(--bg);border:0.5px solid var(--bdr);border-radius:var(--r-lg);overflow-x:auto;}
 table{width:100%;border-collapse:collapse;font-size:12px;min-width:560px;}
 thead th{background:var(--bg2);padding:8px 10px;text-align:left;font-size:11px;font-weight:500;color:var(--text2);border-bottom:0.5px solid var(--bdr);white-space:nowrap;user-select:none;}
-th.sth{cursor:pointer;}
-th.son{color:var(--pur);}
+th.sth{cursor:pointer;}th.son{color:var(--pur);}
 .si{display:inline-flex;flex-direction:column;gap:1px;vertical-align:middle;margin-left:3px;opacity:0.35;}
 .si svg{width:7px;height:5px;}
 .si.asc svg:first-child,.si.desc svg:last-child{opacity:1;}
@@ -194,37 +212,143 @@ input[type=checkbox]{width:14px;height:14px;cursor:pointer;accent-color:var(--pu
     </table>
   </div>
 </div>
-<!-- MODALS -->
+
+<!-- ===== 新規応募者登録モーダル ===== -->
+<div class="overlay" id="mod-new"><div class="mbox mbox-lg">
+  <h3>新規応募者登録</h3>
+  <div class="form-grid" id="new-form">
+
+    <div class="fsect">基本情報</div>
+
+    <div class="fld span2">
+      <label>氏名 <span class="req">*</span></label>
+      <input type="text" id="nf-name" placeholder="田中 涼子"/>
+      <span class="ferr" id="nf-name-err">氏名は必須です</span>
+    </div>
+
+    <div class="fld">
+      <label>性別 <span class="req">*</span></label>
+      <select id="nf-gender">
+        <option value="">選択してください</option>
+        <option value="男">男性</option>
+        <option value="女">女性</option>
+        <option value="その他">その他</option>
+      </select>
+      <span class="ferr" id="nf-gender-err">性別は必須です</span>
+    </div>
+
+    <div class="fld">
+      <label>生年月日</label>
+      <input type="date" id="nf-dob"/>
+    </div>
+
+    <div class="fld">
+      <label>メールアドレス</label>
+      <input type="email" id="nf-email" placeholder="tanaka@example.com"/>
+    </div>
+
+    <div class="fld">
+      <label>電話番号</label>
+      <input type="tel" id="nf-phone" placeholder="090-1234-5678"/>
+    </div>
+
+    <div class="fld span2">
+      <label>住所</label>
+      <input type="text" id="nf-address" placeholder="東京都渋谷区"/>
+    </div>
+
+    <div class="fsect">職歴・スキル</div>
+
+    <div class="fld span2">
+      <label>応募求人 <span class="req">*</span></label>
+      <select id="nf-job">
+        <option value="">選択してください</option>
+      </select>
+      <span class="ferr" id="nf-job-err">応募求人は必須です</span>
+    </div>
+
+    <div class="fld">
+      <label>最終学歴</label>
+      <input type="text" id="nf-edu" placeholder="〇〇大学 工学部"/>
+    </div>
+
+    <div class="fld">
+      <label>現職・直近の職歴</label>
+      <input type="text" id="nf-job-now" placeholder="株式会社△△ エンジニア"/>
+    </div>
+
+    <div class="fld">
+      <label>経験年数</label>
+      <input type="number" id="nf-exp" placeholder="5" min="0" max="50"/>
+    </div>
+
+    <div class="fld">
+      <label>応募日</label>
+      <input type="date" id="nf-applied"/>
+    </div>
+
+    <div class="fsect">年収情報</div>
+
+    <div class="fld">
+      <label>現年収（万円）</label>
+      <input type="number" id="nf-cur-sal" placeholder="450" min="0"/>
+    </div>
+
+    <div class="fld">
+      <label>希望年収（万円）</label>
+      <input type="number" id="nf-des-sal" placeholder="600" min="0"/>
+    </div>
+
+    <div class="fsect">備考</div>
+
+    <div class="fld span2">
+      <label>メモ</label>
+      <textarea id="nf-memo" placeholder="特記事項があれば入力してください"></textarea>
+    </div>
+
+  </div>
+  <div class="macts">
+    <button class="btn" id="new-cancel">キャンセル</button>
+    <button class="btn pri" id="new-submit">登録する</button>
+  </div>
+</div></div>
+
+<!-- 一括変更 -->
 <div class="overlay" id="mod-bulk"><div class="mbox">
   <h3>一括変更</h3>
-  <div class="mtabs" id="bulk-mtabs" style="grid-template-columns:repeat(5,1fr)"></div>
+  <div class="mtabs" id="bulk-mtabs" style="grid-template-columns:repeat(4,1fr)"></div>
   <div id="bulk-mbody"></div>
   <div class="macts"><button class="btn" id="bulk-mcancel">キャンセル</button><button class="btn pri" id="bulk-mok">変更する</button></div>
 </div></div>
+
+<!-- メール -->
 <div class="overlay" id="mod-mail"><div class="mbox">
   <h3>メールテンプレート選択</h3>
   <input class="msearch" id="mail-search" placeholder="テンプレートを検索..."/>
   <div id="mail-list"></div>
   <div class="macts"><button class="btn" id="mail-cancel">キャンセル</button><button class="btn pri" id="mail-ok">送付する</button></div>
 </div></div>
+
+<!-- CSV -->
 <div class="overlay" id="mod-csv"><div class="mbox">
   <h3>CSVフォーマット選択</h3>
   <input class="msearch" id="csv-search" placeholder="フォーマットを検索..."/>
   <div id="csv-list"></div>
   <div class="macts"><button class="btn" id="csv-cancel">キャンセル</button><button class="btn pri" id="csv-ok">ダウンロード</button></div>
 </div></div>
+
 <div class="toast" id="toast"></div>
 
 <script src="lib/api.js"></script>
 <script>
 // ===== 定数 =====
-const STEPS = ["書類選考","筆記試験","1次面接","2次面接","最終面接","内定"];
+const STEPS    = ["書類選考","筆記試験","1次面接","2次面接","最終面接","内定"];
 const STEP_CLS = {"書類選考":"step-doc","筆記試験":"step-written","1次面接":"step-1st","2次面接":"step-2nd","最終面接":"step-final","内定":"step-offer"};
 const STATUSES = ["未対応","通過","不合格","保留","辞退"];
-const ST_CLS = {"通過":"st-pass","不合格":"st-fail","保留":"st-hold","未対応":"st-new","辞退":"st-wd"};
+const ST_CLS   = {"通過":"st-pass","不合格":"st-fail","保留":"st-hold","未対応":"st-new","辞退":"st-wd"};
 const STEP_ORD = {"書類選考":1,"筆記試験":2,"1次面接":3,"2次面接":4,"最終面接":5,"内定":6};
 const ALL_TAGS = ["エンジニア","HR","HOT","KEEP"];
-const TAG_CLS = {"エンジニア":"t-eng","HR":"t-hr","HOT":"t-hot","KEEP":"t-keep"};
+const TAG_CLS  = {"エンジニア":"t-eng","HR":"t-hr","HOT":"t-hot","KEEP":"t-keep"};
 const CSV_FORMATS = [
   {id:"basic", name:"基本フォーマット",  cols:"ID,氏名,性別,年齢,応募求人,ステップ,ステータス,応募日"},
   {id:"full",  name:"詳細フォーマット",  cols:"ID,氏名,性別,年齢,応募求人,ステップ,ステータス,応募日,評価"},
@@ -232,12 +356,10 @@ const CSV_FORMATS = [
   {id:"report",name:"レポートフォーマット",cols:"応募求人,ID,氏名,ステップ,ステータス,応募日,評価"}
 ];
 
-// ===== 認証チェック =====
+// ===== 認証 =====
 requireAuth();
 const _user = getCurrentUser();
-if (_user) {
-  document.getElementById("nav-user").textContent = _user.name || _user.email || "";
-}
+if (_user) document.getElementById("nav-user").textContent = _user.name || _user.email || "";
 document.getElementById("logout-btn").addEventListener("click", async () => {
   await atsApi.logout();
   window.location.href = "index.html";
@@ -249,57 +371,56 @@ const showToast = msg => { const t=G("toast"); t.textContent=msg; t.className="t
 const openMod  = id => G(id).classList.add("open");
 const closeMod = id => G(id).classList.remove("open");
 
-let ALL_DATA   = [];   // Supabaseから取得したデータ
-let MAIL_TPLS  = [];   // Supabaseから取得したテンプレート
-let dispData   = [];
-let selected   = new Set();
-let sortKey    = null, sortDir = 1;
+let ALL_DATA  = [];
+let MAIL_TPLS = [];
+let JOBS_LIST = [];
+let dispData  = [];
+let selected  = new Set();
+let sortKey   = null, sortDir = 1;
 let activeTags = new Set();
-let advOpen    = false;
-let bulkTab    = "step", selBulkVal = null, selTagsOp = new Set();
-let selCsvFmt  = null, selMailTpl = null;
+let advOpen   = false;
+let bulkTab   = "step", selBulkVal = null, selTagsOp = new Set();
+let selCsvFmt = null, selMailTpl = null;
 
-// ===== 初期化（Supabaseからデータ取得） =====
+// ===== 初期化 =====
 async function init() {
   try {
-    // 応募者・メールテンプレート・求人を並行取得
-    const [applicants, templates, jobs, tags] = await Promise.all([
+    const [applicants, templates, jobs] = await Promise.all([
       atsApi.getApplicants(),
       atsApi.getMailTemplates(),
-      atsApi.getJobs(),
-      atsApi.getTags()
+      atsApi.getJobs()
     ]);
-
     ALL_DATA  = Array.isArray(applicants) ? applicants : [];
     MAIL_TPLS = Array.isArray(templates)  ? templates  : [];
+    JOBS_LIST = Array.isArray(jobs)       ? jobs       : [];
     dispData  = [...ALL_DATA];
 
-    // タグをDBから取得してALL_TAGSを上書き
-    if (Array.isArray(tags) && tags.length > 0) {
-      // タグは定数のまま使用（DB取得タグと合わせる場合は後で拡張）
-    }
-
-    // 求人フィルターをDBデータで構築
-    const jobSel = G("f-job");
-    (Array.isArray(jobs) ? jobs : []).forEach(j => {
-      const o = document.createElement("option");
-      o.value = j.title; o.textContent = j.title;
-      jobSel.appendChild(o);
+    // 求人フィルター・新規登録フォームに求人セット
+    const jobSel  = G("f-job");
+    const nfJobSel = G("nf-job");
+    JOBS_LIST.forEach(j => {
+      [jobSel, nfJobSel].forEach(sel => {
+        const o = document.createElement("option");
+        o.value = j.id; o.textContent = j.title;
+        sel.appendChild(o);
+      });
     });
+
+    // 本日日付をデフォルトに
+    G("nf-applied").value = new Date().toISOString().slice(0,10);
 
     populateFilters();
     renderTagPills();
     renderMetrics();
     renderTable();
-  } catch (e) {
+  } catch(e) {
     console.error(e);
     G("tbody").innerHTML = `<tr><td colspan="9" class="empty">データの読み込みに失敗しました。再読み込みしてください。</td></tr>`;
   }
 }
 
-// ===== フィルター構築 =====
 function populateFilters() {
-  STEPS.forEach(s => { const o=document.createElement("option"); o.value=s; o.textContent=s; G("f-step").appendChild(o); });
+  STEPS.forEach(s   => { const o=document.createElement("option"); o.value=s; o.textContent=s; G("f-step").appendChild(o); });
   STATUSES.forEach(s => { const o=document.createElement("option"); o.value=s; o.textContent=s; G("f-status").appendChild(o); });
 }
 
@@ -321,34 +442,123 @@ function renderMetrics() {
   const i = ALL_DATA.filter(d => d.step && d.step.includes("面接")).length;
   const p = ALL_DATA.filter(d => d.status === "通過").length;
   G("metrics").innerHTML = `
-    <div class="metric"><div class="mlabel">総応募数</div><div class="mval">${t}</div><div class="msub">今月</div></div>
+    <div class="metric"><div class="mlabel">総応募数</div><div class="mval">${t}</div><div class="msub">累計</div></div>
     <div class="metric"><div class="mlabel">選考中</div><div class="mval">${a}</div><div class="msub">アクティブ</div></div>
     <div class="metric"><div class="mlabel">面接中</div><div class="mval">${i}</div><div class="msub">今週</div></div>
     <div class="metric"><div class="mlabel">通過者</div><div class="mval">${p}</div><div class="msub">累計</div></div>`;
 }
 
-// ===== フィルター適用 =====
+// ===== 新規応募者登録 =====
+G("new-btn").addEventListener("click", () => {
+  resetNewForm();
+  openMod("mod-new");
+});
+G("new-cancel").addEventListener("click", () => closeMod("mod-new"));
+
+function resetNewForm() {
+  ["nf-name","nf-email","nf-phone","nf-address","nf-edu","nf-job-now","nf-memo"].forEach(id => { G(id).value = ""; G(id).classList.remove("err"); });
+  ["nf-gender","nf-job"].forEach(id => { G(id).value = ""; G(id).classList.remove("err"); });
+  ["nf-dob","nf-exp","nf-cur-sal","nf-des-sal"].forEach(id => { G(id).value = ""; });
+  G("nf-applied").value = new Date().toISOString().slice(0,10);
+  document.querySelectorAll(".ferr").forEach(el => el.classList.remove("show"));
+}
+
+G("new-submit").addEventListener("click", async () => {
+  // バリデーション
+  let valid = true;
+  const name   = G("nf-name").value.trim();
+  const gender = G("nf-gender").value;
+  const jobId  = G("nf-job").value;
+
+  if (!name)   { G("nf-name").classList.add("err");   G("nf-name-err").classList.add("show");   valid = false; } else { G("nf-name").classList.remove("err");   G("nf-name-err").classList.remove("show"); }
+  if (!gender) { G("nf-gender").classList.add("err"); G("nf-gender-err").classList.add("show"); valid = false; } else { G("nf-gender").classList.remove("err"); G("nf-gender-err").classList.remove("show"); }
+  if (!jobId)  { G("nf-job").classList.add("err");    G("nf-job-err").classList.add("show");    valid = false; } else { G("nf-job").classList.remove("err");    G("nf-job-err").classList.remove("show"); }
+  if (!valid) return;
+
+  // 登録データ組み立て
+  const dob     = G("nf-dob").value;
+  const applied = G("nf-applied").value || new Date().toISOString().slice(0,10);
+  const expVal  = G("nf-exp").value;
+  const curSal  = G("nf-cur-sal").value;
+  const desSal  = G("nf-des-sal").value;
+
+  // 年齢計算
+  let age = null;
+  if (dob) {
+    const today = new Date(), born = new Date(dob);
+    age = today.getFullYear() - born.getFullYear();
+    if (today.getMonth() < born.getMonth() || (today.getMonth() === born.getMonth() && today.getDate() < born.getDate())) age--;
+  }
+
+  const payload = {
+    name,
+    gender,
+    birth_date:       dob       || null,
+    age:              age,
+    email:            G("nf-email").value.trim()   || null,
+    phone:            G("nf-phone").value.trim()   || null,
+    address:          G("nf-address").value.trim() || null,
+    education:        G("nf-edu").value.trim()     || null,
+    current_job:      G("nf-job-now").value.trim() || null,
+    experience_years: expVal  ? parseInt(expVal)  : null,
+    current_salary:   curSal  ? parseInt(curSal)  : null,
+    desired_salary:   desSal  ? parseInt(desSal)  : null,
+    job_id:           jobId,
+    step:             "書類選考",
+    status:           "未対応",
+    stars:            0,
+    memo:             G("nf-memo").value.trim() || "",
+    applied_at:       applied
+  };
+
+  const btn = G("new-submit");
+  btn.disabled = true;
+  btn.textContent = "登録中...";
+
+  try {
+    const result = await atsApi.createApplicant(payload);
+    if (Array.isArray(result) && result[0]) {
+      // 選考履歴に「応募受付」を記録
+      await atsApi.addStepHistory(result[0].id, "書類選考", "未対応", "応募受付");
+      showToast(`${name} さんを登録しました（${result[0].id}）`);
+      closeMod("mod-new");
+      // 一覧を再取得して更新
+      const fresh = await atsApi.getApplicants();
+      ALL_DATA = Array.isArray(fresh) ? fresh : [];
+      dispData = [...ALL_DATA];
+      renderMetrics();
+      renderTable();
+    } else {
+      showToast("登録に失敗しました。入力内容を確認してください。");
+      console.error(result);
+    }
+  } catch(e) {
+    showToast("通信エラーが発生しました");
+    console.error(e);
+  } finally {
+    btn.disabled = false;
+    btn.textContent = "登録する";
+  }
+});
+
+// ===== フィルター =====
 function applyFilter() {
   const kw  = G("f-kw").value.toLowerCase().trim();
-  const fs  = G("f-step").value;
-  const fst = G("f-status").value;
-  const fj  = G("f-job").value;
-  const fg  = G("f-gender").value;
-  const fd1 = G("f-d1").value;
-  const fd2 = G("f-d2").value;
+  const fs  = G("f-step").value, fst = G("f-status").value;
+  const fj  = G("f-job").value,  fg  = G("f-gender").value;
+  const fd1 = G("f-d1").value,   fd2 = G("f-d2").value;
 
   dispData = ALL_DATA.filter(d => {
-    const jobTitle = d.job_title || d.job || "";
+    const jobTitle = d.job_title || "";
     if (kw && !d.name.toLowerCase().includes(kw) && !jobTitle.toLowerCase().includes(kw) && !d.id.toLowerCase().includes(kw)) return false;
     if (fs  && d.step   !== fs)  return false;
     if (fst && d.status !== fst) return false;
-    if (fj  && jobTitle !== fj)  return false;
+    if (fj  && d.job_id !== fj)  return false;
     if (fg  && d.gender !== fg)  return false;
     if (fd1 && d.applied_at < fd1) return false;
     if (fd2 && d.applied_at > fd2) return false;
     return true;
   });
-
   if (sortKey) applySortToDisp();
   renderTable();
   showToast(dispData.length + "件ヒット");
@@ -367,99 +577,80 @@ function sortBy(key) {
   sortKey === key ? sortDir *= -1 : (sortKey = key, sortDir = 1);
   updateSortIcons(); applySortToDisp(); renderTable();
 }
-
 function applySortToDisp() {
   dispData.sort((a, b) => {
     let va = a[sortKey], vb = b[sortKey];
-    if (sortKey === "step") { va = STEP_ORD[va]||99; vb = STEP_ORD[vb]||99; }
-    else if (sortKey === "status") {
-      const o = {"未対応":1,"通過":2,"保留":3,"不合格":4,"辞退":5};
-      va = o[va]||99; vb = o[vb]||99;
-    }
-    if (typeof va === "string" && typeof vb === "string") return va.localeCompare(vb, "ja") * sortDir;
-    return ((va||0) - (vb||0)) * sortDir;
+    if (sortKey === "step")   { va = STEP_ORD[va]||99; vb = STEP_ORD[vb]||99; }
+    if (sortKey === "status") { const o={"未対応":1,"通過":2,"保留":3,"不合格":4,"辞退":5}; va=o[va]||99; vb=o[vb]||99; }
+    if (typeof va === "string" && typeof vb === "string") return va.localeCompare(vb,"ja")*sortDir;
+    return ((va||0)-(vb||0))*sortDir;
   });
 }
-
 function updateSortIcons() {
   ["name","gender","age","job","step","status","stars"].forEach(k => {
-    const el = G("si-" + k); if (!el) return;
-    el.className = "si" + (k === sortKey ? (sortDir === 1 ? " asc" : " desc") : "");
-    el.closest("th").className = k === sortKey ? "sth son" : "sth";
+    const el = G("si-"+k); if (!el) return;
+    el.className = "si"+(k===sortKey?(sortDir===1?" asc":" desc"):"");
+    el.closest("th").className = k===sortKey?"sth son":"sth";
   });
 }
 
-// ===== テーブル描画 =====
+// ===== テーブル =====
 function updateBulkBar() {
-  const n = selected.size;
-  G("bulk-cnt").textContent = n + "件選択中";
-  G("bulk-bar").className = "bulk-bar" + (n > 0 ? " active" : "");
+  G("bulk-cnt").textContent = selected.size + "件選択中";
+  G("bulk-bar").className = "bulk-bar" + (selected.size > 0 ? " active" : "");
 }
-
 function renderTable() {
-  G("rinfo").textContent = dispData.length === ALL_DATA.length
-    ? `全${ALL_DATA.length}件`
-    : `${dispData.length} / ${ALL_DATA.length}件`;
-
+  G("rinfo").textContent = dispData.length===ALL_DATA.length ? `全${ALL_DATA.length}件` : `${dispData.length} / ${ALL_DATA.length}件`;
   const tbody = G("tbody");
-  if (!dispData.length) {
-    tbody.innerHTML = `<tr><td colspan="9" class="empty">該当する応募者が見つかりません</td></tr>`;
-    return;
-  }
+  if (!dispData.length) { tbody.innerHTML=`<tr><td colspan="9" class="empty">該当する応募者が見つかりません</td></tr>`; return; }
 
   tbody.innerHTML = dispData.map(d => {
-    // DBのフィールド名に合わせて取得
-    const jobTitle  = d.job_title || d.job || "―";
-    const appliedAt = d.applied_at ? d.applied_at.slice(0, 10) : "―";
-    const stars = [1,2,3,4,5].map(i =>
-      `<span class="star${i <= (d.stars||0) ? "" : " off"}">★</span>`
-    ).join("");
-    // タグはapplicant_tagsテーブルから取得する（現時点では空）
-    const tags = `<span style="color:var(--text3)">―</span>`;
-
-    return `<tr class="${selected.has(d.id) ? "sel" : ""}" data-id="${d.id}">
-      <td><input type="checkbox" class="rchk" data-id="${d.id}" ${selected.has(d.id) ? "checked" : ""}></td>
+    // 求人名はJOBS_LISTから引く
+    const jobObj   = JOBS_LIST.find(j => j.id === d.job_id);
+    const jobTitle = jobObj ? jobObj.title : (d.job_title || "―");
+    const appliedAt = d.applied_at ? d.applied_at.slice(0,10) : "―";
+    const stars = [1,2,3,4,5].map(i=>`<span class="star${i<=(d.stars||0)?"":" off"}">★</span>`).join("");
+    return `<tr class="${selected.has(d.id)?"sel":""}" data-id="${d.id}">
+      <td><input type="checkbox" class="rchk" data-id="${d.id}" ${selected.has(d.id)?"checked":""}></td>
       <td class="ell" style="font-weight:500">${d.name}</td>
-      <td><span class="${d.gender === "男" ? "gm" : "gf"}">${d.gender || "―"}</span></td>
-      <td style="white-space:nowrap;color:var(--text2)">${d.age ? d.age + "歳" : "―"}</td>
+      <td><span class="${d.gender==="男"?"gm":"gf"}">${d.gender||"―"}</span></td>
+      <td style="white-space:nowrap;color:var(--text2)">${d.age?d.age+"歳":"―"}</td>
       <td class="ell" style="color:var(--text2)">${jobTitle}</td>
-      <td style="white-space:nowrap"><span class="stepb ${STEP_CLS[d.step] || ""}">${d.step || "―"}</span></td>
-      <td style="white-space:nowrap"><span class="badge ${ST_CLS[d.status] || ""}">${d.status || "―"}</span></td>
-      <td>${tags}</td>
+      <td style="white-space:nowrap"><span class="stepb ${STEP_CLS[d.step]||""}">${d.step||"―"}</span></td>
+      <td style="white-space:nowrap"><span class="badge ${ST_CLS[d.status]||""}">${d.status||"―"}</span></td>
+      <td><span style="color:var(--text3)">―</span></td>
       <td><div style="display:flex;flex-direction:column;gap:1px"><div>${stars}</div><div class="drow">${appliedAt}</div></div></td>
     </tr>`;
   }).join("");
 
   tbody.querySelectorAll("tr[data-id]").forEach(tr => {
     tr.addEventListener("click", e => {
-      if (e.target.type === "checkbox") return;
+      if (e.target.type==="checkbox") return;
       window.open(`detail.html?id=${tr.dataset.id}`, "_blank");
     });
   });
-
   tbody.querySelectorAll(".rchk").forEach(cb => {
     cb.addEventListener("click", e => e.stopPropagation());
     cb.addEventListener("change", () => {
       cb.checked ? selected.add(cb.dataset.id) : selected.delete(cb.dataset.id);
       cb.closest("tr").className = cb.checked ? "sel" : "";
-      G("chk-all").checked = dispData.length > 0 && dispData.every(d => selected.has(d.id));
+      G("chk-all").checked = dispData.length>0 && dispData.every(d=>selected.has(d.id));
       updateBulkBar();
     });
   });
-  G("chk-all").checked = dispData.length > 0 && dispData.every(d => selected.has(d.id));
+  G("chk-all").checked = dispData.length>0 && dispData.every(d=>selected.has(d.id));
 }
 
-// ===== イベント設定 =====
+// ===== イベント =====
 G("adv-btn").addEventListener("click", () => {
   advOpen = !advOpen;
-  G("adv-panel").className = "adv-panel" + (advOpen ? " open" : "");
-  G("adv-btn").textContent = "詳細検索 " + (advOpen ? "▴" : "▾");
+  G("adv-panel").className = "adv-panel"+(advOpen?" open":"");
+  G("adv-btn").textContent = "詳細検索 "+(advOpen?"▴":"▾");
 });
 G("search-btn").addEventListener("click", applyFilter);
 G("advsearch-btn").addEventListener("click", applyFilter);
-G("f-kw").addEventListener("keydown", e => { if (e.key === "Enter") applyFilter(); });
+G("f-kw").addEventListener("keydown", e => { if(e.key==="Enter") applyFilter(); });
 G("reset-btn").addEventListener("click", resetFilter);
-G("new-btn").addEventListener("click", () => showToast("新規応募者追加機能（実装予定）"));
 G("chk-all").addEventListener("change", function() {
   dispData.forEach(d => { this.checked ? selected.add(d.id) : selected.delete(d.id); });
   renderTable();
@@ -475,24 +666,20 @@ G("csv-cancel").addEventListener("click",   () => closeMod("mod-csv"));
 G("mail-search").addEventListener("input", renderMailModal);
 G("csv-search").addEventListener("input",  renderCsvModal);
 document.querySelectorAll(".overlay").forEach(ov =>
-  ov.addEventListener("click", e => { if (e.target === ov) ov.classList.remove("open"); })
+  ov.addEventListener("click", e => { if(e.target===ov) ov.classList.remove("open"); })
 );
 
 // ===== 一括変更 =====
 G("bulk-mok").addEventListener("click", async () => {
-  if (bulkTab === "tag-add" || bulkTab === "tag-remove") {
+  if (bulkTab==="tag-add"||bulkTab==="tag-remove") {
     if (!selTagsOp.size) { showToast("タグを選択してください"); return; }
-    showToast(`${selected.size}件のタグを${bulkTab === "tag-add" ? "付与" : "削除"}しました（DB連携は次フェーズ）`);
+    showToast(`${selected.size}件のタグを${bulkTab==="tag-add"?"付与":"削除"}しました（DB連携は次フェーズ）`);
   } else {
     if (!selBulkVal) { showToast("変更先を選択してください"); return; }
-    const field = {step:"step", status:"status"}[bulkTab];
-    const label = {step:"ステップ", status:"ステータス", job:"求人"}[bulkTab];
-    // Supabaseに一括更新
-    await atsApi.bulkUpdate([...selected], { [field]: selBulkVal });
-    selected.forEach(id => {
-      const d = ALL_DATA.find(x => x.id === id);
-      if (d) d[field] = selBulkVal;
-    });
+    const field = {step:"step",status:"status"}[bulkTab];
+    const label = {step:"ステップ",status:"ステータス"}[bulkTab];
+    await atsApi.bulkUpdate([...selected], {[field]: selBulkVal});
+    selected.forEach(id => { const d=ALL_DATA.find(x=>x.id===id); if(d) d[field]=selBulkVal; });
     showToast(`${selected.size}件の${label}を「${selBulkVal}」に変更しました`);
   }
   renderMetrics(); renderTable(); closeMod("mod-bulk");
@@ -501,86 +688,76 @@ G("bulk-mok").addEventListener("click", async () => {
 // ===== メール =====
 G("mail-ok").addEventListener("click", () => {
   if (!selMailTpl) { showToast("テンプレートを選択してください"); return; }
-  const tpl = MAIL_TPLS.find(t => t.id === selMailTpl);
-  showToast(`「${tpl ? tpl.name : ""}」を送付しました`);
+  const tpl = MAIL_TPLS.find(t=>t.id===selMailTpl);
+  showToast(`「${tpl?tpl.name:""}」を送付しました`);
   closeMod("mod-mail");
 });
 
 // ===== CSV =====
 G("csv-ok").addEventListener("click", () => {
   if (!selCsvFmt) { showToast("フォーマットを選択してください"); return; }
-  const rows = ALL_DATA.filter(d => selected.has(d.id));
-  const fmt  = CSV_FORMATS.find(f => f.id === selCsvFmt);
+  const rows = ALL_DATA.filter(d=>selected.has(d.id));
+  const fmt  = CSV_FORMATS.find(f=>f.id===selCsvFmt);
+  const getJob = d => { const j=JOBS_LIST.find(j=>j.id===d.job_id); return j?j.title:""; };
   const maps = {
-    basic:  d => `${d.id},${d.name},${d.gender||""},${d.age||""},${d.job||""},${d.step||""},${d.status||""},${(d.applied_at||"").slice(0,10)}`,
-    full:   d => `${d.id},${d.name},${d.gender||""},${d.age||""},${d.job||""},${d.step||""},${d.status||""},${(d.applied_at||"").slice(0,10)},${d.stars||0}`,
+    basic:  d => `${d.id},${d.name},${d.gender||""},${d.age||""},${getJob(d)},${d.step||""},${d.status||""},${(d.applied_at||"").slice(0,10)}`,
+    full:   d => `${d.id},${d.name},${d.gender||""},${d.age||""},${getJob(d)},${d.step||""},${d.status||""},${(d.applied_at||"").slice(0,10)},${d.stars||0}`,
     hr:     d => `${d.id},${d.name},${d.gender||""},${d.age||""},${d.step||""},${d.status||""}`,
-    report: d => `${d.job||""},${d.id},${d.name},${d.step||""},${d.status||""},${(d.applied_at||"").slice(0,10)},${d.stars||0}`
+    report: d => `${getJob(d)},${d.id},${d.name},${d.step||""},${d.status||""},${(d.applied_at||"").slice(0,10)},${d.stars||0}`
   };
-  const csv = [fmt.cols, ...rows.map(maps[selCsvFmt])].join("\n");
+  const csv = [fmt.cols,...rows.map(maps[selCsvFmt])].join("\n");
   const a = document.createElement("a");
-  a.href = "data:text/csv;charset=utf-8,\uFEFF" + encodeURIComponent(csv);
-  a.download = `applicants_${selCsvFmt}.csv`;
-  a.click();
-  showToast(`${rows.length}件をダウンロードしました`);
-  closeMod("mod-csv");
+  a.href = "data:text/csv;charset=utf-8,\uFEFF"+encodeURIComponent(csv);
+  a.download = `applicants_${selCsvFmt}.csv`; a.click();
+  showToast(`${rows.length}件をダウンロードしました`); closeMod("mod-csv");
 });
 
 // ===== モーダル描画 =====
 function openBulkModal()  { selBulkVal=null; selTagsOp.clear(); bulkTab="step"; renderBulkModal(); openMod("mod-bulk"); }
 function renderBulkModal() {
-  G("bulk-mtabs").innerHTML = ["step","status","tag-add","tag-remove"].map((t, i) =>
+  G("bulk-mtabs").innerHTML = ["step","status","tag-add","tag-remove"].map((t,i) =>
     `<button class="mtab${bulkTab===t?" active":""}" data-bt="${t}">${["ステップ","ステータス","タグ付与","タグ削除"][i]}</button>`
   ).join("");
   G("bulk-mtabs").querySelectorAll(".mtab").forEach(b =>
     b.addEventListener("click", () => { bulkTab=b.dataset.bt; selBulkVal=null; selTagsOp.clear(); renderBulkModal(); })
   );
-  if (bulkTab === "tag-add" || bulkTab === "tag-remove") {
-    const isAdd = bulkTab === "tag-add";
+  if (bulkTab==="tag-add"||bulkTab==="tag-remove") {
+    const isAdd = bulkTab==="tag-add";
     G("bulk-mbody").innerHTML = `<div style="font-size:11px;color:var(--text3);margin-bottom:8px">${isAdd?"付与するタグを選択":"削除するタグを選択"}</div>
       <div class="taggrid">${ALL_TAGS.map(t=>`<div class="tagopt${selTagsOp.has(t)?(isAdd?" tadd":" tremove"):""}" data-tag="${t}">${t}</div>`).join("")}</div>`;
     G("bulk-mbody").querySelectorAll(".tagopt").forEach(el =>
       el.addEventListener("click", () => { selTagsOp.has(el.dataset.tag)?selTagsOp.delete(el.dataset.tag):selTagsOp.add(el.dataset.tag); renderBulkModal(); })
     );
   } else {
-    const items = bulkTab === "step" ? STEPS : STATUSES;
+    const items = bulkTab==="step" ? STEPS : STATUSES;
     G("bulk-mbody").innerHTML = `<input class="msearch" id="bsearch" placeholder="検索..."/><div class="olist" id="blist"></div>`;
     const fill = () => {
       const q = G("bsearch").value.toLowerCase();
-      G("blist").innerHTML = items.filter(v => v.toLowerCase().includes(q)).map(v => {
-        const cls = bulkTab==="step" ? (STEP_CLS[v]||"") : (ST_CLS[v]||"");
-        const bt  = bulkTab==="step" ? "stepb" : "badge";
+      G("blist").innerHTML = items.filter(v=>v.toLowerCase().includes(q)).map(v => {
+        const cls = bulkTab==="step"?(STEP_CLS[v]||""):(ST_CLS[v]||"");
+        const bt  = bulkTab==="step"?"stepb":"badge";
         return `<div class="oitem${selBulkVal===v?" sel":""}" data-bv="${v}"><input type="radio" ${selBulkVal===v?"checked":""} readonly/><span class="${bt} ${cls}">${v}</span></div>`;
       }).join("");
-      G("blist").querySelectorAll(".oitem").forEach(el =>
-        el.addEventListener("click", () => { selBulkVal=el.dataset.bv; fill(); })
-      );
+      G("blist").querySelectorAll(".oitem").forEach(el => el.addEventListener("click", () => { selBulkVal=el.dataset.bv; fill(); }));
     };
-    fill();
-    G("bsearch").addEventListener("input", fill);
+    fill(); G("bsearch").addEventListener("input", fill);
   }
 }
-
-function openMailModal()  { selMailTpl=null; G("mail-search").value=""; renderMailModal(); openMod("mod-mail"); }
+function openMailModal()   { selMailTpl=null; G("mail-search").value=""; renderMailModal(); openMod("mod-mail"); }
 function renderMailModal() {
   const q = G("mail-search").value.toLowerCase();
-  G("mail-list").innerHTML = MAIL_TPLS.filter(t => t.name.includes(q) || (t.body||"").includes(q)).map(t =>
+  G("mail-list").innerHTML = MAIL_TPLS.filter(t=>t.name.includes(q)||(t.subject||"").includes(q)).map(t =>
     `<div class="titem${selMailTpl===t.id?" sel":""}" data-tid="${t.id}"><div class="tn">${t.name}</div><div class="td2">${t.subject||""}</div></div>`
   ).join("") || `<div style="font-size:13px;color:var(--text3);padding:8px">テンプレートがありません</div>`;
-  G("mail-list").querySelectorAll(".titem").forEach(el =>
-    el.addEventListener("click", () => { selMailTpl=el.dataset.tid; renderMailModal(); })
-  );
+  G("mail-list").querySelectorAll(".titem").forEach(el => el.addEventListener("click", () => { selMailTpl=el.dataset.tid; renderMailModal(); }));
 }
-
-function openCsvModal()  { selCsvFmt=null; G("csv-search").value=""; renderCsvModal(); openMod("mod-csv"); }
+function openCsvModal()    { selCsvFmt=null; G("csv-search").value=""; renderCsvModal(); openMod("mod-csv"); }
 function renderCsvModal() {
   const q = G("csv-search").value.toLowerCase();
-  G("csv-list").innerHTML = CSV_FORMATS.filter(f => f.name.toLowerCase().includes(q)).map(f =>
+  G("csv-list").innerHTML = CSV_FORMATS.filter(f=>f.name.toLowerCase().includes(q)).map(f =>
     `<div class="fitem${selCsvFmt===f.id?" sel":""}" data-fid="${f.id}"><div class="fn">${f.name}</div><div class="fd">${f.cols}</div></div>`
   ).join("");
-  G("csv-list").querySelectorAll(".fitem").forEach(el =>
-    el.addEventListener("click", () => { selCsvFmt=el.dataset.fid; renderCsvModal(); })
-  );
+  G("csv-list").querySelectorAll(".fitem").forEach(el => el.addEventListener("click", () => { selCsvFmt=el.dataset.fid; renderCsvModal(); }));
 }
 
 // ===== 起動 =====

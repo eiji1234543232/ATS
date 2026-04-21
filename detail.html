@@ -375,13 +375,12 @@ let editingInfo = false;
 let openAccs  = new Set();
 let selStep2  = null, selStatus2 = null;
 let selMailTpl = null;
-// 評価はメモリ上で管理（将来DB保存に移行）
-let evalData  = {};
+let evalData  = {};  // {step: {adminComment, ivs:[{id,name,ini,role,overall,criteria,comment}]}}
 
 // ===== 初期化 =====
 async function init() {
   try {
-    const [applicant, templates, history, timeline, files, mailHistory, appTags, allTags] = await Promise.all([
+    const [applicant, templates, history, timeline, files, mailHistory, appTags, allTags, evaluations] = await Promise.all([
       atsApi.getApplicant(curId),
       atsApi.getMailTemplates(),
       atsApi.getStepHistory(curId),
@@ -389,7 +388,8 @@ async function init() {
       atsApi.getFiles(curId),
       atsApi.getMailHistory(curId),
       atsApi.getApplicantTags(curId),
-      atsApi.getTags()
+      atsApi.getTags(),
+      atsApi.getEvaluations(curId)
     ]);
 
     if (!applicant) {
@@ -401,6 +401,29 @@ async function init() {
     APPLICANT_TAGS = Array.isArray(appTags) ? appTags : [];
     ALL_TAGS_DB    = Array.isArray(allTags) ? allTags : [];
     MAIL_TPLS = Array.isArray(templates) ? templates : [];
+
+    // DBの評価データをevalData形式に変換
+    evalData = {};
+    STEPS.forEach(s => { evalData[s] = {adminComment: "", ivs: []}; });
+    if (Array.isArray(evaluations)) {
+      evaluations.forEach(ev => {
+        if (!evalData[ev.step]) evalData[ev.step] = {adminComment: "", ivs: []};
+        if (ev.is_admin_comment) {
+          evalData[ev.step].adminComment = ev.comment || "";
+        } else {
+          evalData[ev.step].ivs.push({
+            id:       ev.id,
+            name:     ev.profiles?.name || ev.evaluator_id || "不明",
+            ini:      (ev.profiles?.name || "?").slice(0,1),
+            role:     ev.profiles?.role || "",
+            overall:  ev.overall || 0,
+            crit:     ev.criteria || {技術力:0, コミュ力:0, カルチャー:0},
+            comment:  ev.comment || "",
+            date:     ev.created_at ? ev.created_at.slice(0,10) : ""
+          });
+        }
+      });
+    }
     selStep2   = d.step;
     selStatus2 = d.status;
 
@@ -737,31 +760,81 @@ function renderIVCard(s, si, iv, ii) {
 function wireAccEvents(s, si) {
   const assignBtn = G("assign-" + si);
   if (assignBtn) assignBtn.addEventListener("click", () => assignIV(s, si));
+
+  // 管理者コメント保存（DB）
   const adBtn = G("adcmtsave-" + si);
-  if (adBtn) adBtn.addEventListener("click", () => {
+  if (adBtn) adBtn.addEventListener("click", async () => {
     const el = G("adcmt-" + si);
-    if (el) evalData[s].adminComment = el.value;
+    const comment = el ? el.value : "";
+    evalData[s].adminComment = comment;
+    // 既存の管理者コメントレコードを探す
+    const existing = await atsApi.getEvaluations(curId);
+    const adminRec = Array.isArray(existing)
+      ? existing.find(e => e.step === s && e.is_admin_comment)
+      : null;
+    if (adminRec) {
+      await atsApi.updateEvaluation(adminRec.id, {comment});
+    } else {
+      await atsApi.saveEvaluation({
+        applicant_id: curId, step: s,
+        overall: 0, criteria: {}, comment,
+        is_admin_comment: true
+      });
+    }
     showToast("管理者コメントを保存しました");
   });
+
+  // 各面接官カードのイベント
   (evalData[s]?.ivs || []).forEach((iv, ii) => {
+    // 総合評価スター
     for (let v = 1; v <= 5; v++) {
       const el = G(`osi-${s}-${ii}-${v}`);
-      if (el) el.addEventListener("click", () => { evalData[s].ivs[ii].overall = v; refreshAcc(s, si); });
+      if (el) el.addEventListener("click", () => {
+        evalData[s].ivs[ii].overall = v;
+        refreshAcc(s, si);
+      });
     }
+    // 評価軸スター
     Object.keys(iv.crit || {}).forEach(k => {
       for (let v = 1; v <= 5; v++) {
         const el = G(`csi-${s}-${ii}-${k}-${v}`);
-        if (el) el.addEventListener("click", () => { evalData[s].ivs[ii].crit[k] = v; refreshAcc(s, si); });
+        if (el) el.addEventListener("click", () => {
+          evalData[s].ivs[ii].crit[k] = v;
+          refreshAcc(s, si);
+        });
       }
     });
+    // コメント保存（DB）
     const csave = G(`cmtsave-${s}-${ii}`);
-    if (csave) csave.addEventListener("click", () => {
+    if (csave) csave.addEventListener("click", async () => {
       const el = G(`cmt-${s}-${ii}`);
-      if (el) evalData[s].ivs[ii].comment = el.value;
-      showToast("コメントを保存しました");
+      const comment  = el ? el.value : "";
+      const overall  = evalData[s].ivs[ii].overall;
+      const criteria = evalData[s].ivs[ii].crit;
+      evalData[s].ivs[ii].comment = comment;
+      if (iv.id) {
+        // 既存レコードを更新
+        await atsApi.updateEvaluation(iv.id, {overall, criteria, comment});
+      } else {
+        // 新規保存
+        const result = await atsApi.saveEvaluation({
+          applicant_id: curId, step: s,
+          overall, criteria, comment,
+          is_admin_comment: false
+        });
+        if (Array.isArray(result) && result[0]) {
+          evalData[s].ivs[ii].id = result[0].id;
+        }
+      }
+      showToast("評価を保存しました");
     });
+    // 削除（DB）
     const del = G(`ivdel-${s}-${si}-${ii}`);
-    if (del) del.addEventListener("click", () => {
+    if (del) del.addEventListener("click", async () => {
+      if (!confirm("この評価を削除しますか？")) return;
+      if (iv.id) {
+        await atsApi.deleteEvaluation(iv.id);
+      }
       evalData[s].ivs.splice(ii, 1);
       showToast("削除しました");
       refreshAcc(s, si);
@@ -769,17 +842,33 @@ function wireAccEvents(s, si) {
   });
 }
 
-function assignIV(s, si) {
+async function assignIV(s, si) {
   const sel = G("asel-" + si), full = sel.value;
   if (!full) { showToast("面接官を選択してください"); return; }
   const name = full.split("（")[0];
   const role = (full.match(/（(.+?)）/) || [])[1] || "";
   if (!evalData[s]) evalData[s] = {ivs:[], adminComment:""};
   if (evalData[s].ivs.find(iv => iv.name === name)) { showToast("すでにアサイン済みです"); return; }
+
+  // DBに評価レコードを新規作成（overall=0, criteria初期値）
+  const result = await atsApi.saveEvaluation({
+    applicant_id: curId,
+    step:         s,
+    overall:      0,
+    criteria:     {技術力:0, コミュ力:0, カルチャー:0},
+    comment:      "",
+    is_admin_comment: false
+  });
+
+  const newId = Array.isArray(result) && result[0] ? result[0].id : null;
+
   evalData[s].ivs.push({
-    name, ini: name.slice(0,1), role,
-    date: new Date().toISOString().slice(0,10),
-    overall: 0, crit: {技術力:0, コミュ力:0, カルチャー:0}, comment: ""
+    id:      newId,
+    name,    ini: name.slice(0,1), role,
+    date:    new Date().toISOString().slice(0,10),
+    overall: 0,
+    crit:    {技術力:0, コミュ力:0, カルチャー:0},
+    comment: ""
   });
   sel.value = "";
   showToast(name + " をアサインしました");

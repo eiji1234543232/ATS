@@ -187,6 +187,18 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 .dname{font-size:12px;font-weight:500;}
 .dmeta{font-size:11px;color:var(--text3);}
 .ddl{margin-left:auto;height:24px;padding:0 9px;font-size:11px;border:0.5px solid var(--bdr2);border-radius:var(--r-md);background:transparent;color:var(--text2);cursor:pointer;}
+.ddel{height:24px;padding:0 9px;font-size:11px;border:0.5px solid #F09595;border-radius:var(--r-md);background:transparent;color:#A32D2D;cursor:pointer;margin-left:4px;}
+.ddel:hover{background:var(--red-l);}
+.upload-area{border:1.5px dashed var(--bdr2);border-radius:var(--r-lg);padding:20px;text-align:center;cursor:pointer;transition:border-color 0.15s,background 0.15s;margin-bottom:12px;}
+.upload-area:hover,.upload-area.drag{border-color:var(--pur);background:var(--pur-l);}
+.upload-area input[type=file]{display:none;}
+.upload-icon{font-size:24px;margin-bottom:6px;color:var(--text3);}
+.upload-txt{font-size:13px;color:var(--text2);margin-bottom:4px;}
+.upload-sub{font-size:11px;color:var(--text3);}
+.upload-progress{display:none;margin-top:8px;}
+.upload-progress.show{display:block;}
+.progress-bar{height:4px;background:var(--bdr);border-radius:99px;overflow:hidden;margin-top:4px;}
+.progress-fill{height:100%;background:var(--pur);border-radius:99px;transition:width 0.3s;}
 /* ITL */
 .itl-compose{background:var(--bg2);border-radius:var(--r-md);padding:10px 12px;margin-bottom:12px;}
 .itl-ta{width:100%;min-height:52px;padding:7px 9px;font-size:13px;border:0.5px solid var(--bdr2);border-radius:var(--r-md);background:var(--bg);color:var(--text);outline:none;resize:none;line-height:1.5;margin-bottom:6px;}
@@ -787,21 +799,133 @@ function refreshAcc(s, si) {
 }
 
 // ===== 書類 =====
+let docFiles = []; // 現在の書類一覧をメモリにも保持
+
 function renderDocs(files) {
-  if (!files.length) { G("dpane-docs").innerHTML = `<div class="empty">書類がありません</div>`; return; }
-  G("dpane-docs").innerHTML = files.map(f => `
-    <div class="ditem">
-      <div class="dicon"><svg width="14" height="14" viewBox="0 0 16 16" fill="none"><rect x="2" y="1" width="9" height="13" rx="1" stroke="currentColor" stroke-width="1.2"/><path d="M5 5h5M5 8h5M5 11h3" stroke="currentColor" stroke-width="1" stroke-linecap="round"/></svg></div>
-      <div><div class="dname">${f.name}</div><div class="dmeta">${f.file_type||""} · ${f.size_bytes ? Math.round(f.size_bytes/1024)+"KB" : ""} · ${f.created_at?f.created_at.slice(0,10):""}</div></div>
-      <button class="ddl" data-path="${f.storage_path}" data-name="${f.name}">DL</button>
-    </div>`).join("");
-  G("dpane-docs").querySelectorAll(".ddl").forEach(btn => {
+  docFiles = files;
+  const pane = G("dpane-docs");
+
+  // アップロードエリア
+  const uploadHtml = `
+    <div class="upload-area" id="upload-area">
+      <input type="file" id="doc-file-input" multiple accept=".pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.zip,.png,.jpg,.jpeg"/>
+      <div class="upload-icon">📎</div>
+      <div class="upload-txt">クリックまたはドラッグ＆ドロップでアップロード</div>
+      <div class="upload-sub">PDF / Word / Excel / ZIP / 画像（1ファイル最大10MB）</div>
+      <div class="upload-progress" id="upload-progress">
+        <div style="font-size:12px;color:var(--text2)" id="upload-status">アップロード中...</div>
+        <div class="progress-bar"><div class="progress-fill" id="progress-fill" style="width:0%"></div></div>
+      </div>
+    </div>`;
+
+  // ファイル一覧
+  const listHtml = files.length
+    ? `<div>${files.map(f => `
+        <div class="ditem" id="ditem-${f.id}">
+          <div class="dicon">${getFileIcon(f.file_type)}</div>
+          <div style="flex:1;min-width:0">
+            <div class="dname">${f.name}</div>
+            <div class="dmeta">${f.file_type||""} · ${f.size_bytes ? formatSize(f.size_bytes) : ""} · ${f.created_at?f.created_at.slice(0,10):""}</div>
+          </div>
+          <button class="ddl" data-path="${f.storage_path}" data-name="${f.name}">DL</button>
+          <button class="ddel" data-id="${f.id}" data-path="${f.storage_path}">削除</button>
+        </div>`).join("")}</div>`
+    : `<div class="empty" style="padding:1rem 0">書類がありません</div>`;
+
+  pane.innerHTML = uploadHtml + listHtml;
+
+  // クリックでファイル選択
+  const area = G("upload-area");
+  const input = G("doc-file-input");
+  area.addEventListener("click", e => { if(e.target !== input) input.click(); });
+  input.addEventListener("change", () => { if(input.files.length) handleUpload(input.files); });
+
+  // ドラッグ＆ドロップ
+  area.addEventListener("dragover", e => { e.preventDefault(); area.classList.add("drag"); });
+  area.addEventListener("dragleave", () => area.classList.remove("drag"));
+  area.addEventListener("drop", e => {
+    e.preventDefault(); area.classList.remove("drag");
+    if (e.dataTransfer.files.length) handleUpload(e.dataTransfer.files);
+  });
+
+  // ダウンロード
+  pane.querySelectorAll(".ddl").forEach(btn => {
     btn.addEventListener("click", async () => {
+      btn.textContent = "...";
       const url = await atsApi.getFileUrl(btn.dataset.path);
       if (url) { const a = document.createElement("a"); a.href = url; a.download = btn.dataset.name; a.click(); }
       else showToast("ダウンロードURLの取得に失敗しました");
+      btn.textContent = "DL";
     });
   });
+
+  // 削除
+  pane.querySelectorAll(".ddel").forEach(btn => {
+    btn.addEventListener("click", async () => {
+      if (!confirm(`このファイルを削除しますか？`)) return;
+      btn.disabled = true;
+      await atsApi.deleteFile(btn.dataset.id, btn.dataset.path);
+      docFiles = docFiles.filter(f => f.id !== btn.dataset.id);
+      renderDocs(docFiles);
+      showToast("ファイルを削除しました");
+    });
+  });
+}
+
+async function handleUpload(fileList) {
+  const progress = G("upload-progress");
+  const fill     = G("progress-fill");
+  const status   = G("upload-status");
+  const input    = G("doc-file-input");
+
+  const MAX_SIZE = 10 * 1024 * 1024; // 10MB
+  const files    = Array.from(fileList);
+
+  // サイズチェック
+  const oversized = files.filter(f => f.size > MAX_SIZE);
+  if (oversized.length) {
+    showToast(`${oversized[0].name} は10MBを超えています`);
+    return;
+  }
+
+  progress.classList.add("show");
+
+  for (let i = 0; i < files.length; i++) {
+    const file = files[i];
+    status.textContent = `アップロード中 ${i+1}/${files.length}: ${file.name}`;
+    fill.style.width = `${Math.round((i / files.length) * 100)}%`;
+
+    const result = await atsApi.uploadFile(curId, file);
+    if (result && !result.error) {
+      docFiles.push(result);
+    } else {
+      showToast(`${file.name} のアップロードに失敗しました`);
+    }
+  }
+
+  fill.style.width = "100%";
+  status.textContent = "完了！";
+  setTimeout(() => {
+    progress.classList.remove("show");
+    fill.style.width = "0%";
+  }, 1500);
+
+  if (input) input.value = "";
+  renderDocs(docFiles);
+  showToast(`${files.length}件をアップロードしました`);
+}
+
+function getFileIcon(type) {
+  const t = (type||"").toUpperCase();
+  const color = t==="PDF" ? "#E24B4A" : t.includes("DOC") ? "#185FA5" : t.includes("XLS") ? "#1D9E75" : t.includes("ZIP") ? "#EF9F27" : "#888780";
+  const label = t || "FILE";
+  return `<svg width="28" height="28" viewBox="0 0 28 28" fill="none"><rect width="28" height="28" rx="6" fill="${color}20"/><text x="14" y="18" text-anchor="middle" font-size="7" font-weight="700" fill="${color}">${label.slice(0,4)}</text></svg>`;
+}
+
+function formatSize(bytes) {
+  if (bytes >= 1024*1024) return (bytes/1024/1024).toFixed(1) + "MB";
+  if (bytes >= 1024)      return Math.round(bytes/1024) + "KB";
+  return bytes + "B";
 }
 
 // ===== メール履歴 =====
@@ -951,4 +1075,4 @@ document.querySelectorAll(".overlay").forEach(ov =>
 init();
 </script>
 </body>
-</html>
+</html>  

@@ -220,10 +220,26 @@ input[type=checkbox]{width:14px;height:14px;cursor:pointer;accent-color:var(--pu
 
     <div class="fsect">基本情報</div>
 
-    <div class="fld span2">
-      <label>氏名 <span class="req">*</span></label>
-      <input type="text" id="nf-name" placeholder="田中 涼子"/>
-      <span class="ferr" id="nf-name-err">氏名は必須です</span>
+    <div class="fld">
+      <label>姓 <span class="req">*</span></label>
+      <input type="text" id="nf-sei" placeholder="田中"/>
+      <span class="ferr" id="nf-sei-err">姓は必須です</span>
+    </div>
+
+    <div class="fld">
+      <label>名 <span class="req">*</span></label>
+      <input type="text" id="nf-mei" placeholder="涼子"/>
+      <span class="ferr" id="nf-mei-err">名は必須です</span>
+    </div>
+
+    <div class="fld">
+      <label>セイ（カナ）</label>
+      <input type="text" id="nf-sei-kana" placeholder="タナカ"/>
+    </div>
+
+    <div class="fld">
+      <label>メイ（カナ）</label>
+      <input type="text" id="nf-mei-kana" placeholder="リョウコ"/>
     </div>
 
     <div class="fld">
@@ -456,7 +472,7 @@ G("new-btn").addEventListener("click", () => {
 G("new-cancel").addEventListener("click", () => closeMod("mod-new"));
 
 function resetNewForm() {
-  ["nf-name","nf-email","nf-phone","nf-address","nf-edu","nf-job-now","nf-memo"].forEach(id => { G(id).value = ""; G(id).classList.remove("err"); });
+  ["nf-sei","nf-mei","nf-sei-kana","nf-mei-kana","nf-email","nf-phone","nf-address","nf-edu","nf-job-now","nf-memo"].forEach(id => { G(id).value = ""; G(id).classList.remove("err"); });
   ["nf-gender","nf-job"].forEach(id => { G(id).value = ""; G(id).classList.remove("err"); });
   ["nf-dob","nf-exp","nf-cur-sal","nf-des-sal"].forEach(id => { G(id).value = ""; });
   G("nf-applied").value = new Date().toISOString().slice(0,10);
@@ -466,11 +482,17 @@ function resetNewForm() {
 G("new-submit").addEventListener("click", async () => {
   // バリデーション
   let valid = true;
-  const name   = G("nf-name").value.trim();
+  const sei    = G("nf-sei").value.trim();
+  const mei    = G("nf-mei").value.trim();
+  const seiK   = G("nf-sei-kana").value.trim();
+  const meiK   = G("nf-mei-kana").value.trim();
+  const name   = sei && mei ? sei + " " + mei : "";
+  const nameKana = seiK && meiK ? seiK + " " + meiK : (seiK || meiK || null);
   const gender = G("nf-gender").value;
   const jobId  = G("nf-job").value;
 
-  if (!name)   { G("nf-name").classList.add("err");   G("nf-name-err").classList.add("show");   valid = false; } else { G("nf-name").classList.remove("err");   G("nf-name-err").classList.remove("show"); }
+  if (!sei)    { G("nf-sei").classList.add("err");    G("nf-sei-err").classList.add("show");    valid = false; } else { G("nf-sei").classList.remove("err");    G("nf-sei-err").classList.remove("show"); }
+  if (!mei)    { G("nf-mei").classList.add("err");    G("nf-mei-err").classList.add("show");    valid = false; } else { G("nf-mei").classList.remove("err");    G("nf-mei-err").classList.remove("show"); }
   if (!gender) { G("nf-gender").classList.add("err"); G("nf-gender-err").classList.add("show"); valid = false; } else { G("nf-gender").classList.remove("err"); G("nf-gender-err").classList.remove("show"); }
   if (!jobId)  { G("nf-job").classList.add("err");    G("nf-job-err").classList.add("show");    valid = false; } else { G("nf-job").classList.remove("err");    G("nf-job-err").classList.remove("show"); }
   if (!valid) return;
@@ -492,6 +514,7 @@ G("new-submit").addEventListener("click", async () => {
 
   const payload = {
     name,
+    name_kana: nameKana,
     gender,
     birth_date:       dob       || null,
     age:              age,

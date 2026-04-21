@@ -397,18 +397,31 @@ let activeTags = new Set();
 let advOpen   = false;
 let bulkTab   = "step", selBulkVal = null, selTagsOp = new Set();
 let selCsvFmt = null, selMailTpl = null;
+let ALL_TAGS_DB = [];
+let TAGS_MAP    = {};  // applicant_id → [{id,name,color}]
 
 // ===== 初期化 =====
 async function init() {
   try {
-    const [applicants, templates, jobs] = await Promise.all([
+    const [applicants, templates, jobs, allTags, appTagsAll] = await Promise.all([
       atsApi.getApplicants(),
       atsApi.getMailTemplates(),
-      atsApi.getJobs()
+      atsApi.getJobs(),
+      atsApi.getTags(),
+      atsApi.getAllApplicantTags()
     ]);
     ALL_DATA  = Array.isArray(applicants) ? applicants : [];
     MAIL_TPLS = Array.isArray(templates)  ? templates  : [];
     JOBS_LIST = Array.isArray(jobs)       ? jobs       : [];
+    ALL_TAGS_DB = Array.isArray(allTags)  ? allTags    : [];
+    // 応募者IDをキーにタグをマッピング
+    TAGS_MAP = {};
+    if (Array.isArray(appTagsAll)) {
+      appTagsAll.forEach(t => {
+        if (!TAGS_MAP[t.applicant_id]) TAGS_MAP[t.applicant_id] = [];
+        TAGS_MAP[t.applicant_id].push(t.tags);
+      });
+    }
     dispData  = [...ALL_DATA];
 
     // 求人フィルター・新規登録フォームに求人セット
@@ -617,6 +630,22 @@ function updateSortIcons() {
   });
 }
 
+// ===== タグ表示ヘルパー =====
+const TAG_COLOR_MAP = {
+  "エンジニア": {bg:"var(--pur-l)",color:"var(--pur-d)"},
+  "HR":         {bg:"var(--grn-l)",color:"var(--grn)"},
+  "HOT":        {bg:"#FAECE7",     color:"#712B13"},
+  "KEEP":       {bg:"var(--amb-l)",color:"var(--amb)"},
+};
+function renderTagCell(applicantId) {
+  const tags = TAGS_MAP[applicantId] || [];
+  if (!tags.length) return `<span style="color:var(--text3)">―</span>`;
+  return tags.map(t => {
+    const c = TAG_COLOR_MAP[t?.name] || {bg:"var(--pur-l)",color:"var(--pur-d)"};
+    return `<span style="display:inline-block;font-size:11px;padding:2px 6px;border-radius:99px;margin:1px;background:${c.bg};color:${c.color}">${t?.name||""}</span>`;
+  }).join("");
+}
+
 // ===== テーブル =====
 function updateBulkBar() {
   G("bulk-cnt").textContent = selected.size + "件選択中";
@@ -641,7 +670,7 @@ function renderTable() {
       <td class="ell" style="color:var(--text2)">${jobTitle}</td>
       <td style="white-space:nowrap"><span class="stepb ${STEP_CLS[d.step]||""}">${d.step||"―"}</span></td>
       <td style="white-space:nowrap"><span class="badge ${ST_CLS[d.status]||""}">${d.status||"―"}</span></td>
-      <td><span style="color:var(--text3)">―</span></td>
+      <td>${renderTagCell(d.id)}</td>
       <td><div style="display:flex;flex-direction:column;gap:1px"><div>${stars}</div><div class="drow">${appliedAt}</div></div></td>
     </tr>`;
   }).join("");

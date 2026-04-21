@@ -853,7 +853,7 @@ function renderDocs(files) {
     btn.addEventListener("click", async () => {
       btn.textContent = "...";
       const url = await atsApi.getFileUrl(btn.dataset.path);
-      if (url) { const a = document.createElement("a"); a.href = url; a.download = btn.dataset.name; a.click(); }
+      if (url) { window.open(url, "_blank"); }
       else showToast("ダウンロードURLの取得に失敗しました");
       btn.textContent = "DL";
     });
@@ -1075,4 +1075,4 @@ document.querySelectorAll(".overlay").forEach(ov =>
 init();
 </script>
 </body>
-</html>  
+</html>

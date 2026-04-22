@@ -1164,11 +1164,44 @@ G("mail-cancel").addEventListener("click", () => closeMod("mod-mail"));
 G("mail-ok").addEventListener("click", async () => {
   if (!selMailTpl) { showToast("テンプレートを選択してください"); return; }
   const tpl = MAIL_TPLS.find(t => t.id === selMailTpl);
-  if (tpl && d) {
-    await atsApi.logMail(d.id, tpl.id, tpl.subject, d.email || "");
-    showToast(`「${tpl.name}」を送付しました`);
+  if (!tpl || !d) return;
+
+  if (!d.email) {
+    showToast("候補者のメールアドレスが登録されていません");
+    return;
   }
-  closeMod("mod-mail");
+
+  const btn = G("mail-ok");
+  btn.disabled = true;
+  btn.textContent = "送付中...";
+
+  try {
+    // Edge Function経由でResendでメール送信
+    const body = tpl.body || `${d.name} 様
+
+${tpl.subject}
+
+採用担当`;
+    const result = await atsApi.sendMail(d.email, tpl.subject, body);
+
+    if (result.error) {
+      showToast(`送付失敗: ${result.error}`);
+    } else {
+      // 送付ログをDBに記録
+      await atsApi.logMail(d.id, tpl.id, tpl.subject, d.email);
+      showToast(`「${tpl.name}」を ${d.email} に送付しました`);
+      closeMod("mod-mail");
+      // メール履歴を再取得して更新
+      const updated = await atsApi.getMailHistory(d.id);
+      renderMailsPane(Array.isArray(updated) ? updated : []);
+    }
+  } catch(e) {
+    showToast("通信エラーが発生しました");
+    console.error(e);
+  } finally {
+    btn.disabled = false;
+    btn.textContent = "送付する";
+  }
 });
 
 // オーバーレイ背景クリックで閉じる

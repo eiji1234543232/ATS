@@ -1199,10 +1199,12 @@ G("mail-ok").addEventListener("click", async () => {
     // プレースホルダーを実際の値に置換
     function replacePlaceholders(text) {
       if (!text) return "";
+      const name     = d.name || "";
+      const jobTitle = d.job_title || "";
       return text
-        .replace(/\{\{applicant_name\}\}/g, d.name || "")
-        .replace(/\{\{job_title\}\}/g,      d.job_title || "")
-        .replace(/\n/g, "
+        .split("{{applicant_name}}").join(name)
+        .split("{{job_title}}").join(jobTitle)
+        .split("\n").join("
 ");
     }
 

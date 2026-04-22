@@ -1197,25 +1197,14 @@ G("mail-ok").addEventListener("click", async () => {
 
   try {
     // プレースホルダーを実際の値に置換
-    function replacePlaceholders(text) {
-      if (!text) return "";
-      const name     = d.name || "";
-      const jobTitle = d.job_title || "";
-      return text
-        .split("{{applicant_name}}").join(name)
-        .split("{{job_title}}").join(jobTitle)
-        .split("\n").join("
-");
-    }
+    const ivName = d.name || "";
+    const ivJob  = d.job_title || "";
+    const replaceVars = (t) => (t||"").split("{{applicant_name}}").join(ivName).split("{{job_title}}").join(ivJob);
 
-    const rawBody    = tpl.body    || `${d.name} 様
-
-${tpl.subject}
-
-採用担当`;
+    const rawBody    = tpl.body    || (ivName + " 様\n\n" + (tpl.subject||"") + "\n\n採用担当");
     const rawSubject = tpl.subject || "";
-    const body    = replacePlaceholders(rawBody);
-    const subject = replacePlaceholders(rawSubject);
+    const body    = replaceVars(rawBody);
+    const subject = replaceVars(rawSubject);
 
     // Edge Function経由でResendでメール送信
     const result = await atsApi.sendMail(d.email, subject, body);

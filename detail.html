@@ -1196,19 +1196,33 @@ G("mail-ok").addEventListener("click", async () => {
   btn.textContent = "送付中...";
 
   try {
-    // Edge Function経由でResendでメール送信
-    const body = tpl.body || `${d.name} 様
+    // プレースホルダーを実際の値に置換
+    function replacePlaceholders(text) {
+      if (!text) return "";
+      return text
+        .replace(/\{\{applicant_name\}\}/g, d.name || "")
+        .replace(/\{\{job_title\}\}/g,      d.job_title || "")
+        .replace(/\n/g, "
+");
+    }
+
+    const rawBody    = tpl.body    || `${d.name} 様
 
 ${tpl.subject}
 
 採用担当`;
-    const result = await atsApi.sendMail(d.email, tpl.subject, body);
+    const rawSubject = tpl.subject || "";
+    const body    = replacePlaceholders(rawBody);
+    const subject = replacePlaceholders(rawSubject);
+
+    // Edge Function経由でResendでメール送信
+    const result = await atsApi.sendMail(d.email, subject, body);
 
     if (result.error) {
       showToast(`送付失敗: ${result.error}`);
     } else {
-      // 送付ログをDBに記録
-      await atsApi.logMail(d.id, tpl.id, tpl.subject, d.email, body);
+      // 送付ログをDBに記録（bodyも保存）
+      await atsApi.logMail(d.id, tpl.id, subject, d.email, body);
       showToast(`「${tpl.name}」を ${d.email} に送付しました`);
       closeMod("mod-mail");
       // メール履歴を再取得して更新

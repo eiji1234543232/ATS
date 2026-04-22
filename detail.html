@@ -375,7 +375,7 @@ let editingInfo = false;
 let openAccs  = new Set();
 let selStep2  = null, selStatus2 = null;
 let selMailTpl = null;
-let evalData  = {};  // {step: {adminComment, ivs:[{id,name,ini,role,overall,criteria,comment}]}}
+let evalData  = {};  // {step: {adminCommentId, adminComment, ivs:[{id,name,ini,role,overall,criteria,comment}]}}
 
 // ===== 初期化 =====
 async function init() {
@@ -404,12 +404,13 @@ async function init() {
 
     // DBの評価データをevalData形式に変換
     evalData = {};
-    STEPS.forEach(s => { evalData[s] = {adminComment: "", ivs: []}; });
+    STEPS.forEach(s => { evalData[s] = {adminCommentId: null, adminComment: "", ivs: []}; });
     if (Array.isArray(evaluations)) {
       evaluations.forEach(ev => {
         if (!evalData[ev.step]) evalData[ev.step] = {adminComment: "", ivs: []};
         if (ev.is_admin_comment) {
-          evalData[ev.step].adminComment = ev.comment || "";
+          evalData[ev.step].adminComment   = ev.comment || "";
+          evalData[ev.step].adminCommentId = ev.id; // 既存レコードのIDを保持
         } else {
           // criteria._name/_roleに面接官名・役職が保存されている
           const crit = ev.criteria || {};
@@ -774,19 +775,23 @@ function wireAccEvents(s, si) {
     const el = G("adcmt-" + si);
     const comment = el ? el.value : "";
     evalData[s].adminComment = comment;
-    // 既存の管理者コメントレコードを探す
-    const existing = await atsApi.getEvaluations(curId);
-    const adminRec = Array.isArray(existing)
-      ? existing.find(e => e.step === s && e.is_admin_comment)
-      : null;
-    if (adminRec) {
-      await atsApi.updateEvaluation(adminRec.id, {comment});
+    if (evalData[s].adminCommentId) {
+      // 既存レコードを更新
+      await atsApi.updateEvaluation(evalData[s].adminCommentId, {comment});
     } else {
-      await atsApi.saveEvaluation({
-        applicant_id: curId, step: s,
-        overall: 0, criteria: {}, comment,
-        is_admin_comment: true
+      // 新規保存してIDを記憶
+      const result = await atsApi.saveEvaluation({
+        applicant_id:     curId,
+        step:             s,
+        overall:          0,
+        criteria:         {},
+        comment,
+        is_admin_comment: true,
+        evaluator_id:     null
       });
+      if (Array.isArray(result) && result[0]) {
+        evalData[s].adminCommentId = result[0].id;
+      }
     }
     showToast("管理者コメントを保存しました");
   });

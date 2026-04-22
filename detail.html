@@ -1036,22 +1036,34 @@ function formatSize(bytes) {
 // ===== メール履歴 =====
 function renderMailsPane(mails) {
   if (!mails.length) { G("dpane-mail").innerHTML = `<div class="empty">メール履歴がありません</div>`; return; }
-  G("dpane-mail").innerHTML = mails.map((m, i) => `
-    <div class="mitem">
+  G("dpane-mail").innerHTML = mails.map((m, i) => {
+    const sentAt  = m.sent_at  ? m.sent_at.slice(0,16).replace("T"," ")  : "―";
+    const sentTo  = m.sent_to  || "―";
+    const subject = m.subject  || m.mail_templates?.name || "（件名なし）";
+    const sender  = m.profiles?.name || getCurrentUser()?.name || getCurrentUser()?.email || "管理者";
+    const tplName = m.mail_templates?.name || "―";
+    return `<div class="mitem">
       <div class="mhd" data-mi="${i}">
         <div class="mdir mo">
           <svg width="12" height="12" viewBox="0 0 16 16" fill="none">
             <path d="M3 13L13 3M13 3H7M13 3v6" stroke="#3C3489" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
           </svg>
         </div>
-        <div class="msubj">${m.subject}</div>
-        <div class="mdt">${m.sent_at ? m.sent_at.slice(0,16).replace("T"," ") : ""}</div>
+        <div class="msubj">${subject}</div>
+        <div class="mdt">${sentAt}</div>
         <div class="mchev" id="mchev-${i}">▼</div>
       </div>
       <div class="mbody" id="mbody-${i}">
-        <div class="mmeta">宛先: ${m.sent_to}<br>送信者: ${m.profiles?.name || ""}</div>
+        <div class="mmeta">
+          テンプレート: ${tplName}<br>
+          宛先: ${sentTo}<br>
+          送信者: ${sender}<br>
+          送信日時: ${sentAt}
+        </div>
+        ${m.body ? `<div class="mtext">${m.body}</div>` : ""}
       </div>
-    </div>`).join("");
+    </div>`;
+  }).join("");
   G("dpane-mail").querySelectorAll(".mhd[data-mi]").forEach(el => {
     el.addEventListener("click", () => {
       const b = G("mbody-" + el.dataset.mi), c = G("mchev-" + el.dataset.mi);
@@ -1188,7 +1200,7 @@ ${tpl.subject}
       showToast(`送付失敗: ${result.error}`);
     } else {
       // 送付ログをDBに記録
-      await atsApi.logMail(d.id, tpl.id, tpl.subject, d.email);
+      await atsApi.logMail(d.id, tpl.id, tpl.subject, d.email, body);
       showToast(`「${tpl.name}」を ${d.email} に送付しました`);
       closeMod("mod-mail");
       // メール履歴を再取得して更新

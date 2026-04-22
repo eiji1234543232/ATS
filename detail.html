@@ -411,13 +411,17 @@ async function init() {
         if (ev.is_admin_comment) {
           evalData[ev.step].adminComment = ev.comment || "";
         } else {
+          // criteria._name/_roleに面接官名・役職が保存されている
+          const crit = ev.criteria || {};
+          const ivName = crit._name || ev.profiles?.name || "不明";
+          const ivRole = crit._role || ev.profiles?.role || "";
           evalData[ev.step].ivs.push({
             id:       ev.id,
-            name:     ev.profiles?.name || ev.evaluator_id || "不明",
-            ini:      (ev.profiles?.name || "?").slice(0,1),
-            role:     ev.profiles?.role || "",
+            name:     ivName,
+            ini:      ivName.slice(0,1),
+            role:     ivRole,
             overall:  ev.overall || 0,
-            crit:     ev.criteria || {技術力:0, コミュ力:0, カルチャー:0},
+            crit:     crit,
             comment:  ev.comment || "",
             date:     ev.created_at ? ev.created_at.slice(0,10) : ""
           });
@@ -734,13 +738,16 @@ function renderIVCard(s, si, iv, ii) {
   const stars = Array.from({length:5}, (_, i) =>
     `<span class="osi${i < ov ? " on" : ""}" id="osi-${s}-${ii}-${i+1}">★</span>`
   ).join("");
-  const crits = Object.entries(iv.crit || {}).map(([k, v]) => {
-    const v2 = v || 0;
-    const cs = Array.from({length:5}, (_, i) =>
-      `<span class="csi${i < v2 ? " on" : ""}" id="csi-${s}-${ii}-${k}-${i+1}">★</span>`
-    ).join("");
-    return `<div class="citem"><div class="clabel">${k}</div><div class="cstars">${cs}</div></div>`;
-  }).join("");
+  // _name/_roleはメタ情報なのでスター表示から除外
+  const crits = Object.entries(iv.crit || {})
+    .filter(([k]) => !k.startsWith("_"))
+    .map(([k, v]) => {
+      const v2 = v || 0;
+      const cs = Array.from({length:5}, (_, i) =>
+        `<span class="csi${i < v2 ? " on" : ""}" id="csi-${s}-${ii}-${k}-${i+1}">★</span>`
+      ).join("");
+      return `<div class="citem"><div class="clabel">${k}</div><div class="cstars">${cs}</div></div>`;
+    }).join("");
   return `<div class="ecard">
     <div class="ehd">
       <div class="iav">${iv.ini||iv.name.slice(0,1)}</div>
@@ -810,7 +817,7 @@ function wireAccEvents(s, si) {
       const el = G(`cmt-${s}-${ii}`);
       const comment  = el ? el.value : "";
       const overall  = evalData[s].ivs[ii].overall;
-      const criteria = evalData[s].ivs[ii].crit;
+      const criteria = evalData[s].ivs[ii].crit; // _name/_roleも含めて保存
       evalData[s].ivs[ii].comment = comment;
       if (iv.id) {
         // 既存レコードを更新
@@ -850,14 +857,18 @@ async function assignIV(s, si) {
   if (!evalData[s]) evalData[s] = {ivs:[], adminComment:""};
   if (evalData[s].ivs.find(iv => iv.name === name)) { showToast("すでにアサイン済みです"); return; }
 
-  // DBに評価レコードを新規作成（overall=0, criteria初期値）
+  // DBに評価レコードを新規作成
+  // evaluator_idはnull（社外・外部面接官対応）
+  // 面接官名・役職はcriteriaのメタフィールドに保存
   const result = await atsApi.saveEvaluation({
-    applicant_id: curId,
-    step:         s,
-    overall:      0,
-    criteria:     {技術力:0, コミュ力:0, カルチャー:0},
-    comment:      "",
-    is_admin_comment: false
+    applicant_id:     curId,
+    step:             s,
+    overall:          0,
+    criteria:         {技術力:0, コミュ力:0, カルチャー:0},
+    comment:          "",
+    is_admin_comment: false,
+    evaluator_id:     null,   // 外部面接官のためnull
+    // 面接官名・役職はcommentフィールドではなくcriteriaのメタとして管理
   });
 
   const newId = Array.isArray(result) && result[0] ? result[0].id : null;
@@ -870,6 +881,15 @@ async function assignIV(s, si) {
     crit:    {技術力:0, コミュ力:0, カルチャー:0},
     comment: ""
   });
+
+  // criteriaに名前・役職を保存（DB側に永続化）
+  if (newId) {
+    await atsApi.updateEvaluation(newId, {
+      criteria: {技術力:0, コミュ力:0, カルチャー:0, _name: name, _role: role}
+    });
+    evalData[s].ivs[evalData[s].ivs.length - 1].crit._name = name;
+    evalData[s].ivs[evalData[s].ivs.length - 1].crit._role = role;
+  }
   sel.value = "";
   showToast(name + " をアサインしました");
   refreshAcc(s, si);

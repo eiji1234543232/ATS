@@ -857,39 +857,30 @@ async function assignIV(s, si) {
   if (!evalData[s]) evalData[s] = {ivs:[], adminComment:""};
   if (evalData[s].ivs.find(iv => iv.name === name)) { showToast("すでにアサイン済みです"); return; }
 
-  // DBに評価レコードを新規作成
-  // evaluator_idはnull（社外・外部面接官対応）
-  // 面接官名・役職はcriteriaのメタフィールドに保存
+  // 面接官名・役職をcriteriaに含めて一度のinsertで保存
+  const initCrit = {技術力:0, コミュ力:0, カルチャー:0, _name: name, _role: role};
   const result = await atsApi.saveEvaluation({
     applicant_id:     curId,
     step:             s,
     overall:          0,
-    criteria:         {技術力:0, コミュ力:0, カルチャー:0},
+    criteria:         initCrit,
     comment:          "",
     is_admin_comment: false,
-    evaluator_id:     null,   // 外部面接官のためnull
-    // 面接官名・役職はcommentフィールドではなくcriteriaのメタとして管理
+    evaluator_id:     null
   });
 
   const newId = Array.isArray(result) && result[0] ? result[0].id : null;
 
   evalData[s].ivs.push({
     id:      newId,
-    name,    ini: name.slice(0,1), role,
+    name,
+    ini:     name.slice(0,1),
+    role,
     date:    new Date().toISOString().slice(0,10),
     overall: 0,
-    crit:    {技術力:0, コミュ力:0, カルチャー:0},
+    crit:    initCrit,
     comment: ""
   });
-
-  // criteriaに名前・役職を保存（DB側に永続化）
-  if (newId) {
-    await atsApi.updateEvaluation(newId, {
-      criteria: {技術力:0, コミュ力:0, カルチャー:0, _name: name, _role: role}
-    });
-    evalData[s].ivs[evalData[s].ivs.length - 1].crit._name = name;
-    evalData[s].ivs[evalData[s].ivs.length - 1].crit._role = role;
-  }
   sel.value = "";
   showToast(name + " をアサインしました");
   refreshAcc(s, si);

@@ -388,7 +388,7 @@ let evalData  = {};  // {step: {adminCommentId, adminComment, ivs:[{id,name,ini,
 // ===== 初期化 =====
 async function init() {
   try {
-    const [applicant, templates, history, timeline, files, mailHistory, appTags, allTags, evaluations] = await Promise.all([
+    const [applicant, templates, history, timeline, files, mailHistory, appTags, allTags, evaluations, jobs] = await Promise.all([
       atsApi.getApplicant(curId),
       atsApi.getMailTemplates(),
       atsApi.getStepHistory(curId),
@@ -397,7 +397,8 @@ async function init() {
       atsApi.getMailHistory(curId),
       atsApi.getApplicantTags(curId),
       atsApi.getTags(),
-      atsApi.getEvaluations(curId)
+      atsApi.getEvaluations(curId),
+      atsApi.getJobs()
     ]);
 
     if (!applicant) {
@@ -406,6 +407,10 @@ async function init() {
     }
 
     d = applicant;
+    // job_idから求人名を解決
+    const jobList = Array.isArray(jobs) ? jobs : [];
+    const jobObj  = jobList.find(j => j.id === d.job_id);
+    d.job_title   = jobObj ? jobObj.title : "";
     APPLICANT_TAGS = Array.isArray(appTags) ? appTags : [];
     ALL_TAGS_DB    = Array.isArray(allTags) ? allTags : [];
     MAIL_TPLS = Array.isArray(templates) ? templates : [];

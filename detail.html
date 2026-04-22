@@ -365,6 +365,14 @@ const showToast = msg => { const t=G("toast"); t.textContent=msg; t.className="t
 const openMod  = id => G(id).classList.add("open");
 const closeMod = id => G(id).classList.remove("open");
 
+// UTC→JST変換（+9時間）
+function toJST(isoStr) {
+  if (!isoStr) return "―";
+  const d = new Date(isoStr);
+  const jst = new Date(d.getTime() + 9 * 60 * 60 * 1000);
+  return jst.toISOString().slice(0, 16).replace("T", " ");
+}
+
 // ===== 状態 =====
 let d = null;          // 応募者データ
 let APPLICANT_TAGS = [];  // 応募者に付与済みのタグ [{tag_id, tags:{id,name,color}}]
@@ -1037,7 +1045,7 @@ function formatSize(bytes) {
 function renderMailsPane(mails) {
   if (!mails.length) { G("dpane-mail").innerHTML = `<div class="empty">メール履歴がありません</div>`; return; }
   G("dpane-mail").innerHTML = mails.map((m, i) => {
-    const sentAt  = m.sent_at  ? m.sent_at.slice(0,16).replace("T"," ")  : "―";
+    const sentAt  = toJST(m.sent_at);
     const sentTo  = m.sent_to  || "―";
     const subject = m.subject  || m.mail_templates?.name || "（件名なし）";
     const sender  = m.profiles?.name || getCurrentUser()?.name || getCurrentUser()?.email || "管理者";
